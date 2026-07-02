@@ -1,23 +1,48 @@
 import { Link } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
-import { AppText, PrimaryLink, Screen } from "../src/components";
+import {
+  AppText,
+  PrimaryButton,
+  PrimaryLink,
+  Screen,
+  Section,
+} from "../src/components";
+import { useAuth } from "../src/features/auth/AuthProvider";
 
 export default function HomeScreen() {
+  const { session, isLoading, signOut } = useAuth();
+
   return (
     <Screen>
       <StatusBar style="dark" />
 
-      <AppText variant="label" muted>
-        Project Waypoint
-      </AppText>
+      <Section>
+        <AppText variant="label" muted>
+          Project Waypoint
+        </AppText>
 
-      <AppText variant="title">Every journey deserves its context.</AppText>
+        <AppText variant="title">Every journey deserves its context.</AppText>
 
-      <AppText muted>
-        Discover walks, remember places, and preserve the stories that happen
-        along the way.
-      </AppText>
+        <AppText muted>
+          Discover walks, remember places, and preserve the stories that happen
+          along the way.
+        </AppText>
+      </Section>
+
+      {!isLoading && session ? (
+        <Section>
+          <AppText variant="label" muted>
+            Signed in
+          </AppText>
+
+          <AppText muted>{session.user.email}</AppText>
+
+          <PrimaryButton onPress={signOut}>Sign out</PrimaryButton>
+        </Section>
+      ) : (
+        <PrimaryLink href="/auth">Keep your journeys safe</PrimaryLink>
+      )}
 
       <PrimaryLink href="/discover">Find a walk</PrimaryLink>
       <PrimaryLink href="/passport">View passport</PrimaryLink>
