@@ -1,0 +1,436 @@
+# BP012 – API Standard & Specification
+
+**Project:** Project Waypoint
+**Blueprint:** BP012
+**Version:** 0.1
+**Status:** Draft
+**Author:** Project Waypoint Team
+**Depends On:** WP000, BP001–BP011
+
+---
+
+# 1. Purpose
+
+This blueprint defines the API standards for Project Waypoint.
+
+Rather than documenting individual endpoints alone, it establishes a consistent contract that every client application communicates through.
+
+The API exists to expose the Waypoint domain model—not the underlying database.
+
+Clients should never depend upon PostgreSQL tables, Supabase implementation details or internal storage structures.
+
+---
+
+# 2. API Philosophy
+
+Waypoint APIs should be:
+
+* Predictable
+* Stable
+* Resource-oriented
+* Stateless
+* Secure
+* Evolvable
+
+Learning one endpoint should make every other endpoint feel familiar.
+
+---
+
+# 3. Versioning
+
+```
+/api/v1/
+```
+
+Major breaking changes require a new version.
+
+Minor additions do not.
+
+---
+
+# 4. Resource Naming
+
+Use plural nouns.
+
+Examples:
+
+```
+GET    /trails
+GET    /businesses
+GET    /reports
+
+POST   /check-ins
+
+PATCH  /businesses/{id}
+
+DELETE /offers/{id}
+```
+
+Avoid verb-based endpoints such as:
+
+```
+/getTrail
+/createBusiness
+```
+
+---
+
+# 5. HTTP Methods
+
+| Method | Purpose                       |
+| ------ | ----------------------------- |
+| GET    | Read                          |
+| POST   | Create                        |
+| PATCH  | Partial update                |
+| PUT    | Full replacement (rare)       |
+| DELETE | Soft delete where appropriate |
+
+---
+
+# 6. URI Structure
+
+```
+/api/v1/{resource}
+
+/api/v1/{resource}/{id}
+```
+
+Nested resources only where ownership is obvious.
+
+Example:
+
+```
+/trails/{id}/reports
+/businesses/{id}/offers
+```
+
+---
+
+# 7. Authentication
+
+Authentication uses Supabase Auth with JWT.
+
+Every authenticated request sends:
+
+```http
+Authorization: Bearer <token>
+```
+
+---
+
+# 8. Authorisation
+
+Permissions are determined using:
+
+* Role
+* Ownership
+* Resource State
+
+Roles:
+
+* Walker
+* Business User
+* Moderator
+* Administrator
+
+---
+
+# 9. Standard Response
+
+Single resource
+
+```json
+{
+  "data": {},
+  "meta": {},
+  "links": {}
+}
+```
+
+Collection
+
+```json
+{
+  "data": [],
+  "meta": {},
+  "links": {}
+}
+```
+
+---
+
+# 10. Error Format
+
+```json
+{
+  "error": {
+    "code": "business_not_found",
+    "message": "Business not found.",
+    "details": []
+  }
+}
+```
+
+Errors should always follow this structure.
+
+---
+
+# 11. Pagination
+
+Cursor-based pagination.
+
+Example:
+
+```
+GET /trails?cursor=abc123
+```
+
+Response:
+
+```json
+{
+  "data": [],
+  "meta": {
+    "next_cursor": "xyz456",
+    "has_more": true
+  }
+}
+```
+
+---
+
+# 12. Filtering
+
+```
+GET /trails?difficulty=moderate
+
+GET /businesses?category=cafe
+
+GET /trails?region=peak-district&difficulty=hard
+```
+
+---
+
+# 13. Sorting
+
+```
+?sort=name
+
+?sort=-created_at
+```
+
+A leading minus indicates descending order.
+
+---
+
+# 14. Search
+
+```
+?q=coffee
+
+?q=mam tor
+```
+
+Supported wherever appropriate.
+
+---
+
+# 15. Sparse Fieldsets
+
+Clients may request selected fields.
+
+```
+?fields=id,name,distance
+```
+
+---
+
+# 16. Includes
+
+```
+GET /trails/{id}?include=businesses,reports
+```
+
+Related resources are opt-in rather than automatically expanded.
+
+---
+
+# 17. Geospatial Queries
+
+Standard parameters:
+
+* latitude
+* longitude
+* radius
+
+Example:
+
+```
+GET /businesses/nearby?latitude=53.56&longitude=-2.63&radius=5000
+```
+
+Radius is measured in metres.
+
+---
+
+# 18. Offline Synchronisation
+
+Offline-created resources should include a client-generated identifier.
+
+```
+client_request_id
+```
+
+This supports reliable synchronisation.
+
+---
+
+# 19. Idempotency
+
+Sensitive create operations should support either:
+
+```
+Idempotency-Key
+```
+
+or
+
+```
+client_request_id
+```
+
+to prevent duplicate processing.
+
+---
+
+# 20. Timestamps
+
+All timestamps use ISO-8601 UTC.
+
+Example:
+
+```
+2026-07-02T14:30:25Z
+```
+
+---
+
+# 21. Identifiers
+
+All primary keys are UUIDs.
+
+Clients should never infer meaning from identifiers.
+
+---
+
+# 22. Initial Endpoint Catalogue
+
+## Identity
+
+```
+GET    /profile
+PATCH  /profile
+GET    /notifications
+```
+
+## Trails
+
+```
+GET    /trails
+GET    /trails/{id}
+POST   /trail-completions
+GET    /regions
+```
+
+## Businesses
+
+```
+GET    /businesses
+GET    /businesses/{id}
+GET    /businesses/nearby
+```
+
+## Passport
+
+```
+GET    /passport
+GET    /passport/stamps
+GET    /passport/achievements
+```
+
+## Check-ins
+
+```
+POST   /check-ins
+```
+
+## Community
+
+```
+GET    /reports
+POST   /reports
+PATCH  /reports/{id}
+POST   /reports/{id}/confirm
+```
+
+## Business Portal
+
+```
+GET    /business/dashboard
+PATCH  /business/profile
+GET    /business/analytics
+POST   /business/offers
+```
+
+## Administration
+
+```
+GET    /admin/businesses
+GET    /admin/reports
+POST   /admin/moderation
+```
+
+---
+
+# 23. Rate Limiting
+
+| User          | Limit               |
+| ------------- | ------------------- |
+| Anonymous     | 60 requests/minute  |
+| Authenticated | 300 requests/minute |
+
+---
+
+# 24. Logging
+
+Log:
+
+* Request ID
+* Endpoint
+* User
+* Response code
+* Duration
+
+Never log:
+
+* Passwords
+* JWTs
+* Secrets
+
+---
+
+# 25. OpenAPI
+
+The complete API should ultimately be defined using an OpenAPI specification.
+
+The OpenAPI document becomes the authoritative machine-readable contract for documentation, SDK generation and testing.
+
+---
+
+# API Principle
+
+> **The API represents the Waypoint domain, never the database.**
+
+---
+
+**End of BP012**
