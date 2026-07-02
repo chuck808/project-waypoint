@@ -1,0 +1,549 @@
+# BP015 – Experience & Design System
+
+**Project:** Project Waypoint
+**Blueprint:** BP015
+**Version:** 0.1
+**Status:** Draft
+**Author:** Project Waypoint Team
+**Depends On:** WP000, BP001–BP014
+
+---
+
+# 1. Purpose
+
+This blueprint defines the experience and visual design principles for Project Waypoint.
+
+Rather than prescribing colours, buttons and layouts in isolation, it establishes how Waypoint should feel to use.
+
+The experience comes first.
+
+The interface exists to support that experience.
+
+---
+
+# 2. Experience Philosophy
+
+Waypoint is not designed to compete for attention.
+
+It is designed to quietly support an adventure that is already happening.
+
+The application should feel calm, trustworthy and dependable.
+
+Users should spend more time looking at the landscape than looking at their phone.
+
+Every design decision should reinforce that goal.
+
+---
+
+# 3. Experience Principles
+
+## Calm
+
+The interface should never feel busy.
+
+Avoid unnecessary movement, clutter and visual noise.
+
+Information should be prioritised rather than compressed.
+
+---
+
+## Quiet
+
+Waypoint speaks softly.
+
+It should never shout through excessive colour, animation or notifications.
+
+Important information is highlighted through clarity rather than spectacle.
+
+---
+
+## Respectful
+
+The application should respect:
+
+* the user's attention
+* the surrounding environment
+* local communities
+* independent businesses
+* the natural landscape
+
+Every interaction should justify its existence.
+
+---
+
+## Glanceable
+
+Most interactions should take only a few seconds.
+
+Users should immediately understand:
+
+* where they are
+* what matters
+* what action is available
+
+No screen should require prolonged concentration while outdoors.
+
+---
+
+## Dependable
+
+Users should feel confident that Waypoint will behave consistently.
+
+Predictable interactions create trust.
+
+Trust encourages continued use.
+
+---
+
+# 4. Respect the Landscape
+
+This principle applies to every feature.
+
+Before implementing any interaction, ask:
+
+> **Does this encourage the user to experience the landscape, or the phone?**
+
+If the interface becomes the destination rather than the companion, the design should be reconsidered.
+
+Technology should support exploration, never replace it.
+
+---
+
+# 5. Walking Context
+
+Waypoint is often used under challenging conditions.
+
+Users may be:
+
+* wearing gloves
+* walking in bright sunlight
+* standing in heavy rain
+* carrying walking poles
+* supervising children
+* walking dogs
+* navigating uneven ground
+* conserving battery power
+
+The interface should acknowledge these realities.
+
+---
+
+# 6. Interaction Principles
+
+Interactions should be:
+
+* obvious
+* forgiving
+* reversible where practical
+* quick
+* consistent
+
+Primary actions should always be easy to locate.
+
+Secondary actions should never distract from the primary task.
+
+---
+
+# 7. Information Hierarchy
+
+Every screen should answer three questions:
+
+1. Where am I?
+2. What is most important?
+3. What can I do next?
+
+Anything beyond these questions should be progressively disclosed rather than presented immediately.
+
+---
+
+# 8. Visual Language
+
+Waypoint should feel timeless rather than fashionable.
+
+The visual language should draw inspiration from:
+
+* paper maps
+* stone
+* slate
+* weathered wood
+* natural light
+* open space
+
+Avoid artificial "outdoors" styling.
+
+The interface should complement nature rather than imitate it.
+
+---
+
+# 9. Colour Philosophy
+
+Colour communicates meaning before decoration.
+
+Suggested semantic palette:
+
+* Primary – trust and navigation
+* Success – completed journeys and confirmations
+* Warning – temporary trail concerns
+* Error – actions requiring attention
+* Neutral – backgrounds, supporting information
+
+Accent colours should be used sparingly.
+
+The landscape should remain the most colourful part of the experience.
+
+---
+
+# 10. Typography
+
+Typography should prioritise readability.
+
+Requirements:
+
+* high legibility
+* generous spacing
+* clear hierarchy
+* strong contrast
+* consistent sizing
+
+Avoid decorative fonts.
+
+The type should remain comfortable during prolonged outdoor use.
+
+---
+
+# 11. Spacing
+
+Whitespace is functional.
+
+Generous spacing:
+
+* reduces cognitive load
+* improves touch accuracy
+* increases readability
+
+Crowded interfaces should be avoided.
+
+---
+
+# 12. Iconography
+
+Icons should reinforce labels rather than replace them.
+
+Icons must be:
+
+* recognisable
+* consistent
+* simple
+* accessible
+
+Avoid icons that rely upon cultural assumptions or ambiguous metaphors.
+
+---
+
+# 13. Photography
+
+Photography should represent genuine walking experiences.
+
+Preference should be given to:
+
+* real landscapes
+* changing weather
+* authentic businesses
+* ordinary walkers
+* seasonal variation
+
+Avoid overly staged promotional imagery.
+
+---
+
+# 14. Maps
+
+Maps are supporting tools rather than the entire product.
+
+Maps should:
+
+* remain uncluttered
+* clearly distinguish trails
+* highlight nearby facilities
+* reveal participating businesses naturally
+* show community reports without overwhelming the route
+
+Users should never feel lost within the interface itself.
+
+---
+
+# 15. Passport Experience
+
+The Passport is the emotional centre of Waypoint.
+
+It should feel personal rather than competitive.
+
+Passport entries should resemble memories rather than achievements on a scoreboard.
+
+The emphasis is on reflection, not comparison.
+
+---
+
+# 16. Business Presentation
+
+Businesses should appear as recommendations rather than advertisements.
+
+Profiles should answer practical questions:
+
+* What kind of place is this?
+* Why might a walker enjoy stopping here?
+* What facilities are available?
+* When is it open?
+
+Offers should remain secondary.
+
+The relationship between walker and business should feel authentic.
+
+---
+
+# 17. Community Experience
+
+Community information should be practical.
+
+Reports should prioritise usefulness over discussion.
+
+Confirmation is more valuable than commentary.
+
+Waypoint is not intended to become a social network.
+
+---
+
+# 18. Notifications
+
+Notifications should be infrequent and meaningful.
+
+Appropriate examples include:
+
+* passport stamps earned
+* trail reports affecting saved walks
+* offer successfully redeemed
+* business approval
+* moderation outcomes
+
+Notifications should never exist solely to encourage engagement.
+
+---
+
+# 19. Motion
+
+Animation communicates change.
+
+It should not exist for entertainment.
+
+Appropriate uses include:
+
+* successful QR check-in
+* earned stamp
+* loading transitions
+* state changes
+
+Animations should be:
+
+* brief
+* smooth
+* purposeful
+
+Users should always be able to reduce motion through accessibility settings.
+
+---
+
+# 20. Accessibility
+
+Accessibility is fundamental.
+
+Waypoint should support:
+
+* high contrast
+* scalable text
+* screen readers
+* reduced motion
+* colour-independent communication
+* generous touch targets
+* keyboard navigation where applicable
+
+Good accessibility benefits every walker.
+
+---
+
+# 21. Offline Experience
+
+When connectivity is unavailable:
+
+* previously downloaded information should remain accessible
+* saved trails should continue functioning
+* pending actions should be clearly identified
+* synchronisation should occur automatically when possible
+
+The application should feel resilient rather than broken.
+
+---
+
+# 22. Empty States
+
+Empty screens should be encouraging.
+
+Examples include:
+
+* no completed trails yet
+* no passport stamps yet
+* no saved walks
+* no nearby reports
+
+Empty states should invite exploration rather than highlight absence.
+
+---
+
+# 23. Error States
+
+Errors should:
+
+* explain what happened
+* explain what the user can do next
+* avoid technical language
+* remain calm and respectful
+
+Blame should never be directed at the user.
+
+---
+
+# 24. Loading States
+
+Loading indicators should reassure users without becoming distracting.
+
+Where practical:
+
+* display useful placeholders
+* preserve layout stability
+* avoid unnecessary waiting animations
+
+Performance improvements are preferable to decorative loading indicators.
+
+---
+
+# 25. Design Tokens
+
+The visual system should ultimately be driven by reusable design tokens.
+
+Core token groups include:
+
+* colours
+* typography
+* spacing
+* radii
+* elevation
+* icon sizing
+* animation timing
+* breakpoints
+
+Applications should consume shared tokens rather than defining their own.
+
+---
+
+# 26. Component Principles
+
+Every reusable component should be:
+
+* accessible
+* documented
+* testable
+* reusable
+* visually consistent
+
+Components should solve product problems rather than showcase design techniques.
+
+---
+
+# 27. Brand Personality
+
+If Waypoint were described as a person, it would be:
+
+* knowledgeable
+* dependable
+* welcoming
+* curious
+* modest
+* patient
+
+It would never feel:
+
+* loud
+* competitive
+* intrusive
+* manipulative
+
+---
+
+# 28. Experience Checklist
+
+Before releasing any new feature, ask:
+
+* Does this reduce or increase cognitive load?
+* Can it be understood at a glance?
+* Does it respect the user's attention?
+* Does it work outdoors?
+* Does it improve the walking experience?
+* Would we still build it if engagement metrics did not exist?
+
+If the answer to several of these questions is "no", the design should be reconsidered.
+
+---
+
+# 29. Design Decisions
+
+### D-BP015-001
+
+The interface should remain subordinate to the walking experience.
+
+---
+
+### D-BP015-002
+
+Passport entries should celebrate memories rather than competition.
+
+---
+
+### D-BP015-003
+
+Businesses should appear as trusted recommendations rather than advertisements.
+
+---
+
+### D-BP015-004
+
+Accessibility is treated as a design requirement rather than a compliance exercise.
+
+---
+
+### D-BP015-005
+
+Consistency is valued more highly than novelty.
+
+---
+
+# 30. Success Criteria
+
+BP015 is successful if:
+
+* users can operate Waypoint comfortably outdoors
+* the interface encourages exploration rather than distraction
+* the visual language feels calm and timeless
+* businesses integrate naturally into the walking experience
+* accessibility is considered from the beginning
+* future designers can extend the system without changing its character
+
+---
+
+# The Waypoint Design Principle
+
+> **The best interface is the one the walker forgets they are using.**
+
+If Waypoint quietly helps someone discover a new path, enjoy a welcoming café, report a broken bridge or remember a beautiful day years later, then the design has achieved its purpose.
+
+---
+
+**End of BP015**
