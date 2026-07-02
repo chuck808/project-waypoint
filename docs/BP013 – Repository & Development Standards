@@ -1,0 +1,552 @@
+# BP013 – Repository & Development Standards
+
+**Project:** Project Waypoint
+**Blueprint:** BP013
+**Version:** 0.1
+**Status:** Draft
+**Author:** Project Waypoint Team
+**Depends On:** WP000, BP001–BP012
+
+---
+
+# 1. Purpose
+
+This blueprint defines how the Project Waypoint source code is organised.
+
+It establishes repository structure, naming conventions, coding standards and development practices that every contributor should follow.
+
+Consistency is considered a feature of the project.
+
+---
+
+# 2. Repository Philosophy
+
+The repository should be easy to navigate without requiring prior knowledge of the project.
+
+A new contributor should be able to answer three questions immediately:
+
+* Where does this code belong?
+* Where should new code be added?
+* Where can documentation be found?
+
+The structure should reflect the product architecture rather than individual technologies.
+
+---
+
+# 3. Repository Structure
+
+```text
+project-waypoint/
+│
+├── docs/
+│   ├── blueprints/
+│   ├── decisions/
+│   ├── api/
+│   └── assets/
+│
+├── apps/
+│   ├── mobile/
+│   ├── business-portal/
+│   └── admin-portal/
+│
+├── packages/
+│   ├── ui/
+│   ├── types/
+│   ├── validation/
+│   ├── maps/
+│   ├── utils/
+│   └── config/
+│
+├── backend/
+│   ├── functions/
+│   ├── services/
+│   ├── jobs/
+│   └── webhooks/
+│
+├── database/
+│   ├── migrations/
+│   ├── seeds/
+│   ├── policies/
+│   ├── functions/
+│   └── views/
+│
+├── infrastructure/
+│   ├── scripts/
+│   ├── deployment/
+│   └── monitoring/
+│
+├── tests/
+│   ├── integration/
+│   ├── e2e/
+│   └── fixtures/
+│
+├── .github/
+│   ├── workflows/
+│   └── ISSUE_TEMPLATE/
+│
+├── README.md
+├── LICENSE
+└── CONTRIBUTING.md
+```
+
+---
+
+# 4. Folder Responsibilities
+
+## docs/
+
+Contains project documentation only.
+
+No implementation code should be stored here.
+
+Subdirectories:
+
+* blueprints
+* architecture decisions
+* API documentation
+* diagrams
+* supporting images
+
+---
+
+## apps/
+
+Contains user-facing applications.
+
+Each application should be independently runnable.
+
+```text
+mobile/
+business-portal/
+admin-portal/
+```
+
+Shared logic belongs elsewhere.
+
+---
+
+## packages/
+
+Contains reusable code shared across applications.
+
+Examples:
+
+* UI components
+* validation schemas
+* shared TypeScript types
+* formatting helpers
+* configuration
+
+Packages should avoid depending on individual applications.
+
+---
+
+## backend/
+
+Contains server-side application logic.
+
+Examples:
+
+* Edge Functions
+* service layer
+* scheduled jobs
+* webhook handlers
+
+Business rules should live here rather than in clients.
+
+---
+
+## database/
+
+Contains database-specific assets.
+
+Examples:
+
+* SQL migrations
+* seed data
+* views
+* Row Level Security policies
+* database functions
+
+Application logic should not be duplicated here unnecessarily.
+
+---
+
+## infrastructure/
+
+Contains operational tooling.
+
+Examples:
+
+* deployment scripts
+* CI helpers
+* monitoring configuration
+
+---
+
+## tests/
+
+Contains tests that exercise behaviour.
+
+Structure:
+
+```text
+integration/
+e2e/
+fixtures/
+```
+
+Unit tests should live alongside the code they test.
+
+---
+
+# 5. Monorepo Strategy
+
+Waypoint should use a monorepo.
+
+Benefits include:
+
+* shared packages
+* consistent tooling
+* simplified dependency management
+* atomic changes across applications
+* shared version history
+
+Applications remain independent while sharing a common foundation.
+
+---
+
+# 6. Naming Conventions
+
+## Files
+
+Use lowercase with hyphens.
+
+Examples:
+
+```text
+trail-card.tsx
+passport-service.ts
+community-report.ts
+```
+
+Avoid:
+
+```text
+TrailCard.tsx
+myFile.ts
+```
+
+---
+
+## Components
+
+React components use PascalCase.
+
+Example:
+
+```text
+TrailCard
+BusinessProfile
+PassportStamp
+```
+
+---
+
+## Functions
+
+Use descriptive camelCase names.
+
+Examples:
+
+```text
+createTrailCompletion()
+calculateDistance()
+awardStamp()
+```
+
+Avoid abbreviations unless universally recognised.
+
+---
+
+## Variables
+
+Prefer meaningful names.
+
+Good:
+
+```text
+completedTrails
+nearbyBusinesses
+passportSummary
+```
+
+Avoid:
+
+```text
+data
+temp
+value
+```
+
+unless their meaning is genuinely temporary or obvious.
+
+---
+
+# 7. TypeScript Standards
+
+TypeScript should be used throughout the project.
+
+Guidelines:
+
+* strict mode enabled
+* avoid `any`
+* prefer explicit interfaces
+* favour composition over inheritance
+* use shared types from `packages/types`
+
+The compiler should be treated as an engineering partner rather than an obstacle.
+
+---
+
+# 8. Formatting Standards
+
+Formatting should be automated.
+
+Recommended tools:
+
+* Prettier
+* ESLint
+
+Formatting should never become a subject of code review.
+
+---
+
+# 9. Git Workflow
+
+Use short-lived feature branches.
+
+Naming:
+
+```text
+feature/passport-stamps
+feature/business-dashboard
+
+bugfix/check-in-validation
+
+docs/api-standard
+
+refactor/passport-service
+```
+
+Avoid long-lived development branches.
+
+---
+
+# 10. Commit Messages
+
+Follow a consistent style.
+
+Examples:
+
+```text
+feat: add passport stamp service
+
+fix: prevent duplicate QR check-ins
+
+docs: update BP012 API standard
+
+refactor: simplify trail search logic
+```
+
+Each commit should represent a coherent change.
+
+---
+
+# 11. Pull Requests
+
+Every pull request should answer:
+
+* What changed?
+* Why?
+* How was it tested?
+* Does documentation need updating?
+
+Large pull requests should be avoided.
+
+---
+
+# 12. Documentation Rules
+
+Documentation evolves with the code.
+
+If behaviour changes:
+
+* update blueprint if required
+* update API documentation
+* update README where relevant
+
+Documentation should never become historical fiction.
+
+---
+
+# 13. Dependency Policy
+
+Before adding a dependency, ask:
+
+* Does the platform already provide this?
+* Can we build this simply ourselves?
+* Is the dependency actively maintained?
+* Will it still be useful in two years?
+
+Fewer dependencies generally mean fewer long-term problems.
+
+---
+
+# 14. Logging
+
+Application logs should include:
+
+* request identifier
+* timestamp
+* severity
+* relevant context
+
+Logs should never expose:
+
+* passwords
+* authentication tokens
+* personal secrets
+
+---
+
+# 15. Error Handling
+
+Errors should be:
+
+* meaningful
+* actionable
+* consistent
+
+Unexpected failures should be logged.
+
+Expected validation failures should not generate noisy error logs.
+
+---
+
+# 16. Configuration
+
+Configuration belongs in environment variables.
+
+Never hard-code:
+
+* API keys
+* secrets
+* URLs
+* credentials
+
+Configuration should remain separate from application logic.
+
+---
+
+# 17. Testing Strategy
+
+Testing pyramid:
+
+```text
+End-to-End
+     ▲
+Integration
+     ▲
+Unit
+```
+
+Priorities:
+
+* business rules
+* API behaviour
+* critical user journeys
+
+Tests should verify behaviour rather than implementation details.
+
+---
+
+# 18. Continuous Integration
+
+Every pull request should automatically:
+
+* install dependencies
+* run linting
+* execute tests
+* build applications
+* verify formatting
+
+Code should not be merged if automated checks fail.
+
+---
+
+# 19. Architectural Decision Records
+
+Significant technical decisions should be recorded as ADRs.
+
+Suggested format:
+
+```text
+ADR-001 Repository Structure
+
+ADR-002 API Layer
+
+ADR-003 Offline Synchronisation
+```
+
+Each ADR should explain:
+
+* context
+* decision
+* consequences
+
+---
+
+# 20. Code Review Principles
+
+Reviews should improve the software, not demonstrate expertise.
+
+Focus on:
+
+* correctness
+* clarity
+* maintainability
+* consistency
+* security
+
+Personal coding style should not dominate reviews.
+
+---
+
+# 21. Definition of Done
+
+A feature is complete when:
+
+* implementation is finished
+* tests pass
+* documentation is updated
+* code review is complete
+* no known critical defects remain
+
+"Works on my machine" is not considered done.
+
+---
+
+# 22. Success Criteria
+
+BP013 is successful if:
+
+* every contributor knows where new code belongs
+* shared logic is reused rather than duplicated
+* repository growth remains organised
+* documentation stays aligned with implementation
+* development standards are clear before coding begins
+
+---
+
+# End of BP013
