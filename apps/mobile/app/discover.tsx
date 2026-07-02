@@ -1,9 +1,32 @@
+import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import type { Trail } from "@waypoint/types";
 import { AppText, PrimaryLink, Screen, TrailCard } from "../src/components";
-import { trails } from "../src/data/trails";
+import { getTrails } from "../src/services/trails";
 import { theme } from "../src/theme";
 
 export default function DiscoverScreen() {
+  const [trails, setTrails] = useState<Trail[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadTrails() {
+      try {
+        const nextTrails = await getTrails();
+        setTrails(nextTrails);
+      } catch (error) {
+        setErrorMessage(
+          error instanceof Error ? error.message : "Unable to load trails.",
+        );
+      } finally {
+        setIsLoading(false);
+      }
+    }
+
+    loadTrails();
+  }, []);
+
   return (
     <Screen>
       <View style={styles.header}>
@@ -18,7 +41,17 @@ export default function DiscoverScreen() {
           Popular nearby
         </AppText>
 
-        <TrailCard trail={trails[0]} />
+        {isLoading ? <AppText muted>Loading trails...</AppText> : null}
+
+        {errorMessage ? <AppText muted>{errorMessage}</AppText> : null}
+
+        {!isLoading && !errorMessage && trails.length === 0 ? (
+          <AppText muted>No trails found yet.</AppText>
+        ) : null}
+
+        {trails.map((trail) => (
+          <TrailCard key={trail.id} trail={trail} />
+        ))}
       </View>
 
       <PrimaryLink href="/">Back home</PrimaryLink>

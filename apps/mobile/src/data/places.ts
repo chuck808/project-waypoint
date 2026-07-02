@@ -1,8 +1,11 @@
-export const places = [
+import type { Place } from "@waypoint/types";
+
+export const places: Place[] = [
   {
     id: "old-barn-cafe",
     name: "The Old Barn Café",
-    category: "Café",
+    category: "cafe",
+    displayCategory: "Café",
     description:
       "A quiet walker-friendly café close to the trail, serving coffee, cakes and simple lunches.",
     note: "Walker-friendly stop near the trail.",
@@ -14,7 +17,8 @@ export const places = [
   {
     id: "edale-water",
     name: "Edale Water Refill",
-    category: "Water",
+    category: "water",
+    displayCategory: "Water",
     description:
       "A useful refill point before the climb. Availability may vary seasonally.",
     note: "Useful refill point before the climb.",

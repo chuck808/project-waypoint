@@ -1,4 +1,6 @@
-export const passportStamps = [
+import type { PassportStamp } from "@waypoint/types";
+
+export const passportStamps: PassportStamp[] = [
   {
     id: "first-local-stop",
     title: "First Local Stop",
