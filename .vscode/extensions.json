@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "eamodio.gitlens",
+    "usernamehw.errorlens",
+    "expo.vscode-expo-tools",
+    "yzhang.markdown-all-in-one",
+    "PKief.material-icon-theme"
+  ]
+}
