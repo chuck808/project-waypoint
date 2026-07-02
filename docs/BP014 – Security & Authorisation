@@ -1,0 +1,681 @@
+# BP014 – Security & Authorisation
+
+**Project:** Project Waypoint
+**Blueprint:** BP014
+**Version:** 0.1
+**Status:** Draft
+**Author:** Project Waypoint Team
+**Depends On:** WP000, BP001–BP013
+
+---
+
+# 1. Purpose
+
+This blueprint defines the security architecture for Project Waypoint.
+
+It establishes how users are authenticated, how permissions are granted, how data ownership is enforced, and how trust is maintained throughout the platform.
+
+Security is considered part of the product architecture rather than an implementation detail.
+
+---
+
+# 2. Security Principles
+
+Waypoint security follows seven guiding principles.
+
+## Identity before Permission
+
+The system must always know **who** is making a request before deciding **what** they are allowed to do.
+
+---
+
+## Least Privilege
+
+Users receive only the permissions required to perform their role.
+
+Additional permissions are granted deliberately rather than by default.
+
+---
+
+## Ownership Matters
+
+Users primarily interact with information they own.
+
+Business users interact with businesses they manage.
+
+Administrators interact with the platform.
+
+Ownership is explicit.
+
+---
+
+## Trust by Verification
+
+Claims should be verified whenever practical.
+
+Examples:
+
+* QR check-ins
+* business ownership
+* moderation actions
+
+---
+
+## Defence in Depth
+
+Security should exist at multiple layers.
+
+* Client validation
+* API validation
+* Service validation
+* Database policies
+
+No single layer should be trusted alone.
+
+---
+
+## Audit Everything Important
+
+Trust-sensitive operations should leave an audit trail.
+
+Security without accountability is incomplete.
+
+---
+
+## Privacy by Design
+
+Collect only information that genuinely improves the walking experience.
+
+Avoid collecting information simply because it is technically possible.
+
+---
+
+# 3. Authentication
+
+Waypoint uses:
+
+```text
+Supabase Auth
+```
+
+Supported authentication providers:
+
+* Email and password
+* Magic Link
+* Google (future)
+* Apple (future)
+
+The application never stores passwords.
+
+Authentication tokens are issued by Supabase.
+
+Every authenticated request includes:
+
+```http
+Authorization: Bearer <JWT>
+```
+
+---
+
+# 4. Identity Model
+
+Authentication identifies the account.
+
+The Waypoint profile identifies the person within the product.
+
+```text
+Supabase Auth
+        │
+        ▼
+Authenticated User
+        │
+        ▼
+Waypoint Profile
+        │
+        ▼
+Roles
+        │
+        ▼
+Permissions
+```
+
+This separation allows authentication to evolve without affecting the domain model.
+
+---
+
+# 5. Roles
+
+The MVP defines four primary roles.
+
+## Walker
+
+Default role.
+
+Can:
+
+* browse trails
+* manage own profile
+* complete walks
+* submit reports
+* earn passport stamps
+* redeem offers
+
+Cannot:
+
+* moderate content
+* manage businesses
+* administer the platform
+
+---
+
+## Business User
+
+Inherits Walker capabilities.
+
+Additionally may:
+
+* manage assigned businesses
+* create offers
+* manage QR codes
+* view business analytics
+* edit business information
+
+Cannot:
+
+* access businesses they do not manage
+* moderate platform content
+
+---
+
+## Moderator
+
+Responsible for community quality.
+
+May:
+
+* review reports
+* hide reports
+* resolve reports
+* review flagged content
+* view moderation queues
+
+Moderators do not automatically gain full administrative access.
+
+---
+
+## Administrator
+
+Full platform management.
+
+May:
+
+* manage users
+* manage businesses
+* manage trails
+* assign roles
+* perform moderation
+* access audit information
+* manage system configuration
+
+Administrator access should be granted sparingly.
+
+---
+
+# 6. Permission Model
+
+Permissions are derived from:
+
+```text
+Role
++
+Ownership
++
+Resource State
+```
+
+Example:
+
+A Business User may edit:
+
+* their own business
+
+but not:
+
+* another business
+
+Likewise:
+
+A Walker may edit:
+
+* their own report
+
+until moderation has occurred.
+
+---
+
+# 7. Resource Ownership
+
+## User-Owned Resources
+
+Users own:
+
+* profile
+* passport
+* active walks
+* trail completions
+* earned stamps
+* earned achievements
+* notifications
+
+---
+
+## Shared Resources
+
+Shared resources include:
+
+* trails
+* regions
+* stamp definitions
+* achievement definitions
+
+Most users have read-only access.
+
+---
+
+## Business-Owned Resources
+
+Businesses own:
+
+* business profile
+* locations
+* offers
+* QR codes
+
+Business users receive delegated access through Business Memberships.
+
+---
+
+## Platform-Owned Resources
+
+The platform owns:
+
+* moderation actions
+* audit events
+* analytics summaries
+* system notifications
+
+These cannot be edited by ordinary users.
+
+---
+
+# 8. Row Level Security Strategy
+
+Every application table should have Row Level Security enabled.
+
+Policies should default to **deny** unless explicitly allowed.
+
+---
+
+## Public Read Policies
+
+Authenticated users may read:
+
+* published trails
+* published regions
+* active businesses
+* visible reports
+* active offers
+* public business profiles
+
+---
+
+## User Policies
+
+Users may:
+
+* view their own profile
+* edit their own profile
+* view their passport
+* submit reports
+* edit eligible reports
+* read notifications
+* view check-ins
+* manage saved items
+
+Users cannot access another user's private information.
+
+---
+
+## Business Policies
+
+Business users may:
+
+* edit managed businesses
+* create offers
+* update locations
+* view analytics
+* manage QR codes
+
+Permission is granted through Business Membership.
+
+---
+
+## Moderator Policies
+
+Moderators may:
+
+* view moderation queues
+* update report status
+* review reports
+* perform moderation actions
+
+Moderation actions generate audit events.
+
+---
+
+## Administrator Policies
+
+Administrators bypass ordinary ownership restrictions where required.
+
+Administrative actions remain auditable.
+
+---
+
+# 9. API Security
+
+The API never trusts client input.
+
+Every request should validate:
+
+* authentication
+* permissions
+* ownership
+* resource existence
+* resource state
+
+Business rules belong within the service layer.
+
+---
+
+# 10. QR Check-in Security
+
+QR codes should not expose internal identifiers.
+
+Recommended approach:
+
+```text
+Business Location
+        │
+Random Token
+        │
+Encoded QR
+```
+
+The QR code contains a secure random value rather than a database ID.
+
+Validation occurs server-side.
+
+---
+
+# 11. Offer Redemption Security
+
+Offer redemption should verify:
+
+* authenticated user
+* participating business
+* valid offer
+* offer availability
+* redemption limits
+* duplicate redemption rules
+
+Successful redemption creates:
+
+* redemption record
+* audit event where appropriate
+
+---
+
+# 12. Community Trust
+
+Reports progress through states.
+
+```text
+Submitted
+        ↓
+Visible
+        ↓
+Confirmed
+        ↓
+Resolved
+```
+
+Moderators may intervene where required.
+
+Users should not be able to manipulate report verification unfairly.
+
+---
+
+# 13. Audit Strategy
+
+Important events create immutable audit records.
+
+Examples include:
+
+* role assignment
+* business approval
+* moderation action
+* QR code regeneration
+* offer removal
+* administrative override
+
+Audit records should include:
+
+* actor
+* action
+* timestamp
+* target
+* context
+
+---
+
+# 14. Sensitive Data
+
+Sensitive information includes:
+
+* authentication identifiers
+* email addresses
+* audit records
+* unpublished businesses
+* moderation notes
+
+Access should be restricted according to role.
+
+---
+
+# 15. Privacy
+
+Waypoint should minimise personal data.
+
+Avoid storing:
+
+* unnecessary demographic data
+* continuous location history
+* unrelated behavioural information
+
+Walking history exists because the user chooses to preserve it.
+
+Not because the platform silently records it.
+
+---
+
+# 16. Rate Limiting
+
+Suggested limits:
+
+Anonymous:
+
+* 60 requests per minute
+
+Authenticated:
+
+* 300 requests per minute
+
+Sensitive endpoints:
+
+Lower limits where abuse is possible.
+
+Examples:
+
+* login attempts
+* QR validation
+* report submission
+
+---
+
+# 17. Abuse Prevention
+
+Potential abuse includes:
+
+* fake check-ins
+* spam reports
+* automated account creation
+* offer abuse
+* excessive API usage
+
+Mitigations include:
+
+* rate limiting
+* audit events
+* moderation
+* verification status
+* optional CAPTCHA where appropriate
+
+---
+
+# 18. Security Logging
+
+Record:
+
+* authentication failures
+* permission failures
+* moderation actions
+* business approvals
+* QR validation failures
+
+Never log:
+
+* passwords
+* JWTs
+* personal secrets
+
+---
+
+# 19. Backup & Recovery
+
+Production backups should include:
+
+* PostgreSQL
+* uploaded media
+* configuration
+
+Backups should be:
+
+* encrypted
+* regularly tested
+* retained according to policy
+
+Recovery procedures should be documented.
+
+---
+
+# 20. Future Security Considerations
+
+Deferred but anticipated:
+
+* Multi-factor authentication
+* Device management
+* API keys for partners
+* Public API authentication
+* Signed webhooks
+* Security alerts
+* Suspicious behaviour detection
+
+---
+
+# 21. Security Decisions
+
+### D-BP014-001
+
+Supabase Auth is the sole authentication provider.
+
+Reason:
+
+Avoid implementing custom authentication.
+
+---
+
+### D-BP014-002
+
+Every application table uses Row Level Security.
+
+Reason:
+
+Prevent accidental data exposure.
+
+---
+
+### D-BP014-003
+
+Permissions combine role, ownership and resource state.
+
+Reason:
+
+Provides flexible, understandable access control.
+
+---
+
+### D-BP014-004
+
+Business ownership is delegated through Business Membership.
+
+Reason:
+
+Supports multiple owners and future organisational growth.
+
+---
+
+### D-BP014-005
+
+Audit records are append-only.
+
+Reason:
+
+Maintains accountability and trust.
+
+---
+
+### D-BP014-006
+
+QR codes use secure random tokens rather than internal identifiers.
+
+Reason:
+
+Prevents predictable code generation and enumeration attacks.
+
+---
+
+# 22. Success Criteria
+
+BP014 is successful if:
+
+* authentication is handled by a trusted provider
+* permissions are consistent across all applications
+* ownership rules are explicit
+* Row Level Security policies can be derived directly from this blueprint
+* important actions are auditable
+* user privacy is protected by design
+* future security features can be added without redesigning the core model
+
+---
+
+# End of BP014
