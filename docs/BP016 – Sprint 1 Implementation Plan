@@ -1,0 +1,357 @@
+# BP016 – Sprint 1 Implementation Plan
+
+**Project:** Project Waypoint
+**Blueprint:** BP016
+**Version:** 0.1
+**Status:** Draft
+**Author:** Project Waypoint Team
+**Depends On:** WP000, BP001–BP015
+
+---
+
+# 1. Purpose
+
+Sprint 1 establishes the technical foundations of Project Waypoint while delivering the first complete end-to-end user journey.
+
+The objective is not to build every feature.
+
+The objective is to prove that the architecture, development standards and product philosophy work together in practice.
+
+---
+
+# 2. Sprint Goal
+
+Deliver the first complete user journey:
+
+```
+Register
+    ↓
+Sign In
+    ↓
+Browse Trail
+    ↓
+Visit Business
+    ↓
+Scan QR Code
+    ↓
+Earn Passport Stamp
+    ↓
+View Passport
+```
+
+---
+
+# 3. Sprint Objectives
+
+## Objective 1 – Development Environment
+
+Establish the monorepo.
+
+Configure:
+
+* TypeScript
+* Package manager
+* ESLint
+* Prettier
+* Shared configuration
+* CI pipeline
+
+---
+
+## Objective 2 – Backend
+
+Provision Supabase.
+
+Configure:
+
+* Authentication
+* PostgreSQL
+* Storage
+* Row Level Security
+* Initial migrations
+
+---
+
+## Objective 3 – Identity
+
+Implement:
+
+* Registration
+* Login
+* Logout
+* User profile creation
+* Default Walker role
+* Automatic Passport creation
+
+---
+
+## Objective 4 – Trail Discovery
+
+Implement:
+
+* Trail list
+* Trail details
+* One sample region
+* One sample trail
+
+---
+
+## Objective 5 – Business Check-in
+
+Implement:
+
+* Business profile
+* QR generation
+* QR validation
+* Check-in endpoint
+* Passport stamp award
+
+---
+
+## Objective 6 – Passport
+
+Implement:
+
+* Passport overview
+* Earned stamp display
+* Basic walking history
+
+---
+
+# 4. Deliverables
+
+By the end of Sprint 1 we should have:
+
+* Running backend
+* Running mobile application
+* Authentication
+* User profile
+* Passport
+* Trail viewer
+* Business record
+* QR scanning
+* Successful check-in
+* First earned passport stamp
+
+---
+
+# 5. Technical Deliverables
+
+Repository
+
+* Monorepo
+* Shared packages
+* Documentation
+* Continuous Integration
+
+Backend
+
+* Supabase configured
+* Database migrations
+* RLS policies
+* Storage buckets
+
+Applications
+
+* React Native mobile app
+* Business Portal shell
+* Admin Portal shell
+
+Shared Packages
+
+* Types
+* Validation
+* Configuration
+
+---
+
+# 6. Database Scope
+
+Identity
+
+* profiles
+* user_roles
+
+Walking
+
+* regions
+* trails
+
+Business
+
+* businesses
+* business_locations
+* qr_codes
+* check_ins
+
+Passport
+
+* passports
+* stamp_definitions
+* earned_stamps
+
+---
+
+# 7. API Scope
+
+```
+POST /signup
+POST /signin
+
+GET  /profile
+
+GET  /trails
+GET  /trails/{id}
+
+GET  /businesses/{id}
+
+POST /check-ins
+
+GET  /passport
+```
+
+---
+
+# 8. UI Scope
+
+## Mobile
+
+* Home
+* Trail List
+* Trail Detail
+* QR Scanner
+* Passport
+* Profile
+
+## Business Portal
+
+* Login
+* Dashboard
+* Business Profile
+
+## Admin Portal
+
+* Login only
+
+---
+
+# 9. Sample Data
+
+Initial demonstration dataset:
+
+Region:
+
+* Peak District
+
+Trail:
+
+* Mam Tor Circular
+
+Business:
+
+* One participating café
+
+Additional data:
+
+* One QR code
+* One Passport stamp
+* One achievement definition
+
+---
+
+# 10. Testing
+
+Critical journeys:
+
+* Registration
+* Login
+* Trail retrieval
+* QR validation
+* Stamp creation
+* Passport update
+
+Focus on behaviour rather than exhaustive automation.
+
+---
+
+# 11. Definition of Done
+
+Sprint 1 is complete when a brand-new user can:
+
+* Install the app
+* Create an account
+* Browse a trail
+* Visit a participating business
+* Scan a QR code
+* Receive a Passport stamp
+* View the stamp in their Passport
+
+without developer intervention.
+
+---
+
+# 12. Out of Scope
+
+Deferred until later sprints:
+
+* Achievements
+* Collections
+* Notifications
+* Community reports
+* Offers
+* Analytics
+* Moderation
+* Offline synchronisation
+* Leaderboards
+* Events
+
+---
+
+# 13. Risks
+
+Primary risks include:
+
+* Scope creep
+* Overengineering
+* Premature optimisation
+* Building administration too early
+* Trying to perfect the UI before proving the workflow
+
+---
+
+# 14. Success Measures
+
+Sprint 1 succeeds when:
+
+* Architecture proves sound
+* Authentication works
+* QR validation works
+* Passport updates correctly
+* The first complete user journey can be demonstrated
+
+Most importantly:
+
+> A real user earns their first Passport Stamp.
+
+---
+
+# 15. Sprint Retrospective
+
+At the end of the sprint we should ask:
+
+* What worked well?
+* What surprised us?
+* Which assumptions were wrong?
+* What should change before Sprint 2?
+* Which areas slowed development?
+* Did the documentation reduce uncertainty?
+
+---
+
+# Sprint Principle
+
+> **Build one complete journey before building many incomplete ones.**
+
+---
+
+**End of BP016**
