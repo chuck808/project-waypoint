@@ -1,35 +1,33 @@
-# Dependencies
+# dependencies
 node_modules/
-.pnpm-store/
 
-# Build outputs
+# build outputs
 dist/
 build/
-.next/
-out/
+.svelte-kit/
+.expo/
+.expo-shared/
 .turbo/
 
-# Environment variables
+# environment
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
 
-# Logs
+# logs
 *.log
 npm-debug.log*
 pnpm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 
-# Editor/OS
-.vscode/*
-!.vscode/extensions.json
-.idea/
+# OS / editor
 .DS_Store
 Thumbs.db
 
-# Testing
-coverage/
+# Supabase
+.supabase/
 
-# Misc
-*.tsbuildinfo
+# testing
+coverage/
+playwright-report/
+test-results/
