@@ -1,0 +1,537 @@
+# BP017 – Sprint 1 Build Book
+
+**Project:** Project Waypoint
+**Blueprint:** BP017
+**Version:** 0.1
+**Status:** Active
+**Author:** Project Waypoint Team
+**Depends On:** WP000, BP001–BP016
+
+---
+
+# Purpose
+
+This document is the implementation guide for Sprint 1.
+
+Unlike the previous blueprints, this is a working document.
+
+Every completed task should result in one or more Git commits.
+
+Progress should be measurable, visible and incremental.
+
+**Rule:** Never move to the next section while the current one remains incomplete.
+
+---
+
+# Sprint Goal
+
+Deliver the first complete Waypoint experience:
+
+```text
+Register
+    ↓
+Browse Trail
+    ↓
+Visit Business
+    ↓
+Scan QR Code
+    ↓
+Receive Passport Stamp
+```
+
+Everything in this build book contributes to that journey.
+
+---
+
+# Phase 1 – Repository Foundation
+
+## Repository
+
+* [ ] Repository created
+* [ ] Main branch protected
+* [ ] README added
+* [ ] Licence added
+* [ ] `.gitignore` configured
+* [ ] Initial documentation committed
+
+### Commit
+
+```text
+chore: initialise project repository
+```
+
+---
+
+## Monorepo
+
+Create the project structure.
+
+```text
+project-waypoint/
+├── apps/
+├── backend/
+├── database/
+├── docs/
+├── infrastructure/
+├── packages/
+├── tests/
+└── .github/
+```
+
+Tasks
+
+* [ ] Install `pnpm`
+* [ ] Initialise workspace
+* [ ] Install Turborepo
+* [ ] Create workspace configuration
+* [ ] Verify workspace builds
+
+### Commit
+
+```text
+chore: create monorepo workspace
+```
+
+---
+
+# Phase 2 – Developer Experience
+
+## Code Quality
+
+Install and configure:
+
+* [ ] TypeScript
+* [ ] ESLint
+* [ ] Prettier
+* [ ] EditorConfig
+
+### VS Code
+
+Create a committed `.vscode/` folder.
+
+Include:
+
+* [ ] extensions.json
+* [ ] settings.json
+* [ ] launch.json (if required)
+
+Recommended extensions:
+
+* ESLint
+* Prettier
+* GitLens
+* Error Lens
+* Expo Tools
+* Markdown All in One
+* Material Icon Theme
+* SQLTools (optional)
+* Thunder Client (optional)
+
+### Commit
+
+```text
+chore: configure development tooling
+```
+
+---
+
+# Phase 3 – Applications
+
+## Mobile App
+
+Create React Native application using Expo.
+
+Tasks
+
+* [ ] Initialise Expo project
+* [ ] Configure TypeScript
+* [ ] Launch on simulator/device
+* [ ] Verify hot reload
+
+### Commit
+
+```text
+feat: initialise mobile application
+```
+
+---
+
+## Business Portal
+
+Create SvelteKit application.
+
+Tasks
+
+* [ ] Initialise project
+* [ ] Verify development server
+* [ ] Configure shared tooling
+
+### Commit
+
+```text
+feat: initialise business portal
+```
+
+---
+
+## Admin Portal
+
+Create SvelteKit application.
+
+Tasks
+
+* [ ] Initialise project
+* [ ] Verify development server
+
+### Commit
+
+```text
+feat: initialise admin portal
+```
+
+---
+
+# Phase 4 – Shared Packages
+
+Create reusable packages.
+
+## packages/types
+
+* [ ] Initialise
+* [ ] Export shared domain types
+
+---
+
+## packages/validation
+
+* [ ] Initialise
+* [ ] Configure schema validation
+
+---
+
+## packages/config
+
+* [ ] Shared configuration
+* [ ] Environment helpers
+
+---
+
+## packages/ui
+
+Placeholder only.
+
+Components will arrive later.
+
+### Commit
+
+```text
+feat: create shared packages
+```
+
+---
+
+# Phase 5 – Supabase
+
+Create the development project.
+
+Tasks
+
+* [ ] Create Supabase project
+* [ ] Store credentials securely
+* [ ] Configure local environment variables
+* [ ] Connect applications
+
+### Commit
+
+```text
+feat: connect Supabase backend
+```
+
+---
+
+# Phase 6 – Database
+
+Configure the database project.
+
+Tasks
+
+* [ ] Enable UUID support
+* [ ] Enable PostGIS
+* [ ] Create migrations folder
+* [ ] Configure migration tooling
+
+### Initial Tables
+
+* [ ] profiles
+* [ ] user_roles
+* [ ] passports
+
+### Commit
+
+```text
+feat: create initial database schema
+```
+
+---
+
+# Phase 7 – Authentication
+
+Implement identity.
+
+Tasks
+
+* [ ] Register
+* [ ] Login
+* [ ] Logout
+* [ ] Auto-create profile
+* [ ] Auto-create passport
+* [ ] Assign Walker role
+
+### Verification
+
+A newly registered user should immediately have:
+
+* Profile
+* Passport
+* Walker role
+
+### Commit
+
+```text
+feat: implement authentication
+```
+
+---
+
+# Phase 8 – Trails
+
+Create the first trail.
+
+## Region
+
+* [ ] Peak District
+
+## Trail
+
+* [ ] Mam Tor Circular
+
+Include:
+
+* Name
+* Description
+* Difficulty
+* Estimated duration
+* Distance
+
+### Mobile
+
+* [ ] Trail list
+* [ ] Trail details
+
+### Commit
+
+```text
+feat: implement trail discovery
+```
+
+---
+
+# Phase 9 – Businesses
+
+Create one demonstration business.
+
+Example
+
+```text
+The Old Barn Café
+```
+
+Include:
+
+* Name
+* Description
+* Location
+* Opening hours
+* Facilities
+
+### Commit
+
+```text
+feat: create business domain
+```
+
+---
+
+# Phase 10 – QR Check-in
+
+Tasks
+
+* [ ] Generate QR token
+* [ ] Store securely
+* [ ] Create validation endpoint
+* [ ] Record check-in
+* [ ] Prevent duplicate check-ins
+
+### Verification
+
+Successful scan should:
+
+* Create Check-in
+* Update Passport
+* Return success
+
+### Commit
+
+```text
+feat: implement QR check-ins
+```
+
+---
+
+# Phase 11 – Passport
+
+Implement Passport screen.
+
+Include:
+
+* [ ] Overview
+* [ ] Earned stamps
+* [ ] Journey history (basic)
+
+### Commit
+
+```text
+feat: implement passport
+```
+
+---
+
+# Phase 12 – Demonstration
+
+Perform the complete walkthrough.
+
+Checklist
+
+* [ ] Register user
+* [ ] Browse trail
+* [ ] Open business
+* [ ] Scan QR
+* [ ] Earn stamp
+* [ ] View Passport
+
+Take screenshots.
+
+Record observations.
+
+Open issues for anything unexpected.
+
+### Commit
+
+```text
+feat: complete Sprint 1 demonstration
+```
+
+---
+
+# Testing Checklist
+
+## Authentication
+
+* [ ] Registration succeeds
+* [ ] Login succeeds
+* [ ] Logout succeeds
+
+---
+
+## Trails
+
+* [ ] Trail list loads
+* [ ] Trail details display correctly
+
+---
+
+## Business
+
+* [ ] Business profile loads
+* [ ] QR exists
+
+---
+
+## Passport
+
+* [ ] Stamp awarded
+* [ ] Stamp persists after logout
+* [ ] Passport reloads correctly
+
+---
+
+# Documentation Checklist
+
+Before Sprint 1 is complete:
+
+* [ ] README updated
+* [ ] Environment setup documented
+* [ ] New architectural decisions recorded
+* [ ] API documentation updated (if required)
+
+---
+
+# Sprint Exit Criteria
+
+Sprint 1 is complete only when a brand-new developer can:
+
+1. Clone the repository.
+2. Follow the setup guide.
+3. Run the project.
+4. Register a new account.
+5. Browse a trail.
+6. Scan a QR code.
+7. Receive a Passport Stamp.
+
+Without manual intervention.
+
+---
+
+# Sprint Milestone
+
+When the first Passport Stamp appears in the application:
+
+**Stop.**
+
+Take a screenshot.
+
+Tag the commit.
+
+Celebrate.
+
+That moment represents the transition from architecture to product.
+
+It is the first time that Project Waypoint has fulfilled the promise described in BP001.
+
+---
+
+# Looking Ahead
+
+Sprint 2 will introduce:
+
+* Community Reports
+* Nearby Discovery
+* Offline foundations
+* Business Offers
+* Achievement Engine
+
+Only after Sprint 1 is stable.
+
+---
+
+# Build Principle
+
+> **Small, complete steps are more valuable than large, unfinished leaps.**
+
+Every completed task should leave the project in a working state.
+
+At no point should the repository become "half finished."
+
+---
+
+**End of BP017**
