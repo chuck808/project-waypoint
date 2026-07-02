@@ -1,0 +1,106 @@
+openapi: 3.1.0
+info:
+  title: Project Waypoint API
+  version: 0.1.0
+  description: Initial API contract for Sprint 1.
+servers:
+  - url: /api/v1
+security:
+  - bearerAuth: []
+
+paths:
+  /profile:
+    get:
+      summary: Get current user profile
+      tags: [Identity]
+      responses:
+        "200":
+          description: Current profile
+
+  /trails:
+    get:
+      summary: List published trails
+      tags: [Trails]
+      parameters:
+        - $ref: "#/components/parameters/Cursor"
+        - $ref: "#/components/parameters/Search"
+      responses:
+        "200":
+          description: Trail list
+
+  /trails/{id}:
+    get:
+      summary: Get trail details
+      tags: [Trails]
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Trail details
+
+  /businesses/{id}:
+    get:
+      summary: Get business details
+      tags: [Businesses]
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Business details
+
+  /check-ins:
+    post:
+      summary: Create a QR check-in
+      tags: [Check-ins]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [codeValue]
+              properties:
+                codeValue:
+                  type: string
+                clientRequestId:
+                  type: string
+                  format: uuid
+      responses:
+        "201":
+          description: Check-in created
+
+  /passport:
+    get:
+      summary: Get current user passport
+      tags: [Passport]
+      responses:
+        "200":
+          description: Passport overview
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    Cursor:
+      name: cursor
+      in: query
+      required: false
+      schema:
+        type: string
+    Search:
+      name: q
+      in: query
+      required: false
+      schema:
+        type: string
