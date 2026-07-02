@@ -15,11 +15,12 @@ export default function ScanSuccessScreen() {
         </AppText>
 
         <AppText variant="title">
-          The Old Barn Café was added to your journey.
+          Your visit has been added to your journey.
         </AppText>
 
         <AppText muted>
-          Your Passport has been updated. Enjoy the rest of your walk.
+          The Old Barn Café is now part of your Passport. Enjoy the rest of your
+          walk.
         </AppText>
       </View>
 
