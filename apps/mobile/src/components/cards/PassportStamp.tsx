@@ -1,15 +1,10 @@
 import { StyleSheet, View } from "react-native";
 import { AppText } from "../AppText";
 import { theme } from "../../theme";
+import type { PassportStamp as PassportStampType } from "@waypoint/types";
 
 type PassportStampProps = {
-  stamp: {
-    id: string;
-    title: string;
-    date: string;
-    source: string;
-    description: string;
-  };
+  stamp: PassportStampType;
 };
 
 export function PassportStamp({ stamp }: PassportStampProps) {

@@ -2,17 +2,10 @@ import { Link } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { AppText } from "../AppText";
 import { theme } from "../../theme";
+import type { Trail } from "@waypoint/types";
 
 type TrailCardProps = {
-  trail: {
-    id: string;
-    name: string;
-    region: string;
-    distance: string;
-    difficulty: string;
-    duration: string;
-    type: string;
-  };
+  trail: Trail;
 };
 
 export function TrailCard({ trail }: TrailCardProps) {
@@ -23,9 +16,15 @@ export function TrailCard({ trail }: TrailCardProps) {
         <AppText muted>{trail.region}</AppText>
 
         <View style={styles.meta}>
-          <AppText variant="label" muted>{trail.distance}</AppText>
-          <AppText variant="label" muted>{trail.difficulty}</AppText>
-          <AppText variant="label" muted>{trail.duration}</AppText>
+          <AppText variant="label" muted>
+            {trail.distance}
+          </AppText>
+          <AppText variant="label" muted>
+            {trail.difficulty}
+          </AppText>
+          <AppText variant="label" muted>
+            {trail.duration}
+          </AppText>
         </View>
 
         <AppText variant="label">{trail.type}</AppText>

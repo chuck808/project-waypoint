@@ -2,16 +2,10 @@ import { Link } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { AppText } from "../AppText";
 import { theme } from "../../theme";
+import type { Place } from "@waypoint/types";
 
 type PlaceCardProps = {
-  place: {
-    id: string;
-    name: string;
-    category: string;
-    note: string;
-    distance: string;
-    welcome: string;
-  };
+  place: Place;
 };
 
 export function PlaceCard({ place }: PlaceCardProps) {
@@ -19,7 +13,7 @@ export function PlaceCard({ place }: PlaceCardProps) {
     <Link href={`/places/${place.id}`} style={styles.link}>
       <View style={styles.card}>
         <AppText variant="label" muted>
-          {place.category} · {place.distance}
+          {place.displayCategory} · {place.distance}
         </AppText>
 
         <AppText variant="heading">{place.name}</AppText>
