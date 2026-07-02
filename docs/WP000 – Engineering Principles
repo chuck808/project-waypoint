@@ -1,0 +1,287 @@
+# WP000 – Engineering Principles
+
+**Project:** Project Waypoint
+**Document:** WP000
+**Version:** 1.0
+**Status:** Foundational
+**Audience:** Everyone who contributes to Project Waypoint
+
+---
+
+# Purpose
+
+This document defines the engineering principles that guide the design, development and long-term stewardship of Project Waypoint.
+
+Technologies will change.
+
+Frameworks will evolve.
+
+Individual implementations will be replaced.
+
+These principles should remain largely unchanged.
+
+When a technical decision is unclear, these principles take precedence over convenience.
+
+---
+
+# 1. Build for the Long Term
+
+Waypoint is intended to exist for years, not months.
+
+Every architectural decision should favour maintainability over short-term speed unless there is a compelling reason to do otherwise.
+
+We optimise for the project we want to own five years from now.
+
+---
+
+# 2. Simplicity is a Feature
+
+Complexity carries a maintenance cost.
+
+Every new abstraction, dependency, service or feature increases that cost.
+
+We begin with the simplest solution capable of solving the current problem.
+
+Complexity must be earned through experience rather than anticipated.
+
+---
+
+# 3. The Domain Comes First
+
+The Waypoint domain model represents the product itself.
+
+User interfaces, APIs and databases exist to serve that model.
+
+The domain should never be distorted to satisfy the limitations of a particular framework or library.
+
+---
+
+# 4. Technology Serves the Product
+
+Technology choices are made because they solve problems, not because they are fashionable.
+
+We prefer mature, well-understood technologies with strong communities and predictable behaviour.
+
+Boring technology is often the most professional choice.
+
+---
+
+# 5. Data is Part of the Product
+
+The database is not merely storage.
+
+It preserves journeys, memories, community knowledge and business participation.
+
+Schema changes should be considered product decisions rather than purely technical ones.
+
+Historical information should be preserved whenever practical.
+
+---
+
+# 6. Users Own Their Story
+
+Waypoint exists to help people preserve their experiences.
+
+The platform should never create unnecessary barriers between users and their own information.
+
+User data should remain portable wherever practical.
+
+Trust is more valuable than engagement metrics.
+
+---
+
+# 7. Every Feature Must Have a Purpose
+
+No feature exists because it is technically interesting.
+
+Every feature should clearly improve at least one of the following:
+
+* the walking experience
+* community knowledge
+* local businesses
+* trust
+* accessibility
+* operational simplicity
+
+If its purpose cannot be clearly explained, it should not be built.
+
+---
+
+# 8. Consistency Over Cleverness
+
+Users should not need to learn different behaviours in different parts of the application.
+
+Developers should not need to remember exceptions.
+
+Consistent naming, structure and behaviour reduce mistakes and improve maintainability.
+
+Predictability is a feature.
+
+---
+
+# 9. One Source of Truth
+
+Every important piece of information should have a single authoritative owner.
+
+Examples include:
+
+* authentication belongs to the authentication system
+* business ownership belongs to business memberships
+* passport history belongs to the passport
+* trail metadata belongs to the trail domain
+
+Duplicated data should be avoided unless there is a measurable benefit.
+
+---
+
+# 10. Security is Designed, Not Added
+
+Security should be considered from the beginning.
+
+Authentication, authorisation, validation, auditing and privacy are fundamental parts of the system rather than optional additions.
+
+Security should never depend upon client-side behaviour alone.
+
+---
+
+# 11. Offline is a First-Class Consideration
+
+Walkers frequently travel beyond reliable mobile coverage.
+
+Whenever practical, features should degrade gracefully rather than fail completely.
+
+Synchronisation should be designed into the platform rather than retrofitted later.
+
+---
+
+# 12. Preserve Trust Above All Else
+
+Trust is Waypoint's most valuable asset.
+
+Community information should be verifiable.
+
+Business participation should remain transparent.
+
+Achievements should be meaningful.
+
+Analytics should respect privacy.
+
+Commercial decisions should never undermine user confidence.
+
+---
+
+# 13. Measure What Matters
+
+Not every measurable value is useful.
+
+We value meaningful indicators such as:
+
+* completed journeys
+* returning walkers
+* participating businesses
+* verified community reports
+* user satisfaction
+
+Vanity metrics should never drive product decisions.
+
+---
+
+# 14. The Platform Comes Before the Interface
+
+Mobile applications, web portals and administration tools are clients of the same platform.
+
+Business rules belong within the platform rather than individual interfaces.
+
+Interfaces should remain replaceable without affecting the underlying product.
+
+---
+
+# 15. Documentation is Part of the Codebase
+
+Documentation is maintained alongside implementation.
+
+Important architectural decisions should be recorded.
+
+Future contributors should understand not only *what* was built, but *why*.
+
+Outdated documentation should be corrected or removed.
+
+---
+
+# 16. Test Behaviour, Not Implementation
+
+Tests should describe expected behaviour.
+
+Internal implementation details may change.
+
+The expected behaviour of the system should remain stable.
+
+Well-written tests become executable documentation.
+
+---
+
+# 17. Optimise for Readability
+
+Code is read far more often than it is written.
+
+Clear names, small functions and straightforward logic are preferred over clever implementations.
+
+Future maintainers—including ourselves—should be able to understand the system without unnecessary effort.
+
+---
+
+# 18. Respect Nature
+
+Waypoint exists because people enjoy spending time outdoors.
+
+The platform should encourage responsible access, respect for landowners, care for wildlife and consideration for local communities.
+
+Technology should support that relationship rather than distract from it.
+
+---
+
+# 19. Respect Local Communities
+
+Waypoint succeeds only when walkers and local communities both benefit.
+
+Independent businesses should be treated as partners rather than advertising inventory.
+
+Participation should remain affordable, transparent and worthwhile.
+
+---
+
+# 20. Evolve Through Experience
+
+No blueprint is perfect.
+
+The platform should evolve through observation, evidence and feedback.
+
+Changing a previous decision is a sign of learning, not failure.
+
+The only requirement is that change is deliberate, documented and improves the product.
+
+---
+
+# Engineering Principles
+
+Every significant engineering decision should satisfy the following questions:
+
+* Does this make the system easier to understand?
+* Does this improve the experience for walkers?
+* Does this preserve trust?
+* Does this support local communities?
+* Will this decision still make sense in five years?
+
+If the answer to several of these questions is "no", we should reconsider the decision.
+
+---
+
+# The Waypoint Engineering Principle
+
+> **Build systems that quietly endure.**
+
+The best software rarely draws attention to itself.
+
+It simply works, remains trustworthy, and allows people to focus on what truly matters.
+
+For Waypoint, that means helping people enjoy the journey rather than the technology.
