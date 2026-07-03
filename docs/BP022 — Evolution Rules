@@ -1,0 +1,311 @@
+# BP022 — Evolution Rules
+
+**Status:** Draft
+
+**Version:** 1.0
+
+**Author:** Damien & ChatGPT
+
+**Last Updated:** 2026-07-03
+
+---
+
+# Purpose
+
+This blueprint defines how Waypoint evolves.
+
+Its purpose is to ensure that the platform grows deliberately rather than reactively.
+
+Every abstraction introduces cost.
+
+Every feature increases complexity.
+
+This document describes the principles used to decide when change is justified.
+
+---
+
+# Guiding Principle
+
+> Software should evolve because reality becomes more complex, not because possibility exists.
+
+Waypoint should remain as simple as today's requirements allow.
+
+Future possibilities are acknowledged, but not implemented prematurely.
+
+---
+
+# Rule 1 — Build Today's Behaviour
+
+Design for tomorrow.
+
+Implement for today.
+
+Future requirements should influence interfaces and naming.
+
+They should not introduce speculative code.
+
+Good:
+
+```
+resolveCheckIn()
+
+↓
+
+performCheckIn()
+```
+
+Poor:
+
+```
+ICheckInProvider
+
+BaseCheckInProvider
+
+QrCheckInProvider
+
+GpsCheckInProvider
+```
+
+before GPS exists.
+
+---
+
+# Rule 2 — Extract on the First Exception
+
+An abstraction is justified when behaviour diverges.
+
+Not when duplication first appears.
+
+Example:
+
+Today:
+
+```
+One visit per venue day.
+```
+
+No policy required.
+
+Future:
+
+```
+One visit per venue day.
+
+except...
+
+One business allows unlimited visits.
+```
+
+Now the rule has exceptions.
+
+The behaviour deserves a home.
+
+Extract:
+
+```
+VisitPolicy
+```
+
+---
+
+# Rule 3 — One Source of Truth
+
+Every fact has one owner.
+
+Everything else derives from it.
+
+Examples:
+
+Visits own visit history.
+
+Passports derive memories.
+
+Achievements derive progress.
+
+Statistics derive counts.
+
+Never duplicate ownership.
+
+---
+
+# Rule 4 — Opaque Before Trusted
+
+Encapsulation and trust are different concerns.
+
+Today:
+
+```
+Opaque token
+
+↓
+
+Client generated
+```
+
+Tomorrow:
+
+```
+Signed token
+
+↓
+
+Server generated
+```
+
+Never create signatures that cannot establish trust.
+
+An unsigned opaque value is preferable to a misleading signature.
+
+---
+
+# Rule 5 — Behaviour Before Infrastructure
+
+Infrastructure exists to support behaviour.
+
+Never build infrastructure simply because it might become useful.
+
+Examples include:
+
+* scanner abstraction
+* caching layers
+* messaging
+* event buses
+
+These should appear only when behaviour genuinely requires them.
+
+---
+
+# Rule 6 — Services Speak the Domain
+
+Repositories speak SQL.
+
+Services speak Waypoint.
+
+A service should never expose database terminology.
+
+Good:
+
+```
+already_visited
+```
+
+Poor:
+
+```
+duplicate_check_in
+```
+
+The domain language belongs to Waypoint rather than the database.
+
+---
+
+# Rule 7 — UI Speaks to People
+
+The interface should describe experiences.
+
+Not implementation.
+
+Good:
+
+```
+Welcome back.
+
+You visited here today.
+```
+
+Poor:
+
+```
+Duplicate QR detected.
+```
+
+The walker should never need to understand the implementation.
+
+---
+
+# Rule 8 — Comments Explain Why
+
+Code explains what.
+
+Comments explain why.
+
+Comments should preserve reasoning rather than narrate syntax.
+
+Good:
+
+```
+The resolution check is a courtesy.
+
+The write check is the guard.
+```
+
+Poor:
+
+```
+Check if already visited.
+```
+
+---
+
+# Rule 9 — Prefer Composition
+
+Small responsibilities compose.
+
+Large responsibilities fracture.
+
+When a module begins solving multiple unrelated problems, divide responsibilities rather than introducing inheritance.
+
+---
+
+# Rule 10 — Make the Next Change Easier
+
+The purpose of good architecture is not to predict the future.
+
+It is to reduce the cost of adapting to it.
+
+Every change should leave the codebase slightly easier to evolve than before.
+
+---
+
+# Engineering Philosophy
+
+Waypoint deliberately grows through conversation.
+
+Ideas are explored.
+
+Assumptions are challenged.
+
+Alternatives are considered.
+
+Only then is code written.
+
+The objective is not simply correctness.
+
+It is clarity.
+
+---
+
+# Consequences
+
+Following these rules produces:
+
+* fewer abstractions
+* stronger domain models
+* clearer code reviews
+* lower maintenance cost
+* better documentation
+* more deliberate evolution
+
+Most importantly, it allows Waypoint to remain coherent as it grows.
+
+---
+
+# Summary
+
+Every abstraction should earn its existence.
+
+Every feature should strengthen the product's purpose.
+
+Every line of code should make the next line easier to write.
+
+Software ages well when restraint becomes part of the architecture.
