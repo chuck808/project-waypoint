@@ -46,6 +46,14 @@ export default function HomeScreen() {
 
       <PrimaryLink href="/discover">Find a walk</PrimaryLink>
       <PrimaryLink href="/passport">View passport</PrimaryLink>
+
+      <Section>
+        <AppText variant="label" muted>
+          Developer
+        </AppText>
+
+        <PrimaryLink href="/check-in">Test QR Check-in</PrimaryLink>
+      </Section>
     </Screen>
   );
 }

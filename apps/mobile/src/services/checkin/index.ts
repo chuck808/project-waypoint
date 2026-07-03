@@ -1,0 +1,1 @@
+export { validateQrCode } from "./service";
