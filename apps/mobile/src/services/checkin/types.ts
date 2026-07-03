@@ -22,3 +22,13 @@ export type CheckInResolution =
       outcome: "not_recognised";
       reason: "unknown_code" | "expired" | "revoked" | "place_unavailable";
     };
+
+export type PerformCheckInResult =
+  | {
+      outcome: "recorded";
+      message: string;
+    }
+  | {
+      outcome: "failed";
+      reason: string;
+    };

@@ -1,2 +1,6 @@
-export { resolveCheckIn } from "./service";
-export type { CheckInResolution, StampPreview } from "./types";
+export { performCheckIn, resolveCheckIn } from "./service";
+export type {
+  CheckInResolution,
+  PerformCheckInResult,
+  StampPreview,
+} from "./types";

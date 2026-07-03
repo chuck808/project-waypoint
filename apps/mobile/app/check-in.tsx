@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button, StyleSheet, TextInput, View } from "react-native";
-import { AppText, PrimaryLink, Screen } from "../src/components";
-import { resolveCheckIn } from "../src/services/checkin";
+import { AppText, PrimaryButton, PrimaryLink, Screen } from "../src/components";
+import { performCheckIn, resolveCheckIn } from "../src/services/checkin";
 import type { CheckInResolution } from "../src/services/checkin";
 import { theme } from "../src/theme";
 
@@ -9,6 +9,20 @@ export default function CheckInScreen() {
   const [code, setCode] = useState("");
   const [result, setResult] = useState<CheckInResolution | null>(null);
   const [error, setError] = useState("");
+  const [checkInRef, setCheckInRef] = useState<string | null>(null);
+  const [recordMessage, setRecordMessage] = useState("");
+
+  async function recordVisit() {
+    if (!checkInRef) return;
+
+    const result = await performCheckIn(checkInRef);
+
+    if (result.outcome === "recorded") {
+      setRecordMessage(result.message);
+    } else {
+      setRecordMessage(result.reason);
+    }
+  }
 
   return (
     <Screen>
@@ -43,6 +57,10 @@ export default function CheckInScreen() {
           try {
             const resolution = await resolveCheckIn(code);
             setResult(resolution);
+
+            if (resolution.outcome === "ready") {
+              setCheckInRef(resolution.checkInRef);
+            }
           } catch (err) {
             setError(
               err instanceof Error ? err.message : "Unable to validate code.",
@@ -71,6 +89,12 @@ export default function CheckInScreen() {
         {result?.outcome === "not_recognised" ? (
           <AppText muted>That Waypoint code was not recognised.</AppText>
         ) : null}
+
+        {result?.outcome === "ready" ? (
+          <PrimaryButton onPress={recordVisit}>Add to Passport</PrimaryButton>
+        ) : null}
+
+        {recordMessage ? <AppText muted>{recordMessage}</AppText> : null}
       </View>
 
       <PrimaryLink href="/">Back home</PrimaryLink>
