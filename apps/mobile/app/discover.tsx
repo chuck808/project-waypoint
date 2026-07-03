@@ -1,20 +1,31 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import type { Trail } from "@waypoint/types";
-import { AppText, PrimaryLink, Screen, TrailCard } from "../src/components";
+import type { Place, Trail } from "@waypoint/types";
+import {
+  AppText,
+  PlaceCard,
+  PrimaryLink,
+  Screen,
+  TrailCard,
+} from "../src/components";
+import { getPlaces } from "../src/services/places";
 import { getTrails } from "../src/services/trails";
 import { theme } from "../src/theme";
 
 export default function DiscoverScreen() {
   const [trails, setTrails] = useState<Trail[]>([]);
+  const [places, setPlaces] = useState<Place[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    async function loadTrails() {
+    async function load() {
       try {
         const nextTrails = await getTrails();
         setTrails(nextTrails);
+
+        const nextPlaces = await getPlaces();
+        setPlaces(nextPlaces);
       } catch (error) {
         setErrorMessage(
           error instanceof Error ? error.message : "Unable to load trails.",
@@ -24,7 +35,7 @@ export default function DiscoverScreen() {
       }
     }
 
-    loadTrails();
+    load();
   }, []);
 
   return (
@@ -40,7 +51,6 @@ export default function DiscoverScreen() {
         <AppText variant="label" muted>
           Popular nearby
         </AppText>
-        <AppText muted>Trail count: {trails.length}</AppText>
 
         {isLoading ? (
           <AppText muted>Loading trails…</AppText>
@@ -49,6 +59,16 @@ export default function DiscoverScreen() {
         ) : (
           trails.map((trail) => <TrailCard key={trail.id} trail={trail} />)
         )}
+      </View>
+
+      <View style={styles.section}>
+        <AppText variant="label" muted>
+          Nearby places
+        </AppText>
+
+        {places.map((place) => (
+          <PlaceCard key={place.id} place={place} />
+        ))}
       </View>
 
       <PrimaryLink href="/">Back home</PrimaryLink>
@@ -63,5 +83,6 @@ const styles = StyleSheet.create({
   },
   section: {
     gap: theme.spacing.md,
+    marginBottom: theme.spacing.xl,
   },
 });
