@@ -1,9 +1,32 @@
+import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import { AppText, PassportStamp, PrimaryLink, Screen } from "../src/components";
-import { passportStamps } from "../src/data/passport";
+import type { PassportStamp as PassportStampType } from "@waypoint/types";
+import { getPassportStamps } from "../src/services/passport";
 import { theme } from "../src/theme";
 
 export default function PassportScreen() {
+  const [stamps, setStamps] = useState<PassportStampType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function load() {
+      try {
+        const next = await getPassportStamps();
+        setStamps(next);
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : "Unable to load passport.",
+        );
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    load();
+  }, []);
+
   return (
     <Screen>
       <View style={styles.header}>
@@ -20,14 +43,22 @@ export default function PassportScreen() {
       </View>
 
       <View style={styles.summary}>
-        <AppText variant="heading">{passportStamps.length}</AppText>
+        <AppText variant="heading">{stamps.length}</AppText>
         <AppText muted>memories added so far</AppText>
       </View>
 
       <View style={styles.list}>
-        {passportStamps.map((stamp) => (
-          <PassportStamp key={stamp.id} stamp={stamp} />
-        ))}
+        {loading ? (
+          <AppText muted>Loading your Passport…</AppText>
+        ) : error ? (
+          <AppText muted>{error}</AppText>
+        ) : stamps.length === 0 ? (
+          <AppText muted>
+            Your Passport is waiting for its first memory.
+          </AppText>
+        ) : (
+          stamps.map((stamp) => <PassportStamp key={stamp.id} stamp={stamp} />)
+        )}
       </View>
 
       <PrimaryLink href="/">Back home</PrimaryLink>

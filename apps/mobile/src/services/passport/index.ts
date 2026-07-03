@@ -1,0 +1,1 @@
+export { getPassportStamps } from "./service";
