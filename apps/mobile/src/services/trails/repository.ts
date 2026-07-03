@@ -6,7 +6,16 @@ type TrailRow = Database["public"]["Tables"]["trails"]["Row"];
 export async function getPublishedTrailRows(): Promise<TrailRow[]> {
   const { data, error } = await supabase
     .from("trails")
-    .select("*")
+    .select(
+      `
+      *,
+      trail_regions (
+        region:regions (
+          name
+        )
+      )
+    `,
+    )
     .eq("status", "published")
     .order("name");
 
@@ -22,7 +31,16 @@ export async function getTrailRowBySlug(
 ): Promise<TrailRow | null> {
   const { data, error } = await supabase
     .from("trails")
-    .select("*")
+    .select(
+      `
+      *,
+      trail_regions (
+        regions (
+          name
+        )
+      )
+    `,
+    )
     .eq("slug", slug)
     .single();
 

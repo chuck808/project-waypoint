@@ -1,7 +1,34 @@
 import type { Database } from "@waypoint/database";
-import type { Trail } from "@waypoint/types";
+import type { Trail, TrailDifficulty, TrailType } from "@waypoint/types";
 
-type TrailRow = Database["public"]["Tables"]["trails"]["Row"];
+type TrailRow = Database["public"]["Tables"]["trails"]["Row"] & {
+  trail_regions?: {
+    region?: {
+      name: string;
+    } | null;
+  }[];
+};
+
+function mapDifficulty(value: string): TrailDifficulty {
+  if (
+    value === "easy" ||
+    value === "moderate" ||
+    value === "hard" ||
+    value === "expert"
+  ) {
+    return value;
+  }
+
+  return "moderate";
+}
+
+function mapTrailType(value: string): TrailType {
+  if (value === "circular" || value === "linear" || value === "out_and_back") {
+    return value;
+  }
+
+  return "circular";
+}
 
 function formatDuration(minutes: number | null): string {
   if (!minutes) return "Unknown";
@@ -24,14 +51,14 @@ export function mapTrail(row: TrailRow): Trail {
   return {
     id: row.slug,
     name: row.name,
-    region: "Peak District",
+    region: row.trail_regions?.[0]?.region?.name ?? "Unknown region",
     distance: row.distance_km
       ? `${Number(row.distance_km).toFixed(1)} km`
       : "Unknown",
 
-    difficulty: row.difficulty,
+    difficulty: mapDifficulty(row.difficulty),
     duration: formatDuration(row.estimated_duration_minutes),
-    type: row.trail_type,
+    type: mapTrailType(row.trail_type),
     description: row.description ?? "",
   };
 }
