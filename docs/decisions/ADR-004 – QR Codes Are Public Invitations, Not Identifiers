@@ -1,0 +1,117 @@
+# ADR-004 – QR Codes Are Public Invitations, Not Identifiers
+
+**Project:** Project Waypoint  
+**Status:** Proposed  
+**Date:** 2026-07-03  
+**Related:** BP012, BP014, BP018, ADR-002
+
+---
+
+## Context
+
+Waypoint check-ins begin at a physical QR code displayed at a participating place. These codes will be:
+
+- printed and laminated
+- photographed and shared
+- scanned by people who do not have Waypoint installed
+- read aloud and typed by hand
+
+Once printed, a QR code cannot be patched, migrated or recalled. Whatever it contains becomes a permanent external contract.
+
+The system must also support token rotation, revocation, abuse mitigation and future changes to check-in semantics — without any physical sign ever changing.
+
+---
+
+## Decision
+
+**A Waypoint QR code is a durable public invitation to continue a journey, not a transport mechanism for application state.**
+
+QR codes are part of the public interface of Waypoint. Public interfaces are forever.
+
+Specifically:
+
+1. **QR codes encode a URL, not a bare token.** A scan outside the app must lead somewhere meaningful: a landing page, an explanation of Waypoint, and a path into the app. Every sign is an acquisition channel.
+
+2. **The URL contains a public token, never a database identifier.** The server resolves `publicToken → qr_code → business_location → business`. Regeneration, rotation, revocation and migration are exclusively server-side concerns.
+
+3. **The printed URL carries no version segment.** The printed artifact is the most permanent component in the system; versioning lives where change is possible. Evolution is expressed through server-side resolution and the token prefix.
+
+4. **Tokens are versioned, recognisable and typeable.** Format: `wp1-XXXX-XXXX` — a `wp1` prefix followed by Crockford base32 payload (no 0/O or 1/I ambiguity), hyphen-grouped for reading from a sign. Manual entry is a permanent fallback, so tokens are designed to be typed by cold hands.
+
+5. **Resolution normalises generously.** The service accepts a full URL, a bare token, any letter case, and missing or extra hyphens. "What does this code represent?" is the service's question to answer, however the code arrives.
+
+---
+
+## URL Format
+
+```
+https://<domain>/visit/{publicToken}
+```
+
+- `/visit/` uses Waypoint's domain language (visits, journeys, memories), not application mechanics (`/check-in/`, `/qr/`, `/c/`).
+- The URL should read as an invitation to someone who has never heard of Waypoint.
+- **The domain is part of the public interface.** It must be owned, permanent and formally decided before the first sign is printed. No sign is printed while the domain is provisional.
+
+---
+
+## Reasons
+
+- Printed artifacts cannot be migrated; the server can. All change must therefore live server-side.
+- A bare token is inert to anyone without the app; a URL converts every sign into an onboarding path (scan → landing page → install → resume visit).
+- Database identifiers in the wild couple the physical world to storage internals and prevent rotation.
+- Readable URLs and typeable tokens serve the humans who will inevitably read, share and hand-enter them.
+
+---
+
+## Alternatives Considered
+
+### Bare token in the QR
+
+Rejected. Meaningless outside the app; forfeits the acquisition channel; makes the physical sign useless to new users.
+
+### Versioned URL path (`/v1/visit/{token}`)
+
+Rejected. Embeds an expiry expectation into a permanent artifact. Version signalling moves to the token prefix; semantic evolution moves to server-side resolution.
+
+### Database identifier in the URL
+
+Rejected. Prevents rotation and regeneration; leaks storage internals into a public, permanent interface.
+
+### Deep-link scheme (`waypoint://visit/{token}`)
+
+Rejected as the printed format. Custom schemes fail for users without the app. Universal Links / App Links over HTTPS provide in-app routing from the same URL.
+
+---
+
+## Consequences
+
+Positive:
+
+- No physical sign ever needs reprinting for technical reasons.
+- Token rotation, revocation and abuse mitigation are invisible to the physical world.
+- Every sign doubles as an acquisition channel.
+- Manual entry remains a first-class, permanent fallback.
+
+Trade-offs:
+
+- Requires a public web endpoint (landing page + resolution) earlier than otherwise needed.
+- The domain decision becomes urgent and irreversible.
+- Existing demo tokens (`demo-*` slugs) must be replaced with generated `wp1-` tokens before any real deployment.
+
+---
+
+## Architectural Boundary
+
+The QR payload and URL format are an **external, permanent contract**. Nothing about application state, storage structure or check-in semantics may leak into them.
+
+`qr_codes.code_value` already stores an opaque value distinct from the row identifier; this ADR changes the **generation policy** (random, prefixed, typeable), not the schema.
+
+---
+
+## Review Trigger
+
+Revisit this decision if: a second physical medium (NFC, printed short codes without QR) is introduced; token collisions or abuse patterns emerge at scale; or Universal Link requirements force changes to URL structure.
+
+---
+
+**End of ADR-004**
