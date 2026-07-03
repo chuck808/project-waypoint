@@ -1,0 +1,282 @@
+# BP021 — The Waypoint Memory Graph
+
+**Status:** Draft
+
+**Version:** 1.0
+
+**Author:** Damien & ChatGPT
+
+**Last Updated:** 2026-07-03
+
+---
+
+# Purpose
+
+This blueprint defines the conceptual model that underpins the Waypoint platform.
+
+Waypoint is not organised around trails, businesses or QR codes.
+
+It is organised around **experiences**.
+
+The Memory Graph describes how those experiences become verified memories and how those memories connect people, places and journeys over time.
+
+It is the conceptual heart of the platform.
+
+---
+
+# The Core Idea
+
+People do not remember QR codes.
+
+People remember experiences.
+
+A walk is not simply a route across a map.
+
+It is a collection of moments:
+
+* the café discovered after climbing a hill,
+* the conversation with another walker,
+* the viewpoint reached just before sunset,
+* the unexpected detour that became the highlight of the day.
+
+Those moments deserve context.
+
+Waypoint exists to preserve that context.
+
+---
+
+# Guiding Principle
+
+> Experiences become memories when they are preserved with context.
+
+Everything within Waypoint should strengthen this principle.
+
+If a feature does not enrich, preserve or connect memories, it should be questioned before being added.
+
+---
+
+# Experiences, Not Records
+
+Most location-based applications store records.
+
+Waypoint stores relationships.
+
+A check-in is not valuable because a database row exists.
+
+It is valuable because it connects a person, a place and a moment in time.
+
+Those connections accumulate into stories.
+
+---
+
+# The Memory Graph
+
+The platform revolves around verified visits.
+
+```
+Walker
+
+    │
+
+    │ experiences
+
+    ▼
+
+Visit (Check-In)
+
+    │
+
+    ├────────► Place
+
+    │
+
+    ├────────► Business
+
+    │
+
+    ├────────► Trail
+
+    │
+
+    ├────────► Region
+
+    │
+
+    ├────────► Passport Memory
+
+    │
+
+    └────────► Time
+```
+
+Every future feature should strengthen this graph rather than bypass it.
+
+---
+
+# Source of Truth
+
+The authoritative event is the **Visit**.
+
+Visits are recorded as verified check-ins.
+
+Everything else is derived.
+
+Examples include:
+
+* Passport memories
+* Achievements
+* Statistics
+* Rewards
+* Recommendations
+* Journey reconstruction
+
+The Passport is therefore **not** the source of truth.
+
+It is one interpretation of the visit history.
+
+This distinction intentionally prevents duplicate representations of the same experience.
+
+---
+
+# Verification
+
+Waypoint values authenticity.
+
+Memories gain value when they can be trusted.
+
+Verification currently occurs through QR check-ins.
+
+Future mechanisms may include:
+
+* GPS verification
+* Event participation
+* Business validation
+* Community confirmation
+
+The verification mechanism may evolve.
+
+The meaning of a verified visit should not.
+
+---
+
+# Context
+
+A memory consists of more than a timestamp.
+
+Context may include:
+
+* Trail
+* Region
+* Place
+* Business
+* Season
+* Weather
+* Companions
+* Photographs
+* Personal notes
+
+These are connected to the visit rather than replacing it.
+
+The visit remains the central event.
+
+---
+
+# The Memory Graph Grows Organically
+
+The graph is not manually curated.
+
+It emerges naturally through walking.
+
+Each verified visit creates new relationships.
+
+Over time, previously unrelated experiences become connected.
+
+Examples include:
+
+* Every place visited during autumn.
+* Every independent café discovered on long-distance walks.
+* Every trail completed with a particular friend.
+* Every business supporting a favourite route.
+* Every journey made through a National Park.
+
+These queries require no additional product design.
+
+They emerge because the graph already contains the relationships.
+
+---
+
+# Local Communities
+
+Businesses are not advertisements.
+
+They are participants.
+
+A welcoming café, village shop or visitor centre becomes part of the walker's story.
+
+Waypoint therefore models businesses as contributors to experiences rather than destinations in isolation.
+
+---
+
+# Product Philosophy
+
+Waypoint is not attempting to become the largest catalogue of walking routes.
+
+Its purpose is different.
+
+The objective is to help people build a trustworthy record of meaningful experiences.
+
+Trails provide opportunities.
+
+Visits create memories.
+
+Memories become stories.
+
+---
+
+# Evolution
+
+The Memory Graph deliberately anticipates future capabilities.
+
+Potential examples include:
+
+* seasonal memory timelines
+* revisit recommendations
+* connected journeys
+* social storytelling
+* heritage collections
+* conservation participation
+* local business discovery
+* personal walking histories
+
+These features should emerge from the graph rather than introducing parallel data models.
+
+---
+
+# Consequences
+
+This philosophy leads to several engineering decisions:
+
+* Check-ins are the source of truth.
+* Passport entries are derived.
+* Domain models describe experiences rather than tables.
+* Services return meaning rather than persistence models.
+* Verification is separated from presentation.
+* Relationships are considered first-class information.
+
+These are architectural consequences of the Memory Graph rather than independent rules.
+
+---
+
+# Summary
+
+Waypoint is not fundamentally a hiking application.
+
+It is a platform for preserving verified experiences.
+
+Walking is simply the first domain in which those experiences are collected.
+
+The long-term value of Waypoint lies not in its database of places, but in the growing graph of relationships between people, places and moments.
+
+Every verified visit adds another thread to that graph.
+
+Every thread strengthens the story.
