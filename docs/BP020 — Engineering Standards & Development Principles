@@ -1,0 +1,351 @@
+# BP020 — Engineering Standards & Development Principles
+
+**Status:** Draft
+
+**Version:** 1.0
+
+**Author:** Damien & ChatGPT
+
+**Last Updated:** 2026-07-03
+
+---
+
+# Purpose
+
+This blueprint defines the engineering principles used throughout the Waypoint platform.
+
+Rather than prescribing language syntax or coding style, it establishes the architectural rules that allow every part of Waypoint to evolve consistently.
+
+The objective is not simply to write working software, but to create a platform that remains understandable, maintainable and enjoyable to extend many years into the future.
+
+---
+
+# Guiding Principle
+
+> Build behaviour, not implementation.
+
+Implementation details change.
+
+Behaviour should remain stable.
+
+Every architectural decision should therefore be judged by how well it models the Waypoint domain rather than the underlying technology.
+
+---
+
+# Engineering Philosophy
+
+Waypoint is intentionally built as a layered system.
+
+Each layer has one responsibility.
+
+```
+UI
+
+↓
+
+Feature
+
+↓
+
+Service
+
+↓
+
+Repository
+
+↓
+
+Database
+```
+
+No layer should assume responsibilities belonging to another.
+
+---
+
+# Repository Pattern
+
+Repositories communicate with external systems.
+
+Responsibilities include:
+
+- querying Supabase
+- writing data
+- relationship loading
+- persistence
+
+Repositories return **database rows**.
+
+Repositories never contain business rules.
+
+Example:
+
+```
+trailRepository.getPublished()
+
+passportRepository.getEntries()
+
+checkInRepository.create()
+```
+
+---
+
+# Mapper Pattern
+
+Mappers translate between persistence models and domain models.
+
+They exist because:
+
+- database schemas optimise storage
+- domain models optimise understanding
+
+Example:
+
+```
+Database
+
+difficulty: string
+
+↓
+
+Domain
+
+difficulty: TrailDifficulty
+```
+
+A mapper is the only place where this translation should occur.
+
+---
+
+# Service Pattern
+
+Services express business behaviour.
+
+Services never expose database rows.
+
+Services speak the language of Waypoint.
+
+Good:
+
+```
+resolveCheckIn()
+
+performCheckIn()
+
+getPassportStamps()
+```
+
+Poor:
+
+```
+getQrCodeRow()
+
+insertEarnedStamp()
+```
+
+Services orchestrate repositories.
+
+Repositories never orchestrate services.
+
+---
+
+# Feature Modules
+
+Features own user journeys.
+
+```
+features/
+
+    checkin/
+
+    discover/
+
+    passport/
+```
+
+A feature may contain:
+
+- components
+- hooks
+- local state machines
+- formatting helpers
+
+A feature should not know how persistence works.
+
+---
+
+# Result Types
+
+Expected business outcomes should be represented by explicit result types.
+
+Do not use exceptions for normal behaviour.
+
+Good:
+
+```
+ready
+
+already_visited
+
+not_recognised
+```
+
+Poor:
+
+```
+throw "Already visited"
+```
+
+Exceptions represent technical failures.
+
+Result types represent domain behaviour.
+
+---
+
+# Source of Truth
+
+Every concept has exactly one authoritative source.
+
+Examples:
+
+| Concept | Source |
+|----------|--------|
+| Visit | check_ins |
+| Passport | Derived from visits |
+| Trail | trails |
+| Business | businesses |
+
+Avoid duplicate truths.
+
+Derived data should always remain derivable.
+
+---
+
+# Row Level Security
+
+RLS is considered part of the domain.
+
+Policies should describe business permissions rather than implementation convenience.
+
+Examples:
+
+- Users read their own passport.
+- Published trails are public.
+- Active businesses are visible.
+- Users create only their own check-ins.
+
+---
+
+# Domain Types
+
+The UI consumes domain models.
+
+The UI must never consume database rows directly.
+
+```
+Database
+
+↓
+
+Mapper
+
+↓
+
+Domain
+
+↓
+
+UI
+```
+
+---
+
+# State Machines
+
+User journeys are modelled as state machines.
+
+Example:
+
+```
+Idle
+
+↓
+
+Resolving
+
+↓
+
+Ready
+
+↓
+
+Recording
+
+↓
+
+Recorded
+```
+
+Alternative outcomes are modelled explicitly.
+
+This produces deterministic user experiences.
+
+---
+
+# Policies
+
+Business rules become Policies only when multiple behaviours depend upon them.
+
+Do not extract policies prematurely.
+
+The extraction trigger is the first genuine exception.
+
+Example:
+
+VisitPolicy
+
+created when "one visit per venue day" gains its first exception.
+
+---
+
+# Documentation
+
+Every significant architectural decision should be documented.
+
+Blueprints explain:
+
+**Why the platform exists this way.**
+
+ADRs explain:
+
+**Why a specific decision was taken.**
+
+Feature documentation explains:
+
+**How users experience the feature.**
+
+---
+
+# Consequences
+
+Following these principles results in:
+
+- consistent services
+- stable domain models
+- isolated persistence
+- reusable UI
+- simpler testing
+- easier long-term evolution
+
+The goal is coherence rather than cleverness.
+
+---
+
+# Summary
+
+Waypoint is built from small, well-defined responsibilities.
+
+Each layer exists to protect the layer above it from unnecessary knowledge.
+
+The resulting platform is easier to understand because every component answers a single question:
+
+> "What responsibility do I own?"
