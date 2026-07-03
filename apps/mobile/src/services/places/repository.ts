@@ -24,3 +24,22 @@ export async function getBusinessLocations(): Promise<BusinessLocationRow[]> {
 
   return data ?? [];
 }
+
+export async function getBusinessLocationById(
+  id: string,
+): Promise<BusinessLocationRow | null> {
+  const { data, error } = await supabase
+    .from("business_locations")
+    .select(
+      `
+      *,
+      businesses (*)
+    `,
+    )
+    .eq("id", id)
+    .single();
+
+  if (error) throw error;
+
+  return data;
+}

@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { AppText, PlaceCard, PrimaryLink, Screen } from "../../src/components";
-import { places } from "../../src/data/places";
+import type { Place } from "@waypoint/types";
+import { getPlaces } from "../../src/services/places";
 import { theme } from "../../src/theme";
 import type { Trail } from "@waypoint/types";
 import { getTrail } from "../../src/services/trails";
@@ -11,6 +12,7 @@ export default function TrailDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
   const [trail, setTrail] = useState<Trail | null>(null);
+  const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -18,8 +20,11 @@ export default function TrailDetailScreen() {
       if (!id) return;
 
       const result = await getTrail(id);
-
       setTrail(result);
+
+      const nextPlaces = await getPlaces();
+      setPlaces(nextPlaces);
+
       setLoading(false);
     }
 

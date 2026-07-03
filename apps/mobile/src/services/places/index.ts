@@ -1,1 +1,1 @@
-export { getPlaces } from "./service";
+export { getPlace, getPlaces } from "./service";

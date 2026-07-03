@@ -1,12 +1,45 @@
 import { useLocalSearchParams } from "expo-router";
+import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
+import type { Place } from "@waypoint/types";
 import { AppText, PrimaryLink, Screen } from "../../src/components";
-import { places } from "../../src/data/places";
+import { getPlace } from "../../src/services/places";
 import { theme } from "../../src/theme";
 
 export default function PlaceDetailScreen() {
-  const { id } = useLocalSearchParams();
-  const place = places.find((item) => item.id === id) ?? places[0];
+  const { id: rawId } = useLocalSearchParams();
+  const id = Array.isArray(rawId) ? rawId[0] : rawId;
+
+  const [place, setPlace] = useState<Place | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      if (!id) return;
+
+      const nextPlace = await getPlace(id);
+      setPlace(nextPlace);
+      setLoading(false);
+    }
+
+    load();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <Screen>
+        <AppText>Loading place...</AppText>
+      </Screen>
+    );
+  }
+
+  if (!place) {
+    return (
+      <Screen>
+        <AppText>Place not found.</AppText>
+      </Screen>
+    );
+  }
 
   return (
     <Screen>
