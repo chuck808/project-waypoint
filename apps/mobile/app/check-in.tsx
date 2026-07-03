@@ -1,12 +1,13 @@
 import { useState } from "react";
 import { Button, StyleSheet, TextInput, View } from "react-native";
 import { AppText, PrimaryLink, Screen } from "../src/components";
-import { validateQrCode } from "../src/services/checkin";
+import { resolveCheckIn } from "../src/services/checkin";
+import type { CheckInResolution } from "../src/services/checkin";
 import { theme } from "../src/theme";
 
 export default function CheckInScreen() {
   const [code, setCode] = useState("");
-  const [result, setResult] = useState<any>(null);
+  const [result, setResult] = useState<CheckInResolution | null>(null);
   const [error, setError] = useState("");
 
   return (
@@ -40,8 +41,8 @@ export default function CheckInScreen() {
           setResult(null);
 
           try {
-            const qr = await validateQrCode(code);
-            setResult(qr);
+            const resolution = await resolveCheckIn(code);
+            setResult(resolution);
           } catch (err) {
             setError(
               err instanceof Error ? err.message : "Unable to validate code.",
@@ -51,10 +52,24 @@ export default function CheckInScreen() {
       />
 
       <View style={styles.result}>
-        {error ? (
-          <AppText muted>{error}</AppText>
-        ) : result ? (
-          <AppText>{result.business_locations.businesses.name}</AppText>
+        {error ? <AppText muted>{error}</AppText> : null}
+
+        {result?.outcome === "ready" ? (
+          <>
+            <AppText variant="heading">{result.placeName}</AppText>
+
+            {result.businessName !== result.placeName ? (
+              <AppText muted>{result.businessName}</AppText>
+            ) : null}
+
+            {result.welcomeMessage ? (
+              <AppText muted>{result.welcomeMessage}</AppText>
+            ) : null}
+          </>
+        ) : null}
+
+        {result?.outcome === "not_recognised" ? (
+          <AppText muted>That Waypoint code was not recognised.</AppText>
         ) : null}
       </View>
 
