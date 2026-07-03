@@ -20,6 +20,16 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Waypoint uses your camera to read the code on the sign at each place.",
+          "recordAudioAndroid": false
+        }
+      ],
+      "expo-router"
+    ]
   }
 }
