@@ -26,8 +26,6 @@ export async function createCheckIn(input: {
   businessLocationId: string;
   qrCodeId: string;
 }) {
-  console.log("CREATE CHECK-IN INPUT", input);
-
   const { data, error } = await supabase
     .from("check_ins")
     .insert({

@@ -58,8 +58,6 @@ export async function performCheckIn(
       };
     }
 
-    console.log("CHECK-IN USER", auth.user.id);
-
     const ref = parseCheckInRef(checkInRef);
 
     const checkIn = await createCheckIn({
@@ -82,8 +80,6 @@ export async function performCheckIn(
       message: "Visit remembered.",
     };
   } catch (err) {
-    console.log("PERFORM CHECK-IN ERROR", err);
-
     return {
       outcome: "failed",
       reason: err instanceof Error ? err.message : JSON.stringify(err),
