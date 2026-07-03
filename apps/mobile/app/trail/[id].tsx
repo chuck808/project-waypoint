@@ -1,13 +1,46 @@
+import { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { AppText, PlaceCard, PrimaryLink, Screen } from "../../src/components";
 import { places } from "../../src/data/places";
-import { trails } from "../../src/data/trails";
 import { theme } from "../../src/theme";
+import type { Trail } from "@waypoint/types";
+import { getTrail } from "../../src/services/trails";
 
 export default function TrailDetailScreen() {
-  const { id } = useLocalSearchParams();
-  const trail = trails.find((item) => item.id === id) ?? trails[0];
+  const { id } = useLocalSearchParams<{ id: string }>();
+
+  const [trail, setTrail] = useState<Trail | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    async function load() {
+      if (!id) return;
+
+      const result = await getTrail(id);
+
+      setTrail(result);
+      setLoading(false);
+    }
+
+    load();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <Screen>
+        <AppText>Loading trail...</AppText>
+      </Screen>
+    );
+  }
+
+  if (!trail) {
+    return (
+      <Screen>
+        <AppText>Trail not found.</AppText>
+      </Screen>
+    );
+  }
 
   return (
     <Screen>
@@ -32,7 +65,7 @@ export default function TrailDetailScreen() {
         <AppText variant="label">Along the way</AppText>
 
         {places.map((place) => (
-            <PlaceCard key={place.id} place={place} />
+          <PlaceCard key={place.id} place={place} />
         ))}
       </View>
 

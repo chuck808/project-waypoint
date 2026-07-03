@@ -40,18 +40,15 @@ export default function DiscoverScreen() {
         <AppText variant="label" muted>
           Popular nearby
         </AppText>
+        <AppText muted>Trail count: {trails.length}</AppText>
 
-        {isLoading ? <AppText muted>Loading trails...</AppText> : null}
-
-        {errorMessage ? <AppText muted>{errorMessage}</AppText> : null}
-
-        {!isLoading && !errorMessage && trails.length === 0 ? (
-          <AppText muted>No trails found yet.</AppText>
-        ) : null}
-
-        {trails.map((trail) => (
-          <TrailCard key={trail.id} trail={trail} />
-        ))}
+        {isLoading ? (
+          <AppText muted>Loading trails…</AppText>
+        ) : errorMessage ? (
+          <AppText muted>{errorMessage}</AppText>
+        ) : (
+          trails.map((trail) => <TrailCard key={trail.id} trail={trail} />)
+        )}
       </View>
 
       <PrimaryLink href="/">Back home</PrimaryLink>

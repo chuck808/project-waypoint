@@ -1,1 +1,1 @@
-export { getTrails } from "./trailService";
+export { getTrail, getTrails } from "./service";

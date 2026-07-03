@@ -1,5 +1,5 @@
 import { Link } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { AppText } from "../AppText";
 import { theme } from "../../theme";
 import type { Trail } from "@waypoint/types";
@@ -10,8 +10,8 @@ type TrailCardProps = {
 
 export function TrailCard({ trail }: TrailCardProps) {
   return (
-    <Link href={`/trail/${trail.id}`} style={styles.link}>
-      <View style={styles.card}>
+    <Link href={`/trail/${trail.id}`} asChild>
+      <Pressable style={styles.card}>
         <AppText variant="heading">{trail.name}</AppText>
         <AppText muted>{trail.region}</AppText>
 
@@ -28,15 +28,12 @@ export function TrailCard({ trail }: TrailCardProps) {
         </View>
 
         <AppText variant="label">{trail.type}</AppText>
-      </View>
+      </Pressable>
     </Link>
   );
 }
 
 const styles = StyleSheet.create({
-  link: {
-    textDecorationLine: "none",
-  },
   card: {
     padding: theme.spacing.lg,
     borderRadius: 18,
