@@ -21,6 +21,27 @@ export async function getQrCode(code: string) {
   return data;
 }
 
+export async function getLatestCheckInSince(input: {
+  userId: string;
+  businessLocationId: string;
+  since: string;
+}) {
+  const { data, error } = await supabase
+    .from("check_ins")
+    .select("checked_in_at")
+    .eq("user_id", input.userId)
+    .eq("business_location_id", input.businessLocationId)
+    .neq("verification_status", "rejected")
+    .gte("checked_in_at", input.since)
+    .order("checked_in_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error) throw error;
+
+  return data;
+}
+
 export async function createCheckIn(input: {
   userId: string;
   businessLocationId: string;

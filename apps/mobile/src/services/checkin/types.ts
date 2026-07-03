@@ -29,6 +29,12 @@ export type PerformCheckInResult =
       message: string;
     }
   | {
+      outcome: "already_visited";
+      placeName?: string;
+      businessName?: string;
+      lastVisitedAt: string;
+    }
+  | {
       outcome: "failed";
       reason: string;
     };
