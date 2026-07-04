@@ -8,7 +8,6 @@ import {
   getQrCode,
   getUserPassport,
 } from "./repository";
-import { normaliseInvitation } from "./invitation";
 import { startOfVenueDayISO } from "./time";
 
 type CheckInRef = {
@@ -53,7 +52,7 @@ async function findTodaysVisit(businessLocationId: string) {
 
 export async function resolveCheckIn(code: string): Promise<CheckInResolution> {
   try {
-    const qr = await getQrCode(normaliseInvitation(code));
+    const qr = await getQrCode(code.trim());
 
     const placeName = qr.business_locations?.name ?? "Unknown place";
     const businessName =
@@ -74,7 +73,6 @@ export async function resolveCheckIn(code: string): Promise<CheckInResolution> {
       outcome: "ready",
       placeName,
       businessName,
-      welcomeMessage: "Muddy boots welcome",
       stamp: {
         title: "First Local Stop",
       },

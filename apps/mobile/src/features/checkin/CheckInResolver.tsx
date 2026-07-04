@@ -6,6 +6,7 @@ import { CheckInEntry } from "./CheckInEntry";
 import { CheckInNotRecognised } from "./CheckInNotRecognised";
 import { CheckInReady } from "./CheckInReady";
 import { CheckInRecorded } from "./CheckInRecorded";
+import { JourneyStage } from "./JourneyStage";
 import { useCheckInJourney } from "./useCheckInJourney";
 
 /**
@@ -16,54 +17,63 @@ import { useCheckInJourney } from "./useCheckInJourney";
 export function CheckInResolver() {
   const { state, submitCode, confirmVisit, reset } = useCheckInJourney();
 
-  switch (state.status) {
-    case "idle":
-      return <CheckInEntry onSubmit={submitCode} />;
+  // ready/recording share a stage: the button relabels, the scene stays.
+  const stageKey = state.status === "recording" ? "ready" : state.status;
 
-    case "resolving":
-      return (
-        <View style={styles.resolving}>
-          <ActivityIndicator color={theme.colors.primary} />
-          <AppText variant="label" muted>
-            Resolving location…
-          </AppText>
-        </View>
-      );
+  return <JourneyStage stageKey={stageKey}>{renderStage()}</JourneyStage>;
 
-    case "ready":
-    case "recording":
-      return (
-        <CheckInReady
-          resolution={state.resolution}
-          recordError={state.status === "ready" ? state.recordError : undefined}
-          isRecording={state.status === "recording"}
-          onConfirm={confirmVisit}
-          onDismiss={reset}
-        />
-      );
+  function renderStage() {
+    switch (state.status) {
+      case "idle":
+        return <CheckInEntry onSubmit={submitCode} />;
 
-    case "already_visited":
-      return (
-        <CheckInAlreadyVisited
-          placeName={state.placeName}
-          businessName={state.businessName}
-          lastVisitedAt={state.lastVisitedAt}
-          onDismiss={reset}
-        />
-      );
+      case "resolving":
+        return (
+          <View style={styles.resolving}>
+            <ActivityIndicator color={theme.colors.primary} />
+            <AppText variant="label" muted>
+              Resolving location…
+            </AppText>
+          </View>
+        );
 
-    case "recorded":
-      return (
-        <CheckInRecorded
-          placeName={state.placeName}
-          businessName={state.businessName}
-          stampTitle={state.stampTitle}
-          onDismiss={reset}
-        />
-      );
+      case "ready":
+      case "recording":
+        return (
+          <CheckInReady
+            resolution={state.resolution}
+            recordError={
+              state.status === "ready" ? state.recordError : undefined
+            }
+            isRecording={state.status === "recording"}
+            onConfirm={confirmVisit}
+            onDismiss={reset}
+          />
+        );
 
-    case "not_recognised":
-      return <CheckInNotRecognised reason={state.reason} onRetry={reset} />;
+      case "already_visited":
+        return (
+          <CheckInAlreadyVisited
+            placeName={state.placeName}
+            businessName={state.businessName}
+            lastVisitedAt={state.lastVisitedAt}
+            onDismiss={reset}
+          />
+        );
+
+      case "recorded":
+        return (
+          <CheckInRecorded
+            placeName={state.placeName}
+            businessName={state.businessName}
+            stampTitle={state.stampTitle}
+            onDismiss={reset}
+          />
+        );
+
+      case "not_recognised":
+        return <CheckInNotRecognised reason={state.reason} onRetry={reset} />;
+    }
   }
 }
 
