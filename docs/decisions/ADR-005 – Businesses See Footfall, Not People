@@ -1,0 +1,232 @@
+# ADR-005 – Businesses See Footfall, Not People
+
+**Project:** Project Waypoint
+**Status:** Proposed
+**Date:** 2026-07-04
+**Related:** BP018, BP021, BP023, ADR-004
+
+---
+
+## Context
+
+Waypoint allows walkers to create verified memories by checking in at participating places.
+
+Those check-ins are valuable to businesses because they show that Waypoint is bringing walkers to their locations.
+
+However, check-ins also belong to walkers.
+
+A check-in connects a person, a place and a moment in time. In the Memory Graph, it is part of the walker’s personal journey.
+
+The Business Portal needs to show useful operational information without exposing walker identity or personal history.
+
+---
+
+## Decision
+
+> Businesses may see footfall, but not people.
+
+Business users may view privacy-preserving visit information for locations they are authorised to manage.
+
+They must not receive:
+
+* walker user IDs
+* walker email addresses
+* walker profile data
+* passport history
+* cross-location journey patterns
+* identity-linked visit trails
+
+Business reporting should therefore be based on dedicated views or RPCs that expose only the fields required for business operation.
+
+Business users should not query raw `check_ins` directly.
+
+---
+
+## Allowed Business Visibility
+
+Business-facing visit data may include:
+
+* business location ID
+* business location name
+* visit timestamp
+* check-in method
+* verification status
+* invitation / QR code usage
+* aggregate counts
+* daily, weekly or monthly trends
+
+Business-facing visit data should not include any direct walker identifier.
+
+---
+
+## Prohibited Business Visibility
+
+Business users must not receive:
+
+* `check_ins.user_id`
+* profile information
+* passport entries tied to a walker
+* earned stamps tied to a walker
+* full movement history
+* cross-business visit history
+* anything that allows a business to identify or reconstruct a walker’s journey
+
+The business owns its operational relationship with a location.
+
+It does not own the walker’s memory.
+
+---
+
+## Implementation Direction
+
+Create a privacy-preserving projection such as:
+
+```sql
+public.business_location_footfall
+```
+
+or:
+
+```sql
+public.business_location_visit_events
+```
+
+The projection should expose visit facts without walker identity.
+
+Example shape:
+
+```sql
+business_location_id
+business_location_name
+business_id
+checked_in_at
+check_in_method
+verification_status
+qr_code_id
+```
+
+The view or RPC should be readable only by authorised business members for the relevant business.
+
+The Business Portal should consume this projection rather than `public.check_ins`.
+
+---
+
+## RLS Principle
+
+Raw `check_ins` remain walker-owned.
+
+Business access is granted only through privacy-preserving projections.
+
+This keeps the permission model aligned with the product model:
+
+```text
+Walker
+  owns memory
+
+Business
+  sees footfall
+
+Admin
+  audits platform integrity
+```
+
+---
+
+## Rationale
+
+This decision protects the trust boundary at the heart of Waypoint.
+
+Businesses need evidence that walkers are visiting.
+
+They do not need to know who those walkers are.
+
+This supports:
+
+* walker privacy
+* business usefulness
+* simpler consent expectations
+* safer reporting
+* stronger platform trust
+
+It also keeps the Business Portal consistent with BP023, where business tools are operational rather than personal.
+
+---
+
+## Alternatives Considered
+
+### Let businesses read raw check-ins
+
+Rejected.
+
+This exposes walker identity and creates unnecessary privacy risk.
+
+### Show only aggregate counts
+
+Rejected for now.
+
+Aggregate counts are useful, but businesses may need recent operational visit events to understand whether invitations are working.
+
+The correct boundary is event visibility without identity.
+
+### Anonymise walker IDs
+
+Rejected.
+
+Stable anonymous identifiers can still become tracking identifiers over time.
+
+The safer approach is not to expose walker identifiers at all.
+
+### Delay the decision
+
+Rejected.
+
+The Business Portal is now live enough that privacy boundaries must be established before reporting grows.
+
+---
+
+## Consequences
+
+### Positive
+
+* Business users get useful operational information.
+* Walker identity remains protected.
+* Reporting can grow safely.
+* The Business Portal has a clear data boundary.
+* The platform reinforces trust before scale.
+
+### Trade-offs
+
+* Requires additional views or RPCs.
+* Business reporting is less flexible than raw access.
+* Some future analytics may require carefully designed aggregate projections.
+* Admin tooling must remain separate for full audit visibility.
+
+These trade-offs are acceptable because trust is more important than reporting convenience.
+
+---
+
+## Review Trigger
+
+Revisit this decision if:
+
+* businesses require legally justified identity-linked workflows;
+* walkers explicitly opt into named business interactions;
+* regulatory requirements demand a different reporting model;
+* aggregate analytics replace event-level business reporting;
+* admin audit needs become confused with business operations.
+
+Until then, the rule remains:
+
+> Businesses see footfall, not people.
+
+---
+
+## Summary
+
+A Waypoint check-in is part of a walker’s memory.
+
+A business may see that a visit happened.
+
+It should not see who the walker was.
+
+This boundary allows Waypoint to support local places without turning walkers into customer records.
