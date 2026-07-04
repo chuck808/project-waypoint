@@ -11,12 +11,12 @@ Project Waypoint is a digital trail companion that enriches walking by connectin
 
 This repository is in active early development. Product foundation and blueprints are extensive and mature (see [`docs/`](./docs)); implementation is progressing surface-by-surface, starting with the Walker App.
 
-Per **BP023 – Product Surface Architecture**, Waypoint is one platform expressed through four product surfaces, three of which now have real code:
+Per **BP023 – Product Surface Architecture**, Waypoint is one platform expressed through four product surfaces, all of which now have real code:
 
 - **`apps/mobile`** (Walker App, Expo / React Native) — the most developed surface. Has working auth (Supabase), a home screen, a discover flow for trails and places, a full QR check-in journey (scan → resolve → record → already-visited / not-recognised states), a live Passport timeline backed by Supabase, and a MapLibre map spike.
 - **`web`** (Public Front Door, SvelteKit) — a small landing page plus `/visit/{token}` invitation resolution, per ADR-004 (QR codes are public invitations, not identifiers).
 - **`business`** (Business Portal, SvelteKit) — sign-in and a dashboard that lists the signed-in user's business memberships, locations and current QR invitation codes, respecting RLS-scoped queries.
-- **`admin`** (Admin Portal) — planned, not yet started.
+- **`admin`** (Admin Portal, SvelteKit) — sign-in gated behind a server-side `is_admin` check (RLS remains the real authority). The dashboard lets admins approve/suspend businesses, and shows a read-only view of trails, regions and recent check-ins for auditing.
 
 Supporting the surfaces:
 
@@ -26,22 +26,20 @@ Supporting the surfaces:
 
 Known gaps / in-progress items:
 
-- The `business` app is not yet listed in `pnpm-workspace.yaml`'s package globs — this should be verified before relying on `workspace:*` linking for it.
-- `apps/admin` has not been scaffolded yet.
 - CI (`.github/workflows/`) has not been set up.
 
 ---
 
 ## Tech Stack
 
-| Layer                                                    | Choice                                                                            |
-| -------------------------------------------------------- | --------------------------------------------------------------------------------- |
-| Monorepo tooling                                         | [Turborepo](https://turbo.build/) + [pnpm workspaces](https://pnpm.io/workspaces) |
-| Language                                                 | TypeScript                                                                        |
-| Walker App (`apps/mobile`)                               | [Expo](https://expo.dev/) / React Native, [MapLibre](https://maplibre.org/)       |
-| Public Front Door (`web`) & Business Portal (`business`) | [SvelteKit](https://kit.svelte.dev/)                                              |
-| Backend                                                  | [Supabase](https://supabase.com/) (Postgres, PostGIS, RLS, Auth)                  |
-| Formatting                                               | Prettier                                                                          |
+| Layer                                                                            | Choice                                                                            |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Monorepo tooling                                                                 | [Turborepo](https://turbo.build/) + [pnpm workspaces](https://pnpm.io/workspaces) |
+| Language                                                                         | TypeScript                                                                        |
+| Walker App (`apps/mobile`)                                                       | [Expo](https://expo.dev/) / React Native, [MapLibre](https://maplibre.org/)       |
+| Public Front Door (`web`), Business Portal (`business`) & Admin Portal (`admin`) | [SvelteKit](https://kit.svelte.dev/)                                              |
+| Backend                                                                          | [Supabase](https://supabase.com/) (Postgres, PostGIS, RLS, Auth)                  |
+| Formatting                                                                       | Prettier                                                                          |
 
 See [`docs/decisions/`](./docs/decisions) for the Architecture Decision Records explaining these choices.
 
@@ -55,6 +53,7 @@ project-waypoint/
 │   └── mobile/              # Walker App — Expo / React Native (auth, discover, check-in, passport, map)
 ├── web/                     # Public Front Door — SvelteKit (landing page, /visit/{token})
 ├── business/                # Business Portal — SvelteKit (sign-in, business/location/QR dashboard)
+├── admin/                   # Admin Portal — SvelteKit (sign-in, business approval, trails/regions/check-ins audit)
 ├── packages/
 │   ├── types/                # Shared domain types
 │   ├── validation/            # Shared validation (invitation tokens, etc.)
@@ -67,8 +66,6 @@ project-waypoint/
 ├── supabase/                # Reserved for Supabase CLI project config (empty)
 └── docs/                    # Blueprints (BP001–BP023), ADRs, API & component docs
 ```
-
-`apps/admin` (Admin Portal) is planned per BP023 but not yet scaffolded.
 
 ---
 
@@ -103,6 +100,7 @@ To work on a single app, use pnpm's `--filter` flag, e.g.:
 pnpm --filter mobile start      # Walker App (Expo)
 pnpm --filter @waypoint/web dev       # Public Front Door
 pnpm --filter @waypoint/business dev  # Business Portal
+pnpm --filter @waypoint/admin dev     # Admin Portal
 ```
 
 ---
