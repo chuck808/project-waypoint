@@ -1,4 +1,5 @@
 export { AppText } from "./AppText";
+export { Card } from "./Card";
 export { FormField } from "./FormField";
 export { PrimaryButton } from "./PrimaryButton";
 export { PrimaryLink } from "./PrimaryLink";

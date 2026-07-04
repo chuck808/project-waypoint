@@ -53,6 +53,7 @@ export default function HomeScreen() {
         </AppText>
 
         <PrimaryLink href="/check-in">Test QR Check-in</PrimaryLink>
+        <PrimaryLink href="/map-spike">Map spike</PrimaryLink>
       </Section>
     </Screen>
   );

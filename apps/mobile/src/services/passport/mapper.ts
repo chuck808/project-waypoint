@@ -25,3 +25,32 @@ export function mapPassportStamp(row: EarnedStampRow): PassportStamp {
       "A moment added to your Waypoint journey.",
   };
 }
+
+import type { CheckInMomentRow, CheckInStampRow } from "./repository";
+import type { PassportMoment } from "./types";
+
+export function mapPassportMoment(
+  row: CheckInMomentRow,
+  stampsByCheckIn: Map<string, CheckInStampRow>,
+): PassportMoment {
+  const stampRow = stampsByCheckIn.get(row.id);
+  const stampDefinition = stampRow?.stamp_definitions;
+
+  return {
+    id: row.id,
+    occurredAt: row.checked_in_at,
+    placeName: row.business_locations?.name ?? "Unknown place",
+    businessName: row.business_locations?.businesses?.name ?? "Unknown business",
+    ...(stampDefinition
+      ? {
+          stamp: {
+            title: stampDefinition.title,
+            ...(stampDefinition.image_url
+              ? { imageUrl: stampDefinition.image_url }
+              : {}),
+          },
+        }
+      : {}),
+    ...(row.trails?.name ? { trailName: row.trails.name } : {}),
+  };
+}

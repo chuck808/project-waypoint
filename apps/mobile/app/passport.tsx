@@ -1,20 +1,23 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { AppText, PassportStamp, PrimaryLink, Screen } from "../src/components";
-import type { PassportStamp as PassportStampType } from "@waypoint/types";
-import { getPassportStamps } from "../src/services/passport";
+import { AppText, PrimaryLink, Screen } from "../src/components";
+import { PassportTimeline } from "../src/features/passport";
+import {
+  getPassportMoments,
+  type PassportMoment,
+} from "../src/services/passport";
 import { theme } from "../src/theme";
 
 export default function PassportScreen() {
-  const [stamps, setStamps] = useState<PassportStampType[]>([]);
+  const [moments, setMoments] = useState<PassportMoment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
     async function load() {
       try {
-        const next = await getPassportStamps();
-        setStamps(next);
+        const next = await getPassportMoments();
+        setMoments(next);
       } catch (err) {
         setError(
           err instanceof Error ? err.message : "Unable to load passport.",
@@ -43,7 +46,7 @@ export default function PassportScreen() {
       </View>
 
       <View style={styles.summary}>
-        <AppText variant="heading">{stamps.length}</AppText>
+        <AppText variant="heading">{moments.length}</AppText>
         <AppText muted>memories added so far</AppText>
       </View>
 
@@ -52,12 +55,8 @@ export default function PassportScreen() {
           <AppText muted>Loading your Passport…</AppText>
         ) : error ? (
           <AppText muted>{error}</AppText>
-        ) : stamps.length === 0 ? (
-          <AppText muted>
-            Your Passport is waiting for its first memory.
-          </AppText>
         ) : (
-          stamps.map((stamp) => <PassportStamp key={stamp.id} stamp={stamp} />)
+          <PassportTimeline moments={moments} />
         )}
       </View>
 
@@ -73,7 +72,7 @@ const styles = StyleSheet.create({
   },
   summary: {
     padding: theme.spacing.lg,
-    borderRadius: 18,
+    borderRadius: theme.radius.card,
     backgroundColor: theme.colors.primarySoft,
     marginBottom: theme.spacing.xl,
   },
