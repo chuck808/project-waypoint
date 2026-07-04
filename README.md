@@ -9,25 +9,39 @@ Project Waypoint is a digital trail companion that enriches walking by connectin
 
 ## Current Status
 
-This repository is in active early development.
+This repository is in active early development. Product foundation and blueprints are extensive and mature (see [`docs/`](./docs)); implementation is progressing surface-by-surface, starting with the Walker App.
 
-- Product foundation and blueprints are complete (see [`docs/`](./docs)).
-- The monorepo scaffolding (Turborepo + pnpm workspaces) is in place.
-- The mobile app (`apps/mobile`) has an initial Expo shell, theme and base components.
-- `apps/admin-portal` and `apps/business-portal` are reserved but not yet started.
-- Backend, database and infrastructure directories are scaffolded but largely unimplemented.
+Per **BP023 – Product Surface Architecture**, Waypoint is one platform expressed through four product surfaces, three of which now have real code:
+
+- **`apps/mobile`** (Walker App, Expo / React Native) — the most developed surface. Has working auth (Supabase), a home screen, a discover flow for trails and places, a full QR check-in journey (scan → resolve → record → already-visited / not-recognised states), a live Passport timeline backed by Supabase, and a MapLibre map spike.
+- **`web`** (Public Front Door, SvelteKit) — a small landing page plus `/visit/{token}` invitation resolution, per ADR-004 (QR codes are public invitations, not identifiers).
+- **`business`** (Business Portal, SvelteKit) — sign-in and a dashboard that lists the signed-in user's business memberships, locations and current QR invitation codes, respecting RLS-scoped queries.
+- **`admin`** (Admin Portal) — planned, not yet started.
+
+Supporting the surfaces:
+
+- **`packages/`** — shared workspace packages: `types` (domain types), `validation` (shared invitation/check-in validation, e.g. Crockford base32 normalisation), `database` (generated Supabase types), `config`, and `ui` (reserved, not yet populated — see BP022 on earning reuse before promoting shared code).
+- **`database/`** — SQL migrations and seed data for the initial core schema (regions, trails, businesses, locations, QR codes, check-ins, etc.), supporting the register → browse trail → scan QR → earn passport stamp journey.
+- **`supabase/`** — reserved for Supabase CLI project config; currently empty.
+
+Known gaps / in-progress items:
+
+- The `business` app is not yet listed in `pnpm-workspace.yaml`'s package globs — this should be verified before relying on `workspace:*` linking for it.
+- `apps/admin` has not been scaffolded yet.
+- CI (`.github/workflows/`) has not been set up.
 
 ---
 
 ## Tech Stack
 
-| Layer | Choice |
-|---|---|
-| Monorepo tooling | [Turborepo](https://turbo.build/) + [pnpm workspaces](https://pnpm.io/workspaces) |
-| Language | TypeScript |
-| Mobile app | [Expo](https://expo.dev/) / React Native |
-| Backend | Supabase (Postgres, Edge Functions, RLS) |
-| Formatting | Prettier |
+| Layer                                                    | Choice                                                                            |
+| -------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| Monorepo tooling                                         | [Turborepo](https://turbo.build/) + [pnpm workspaces](https://pnpm.io/workspaces) |
+| Language                                                 | TypeScript                                                                        |
+| Walker App (`apps/mobile`)                               | [Expo](https://expo.dev/) / React Native, [MapLibre](https://maplibre.org/)       |
+| Public Front Door (`web`) & Business Portal (`business`) | [SvelteKit](https://kit.svelte.dev/)                                              |
+| Backend                                                  | [Supabase](https://supabase.com/) (Postgres, PostGIS, RLS, Auth)                  |
+| Formatting                                               | Prettier                                                                          |
 
 See [`docs/decisions/`](./docs/decisions) for the Architecture Decision Records explaining these choices.
 
@@ -38,36 +52,23 @@ See [`docs/decisions/`](./docs/decisions) for the Architecture Decision Records 
 ```text
 project-waypoint/
 ├── apps/
-│   ├── mobile/            # Expo / React Native app
-│   ├── business-portal/   # Web portal for participating businesses (planned)
-│   └── admin-portal/      # Internal admin tooling (planned)
+│   └── mobile/              # Walker App — Expo / React Native (auth, discover, check-in, passport, map)
+├── web/                     # Public Front Door — SvelteKit (landing page, /visit/{token})
+├── business/                # Business Portal — SvelteKit (sign-in, business/location/QR dashboard)
 ├── packages/
-│   ├── ui/                # Shared UI components
-│   ├── types/              # Shared TypeScript types
-│   ├── validation/         # Shared validation schemas
-│   └── config/              # Shared configuration
-├── backend/
-│   ├── functions/          # Edge functions
-│   ├── services/            # Service layer
-│   ├── jobs/                 # Scheduled jobs
-│   └── webhooks/            # Webhook handlers
+│   ├── types/                # Shared domain types
+│   ├── validation/            # Shared validation (invitation tokens, etc.)
+│   ├── database/              # Generated Supabase database types
+│   ├── config/                 # Shared configuration
+│   └── ui/                      # Shared UI primitives (reserved, not yet populated)
 ├── database/
-│   ├── migrations/          # SQL migrations
-│   ├── seeds/                # Seed data
-│   ├── policies/             # Row Level Security policies
-│   ├── functions/            # Database functions
-│   └── views/                 # Database views
-├── infrastructure/
-│   ├── scripts/               # Operational scripts
-│   ├── deployment/            # Deployment configuration
-│   └── monitoring/            # Monitoring configuration
-├── tests/
-│   ├── integration/
-│   ├── e2e/
-│   └── fixtures/
-├── docs/                       # Blueprints, ADRs, API & component docs
-└── .github/workflows/          # CI (planned)
+│   ├── migrations/            # SQL migrations (initial core schema)
+│   └── seeds/                  # Seed data
+├── supabase/                # Reserved for Supabase CLI project config (empty)
+└── docs/                    # Blueprints (BP001–BP023), ADRs, API & component docs
 ```
+
+`apps/admin` (Admin Portal) is planned per BP023 but not yet scaffolded.
 
 ---
 
@@ -99,7 +100,9 @@ pnpm format:check   # check formatting without writing changes
 To work on a single app, use pnpm's `--filter` flag, e.g.:
 
 ```bash
-pnpm --filter mobile start
+pnpm --filter mobile start      # Walker App (Expo)
+pnpm --filter @waypoint/web dev       # Public Front Door
+pnpm --filter @waypoint/business dev  # Business Portal
 ```
 
 ---
@@ -108,32 +111,36 @@ pnpm --filter mobile start
 
 Full documentation lives in [`docs/`](./docs). Key blueprints:
 
-| Blueprint | Title | Status |
-|---|---|---|
-| BP001 | The Waypoint Charter | Draft |
-| BP002 | Product Requirements Document | Draft |
-| BP003 | User Personas | Draft |
-| BP004 | User Journeys | Draft |
-| BP005 | Product Feature Catalogue | Draft |
-| BP006 | System Architecture | Draft |
-| BP007 | Domain Model | Draft |
-| BP008 | Information Architecture | Draft |
-| BP009 | Conceptual ERD | Draft |
-| BP010 | Logical Data Model | Draft |
-| BP011 | Physical Database Design | Draft |
-| BP012 | API Standard & Specification | Draft |
-| BP013 | Repository & Development Standards | Draft |
-| BP014 | Security & Authorisation | Draft |
-| BP015 | Experience & Design System | Draft |
-| BP016 | Sprint 1 Implementation Plan | Draft |
-| BP017 | Sprint 1 Build Book | Draft |
-| BP018 | Defining the Waypoint Difference | Draft |
-| BP019 | The Waypoint Ecosystem | Draft |
-| WP000 | Engineering Principles | Foundational |
+| Blueprint | Title                                          | Status       |
+| --------- | ---------------------------------------------- | ------------ |
+| BP001     | The Waypoint Charter                           | Draft        |
+| BP002     | Product Requirements Document                  | Draft        |
+| BP003     | User Personas                                  | Draft        |
+| BP004     | User Journeys                                  | Draft        |
+| BP005     | Product Feature Catalogue                      | Draft        |
+| BP006     | System Architecture                            | Draft        |
+| BP007     | Domain Model                                   | Draft        |
+| BP008     | Information Architecture                       | Draft        |
+| BP009     | Conceptual ERD                                 | Draft        |
+| BP010     | Logical Data Model                             | Draft        |
+| BP011     | Physical Database Design                       | Draft        |
+| BP012     | API Standard & Specification                   | Draft        |
+| BP013     | Repository & Development Standards             | Draft        |
+| BP014     | Security & Authorisation                       | Draft        |
+| BP015     | Experience & Design System                     | Draft        |
+| BP016     | Sprint 1 Implementation Plan                   | Draft        |
+| BP017     | Sprint 1 Build Book                            | Draft        |
+| BP018     | Defining the Waypoint Difference               | Draft        |
+| BP019     | The Waypoint Ecosystem                         | Draft        |
+| BP020     | Engineering Standards & Development Principles | Draft        |
+| BP021     | The Waypoint Memory Graph                      | Draft        |
+| BP022     | Evolution Rules                                | Draft        |
+| BP023     | Product Surface Architecture                   | Draft        |
+| WP000     | Engineering Principles                         | Foundational |
 
 Also see:
 
-- [`docs/decisions/`](./docs/decisions) – Architecture Decision Records (ADRs)
+- [`docs/decisions/`](./docs/decisions) – Architecture Decision Records (ADR-001 Turborepo, ADR-002 Supabase, ADR-003 Expo — all Accepted; ADR-004 QR Codes as Public Invitations — Proposed)
 - [`docs/api/`](./docs/api) – OpenAPI contract and API documentation
 - [`docs/components/`](./docs/components) – Reusable component documentation
 
