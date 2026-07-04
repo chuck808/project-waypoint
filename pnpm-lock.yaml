@@ -18,6 +18,40 @@ importers:
         specifier: ^5.8.0
         version: 5.9.3
 
+  admin:
+    dependencies:
+      '@supabase/ssr':
+        specifier: ^0.12.0
+        version: 0.12.0(@supabase/supabase-js@2.110.0)
+      '@supabase/supabase-js':
+        specifier: ^2.47.0
+        version: 2.110.0
+      '@waypoint/database':
+        specifier: workspace:*
+        version: link:../packages/database
+    devDependencies:
+      '@sveltejs/adapter-auto':
+        specifier: ^3.3.0
+        version: 3.3.1(@sveltejs/kit@2.69.1(@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.56.4)(vite@5.4.21(@types/node@26.1.0)(lightningcss@1.32.0)(terser@5.48.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@5.4.21(@types/node@26.1.0)(lightningcss@1.32.0)(terser@5.48.0)))
+      '@sveltejs/kit':
+        specifier: ^2.15.0
+        version: 2.69.1(@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.56.4)(vite@5.4.21(@types/node@26.1.0)(lightningcss@1.32.0)(terser@5.48.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@5.4.21(@types/node@26.1.0)(lightningcss@1.32.0)(terser@5.48.0))
+      '@sveltejs/vite-plugin-svelte':
+        specifier: ^4.0.0
+        version: 4.0.4(svelte@5.56.4)(vite@5.4.21(@types/node@26.1.0)(lightningcss@1.32.0)(terser@5.48.0))
+      svelte:
+        specifier: ^5.16.0
+        version: 5.56.4
+      svelte-check:
+        specifier: ^4.1.0
+        version: 4.7.1(picomatch@4.0.4)(svelte@5.56.4)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vite:
+        specifier: ^5.4.0
+        version: 5.4.21(@types/node@26.1.0)(lightningcss@1.32.0)(terser@5.48.0)
+
   apps/mobile:
     dependencies:
       '@maplibre/maplibre-react-native':
@@ -87,6 +121,40 @@ importers:
       typescript:
         specifier: ~6.0.3
         version: 6.0.3
+
+  business:
+    dependencies:
+      '@supabase/ssr':
+        specifier: ^0.12.0
+        version: 0.12.0(@supabase/supabase-js@2.110.0)
+      '@supabase/supabase-js':
+        specifier: ^2.47.0
+        version: 2.110.0
+      '@waypoint/database':
+        specifier: workspace:*
+        version: link:../packages/database
+    devDependencies:
+      '@sveltejs/adapter-auto':
+        specifier: ^3.3.0
+        version: 3.3.1(@sveltejs/kit@2.69.1(@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.56.4)(vite@5.4.21(@types/node@26.1.0)(lightningcss@1.32.0)(terser@5.48.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@5.4.21(@types/node@26.1.0)(lightningcss@1.32.0)(terser@5.48.0)))
+      '@sveltejs/kit':
+        specifier: ^2.15.0
+        version: 2.69.1(@sveltejs/vite-plugin-svelte@4.0.4(svelte@5.56.4)(vite@5.4.21(@types/node@26.1.0)(lightningcss@1.32.0)(terser@5.48.0)))(svelte@5.56.4)(typescript@5.9.3)(vite@5.4.21(@types/node@26.1.0)(lightningcss@1.32.0)(terser@5.48.0))
+      '@sveltejs/vite-plugin-svelte':
+        specifier: ^4.0.0
+        version: 4.0.4(svelte@5.56.4)(vite@5.4.21(@types/node@26.1.0)(lightningcss@1.32.0)(terser@5.48.0))
+      svelte:
+        specifier: ^5.16.0
+        version: 5.56.4
+      svelte-check:
+        specifier: ^4.1.0
+        version: 4.7.1(picomatch@4.0.4)(svelte@5.56.4)(typescript@5.9.3)
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+      vite:
+        specifier: ^5.4.0
+        version: 5.4.21(@types/node@26.1.0)(lightningcss@1.32.0)(terser@5.48.0)
 
   packages/config: {}
 
@@ -1361,6 +1429,11 @@ packages:
     resolution: {integrity: sha512-Wn2AWpneZuDFTkp/65tqctvoh+3JvyTjMam8sTMqVWy5BgkU8zAvFwilPYPPPhkINeKF8NAJKP7FclJ2iGCUMw==}
     engines: {node: '>=22.0.0'}
 
+  '@supabase/ssr@0.12.0':
+    resolution: {integrity: sha512-d9XV5XzJvzzZbeAIM7fWTCUYxQJZ2Ru6ny3dJHmHGp/LIrJ+o9FpD7N9Rf/UhhWEvHXSoDe8SI32Z2ouOdMjBg==}
+    peerDependencies:
+      '@supabase/supabase-js': ^2.108.0
+
   '@supabase/storage-js@2.110.0':
     resolution: {integrity: sha512-71+gU3HrhiylAhftY6FmO5PPdcsScnVcS766CVD+vTYK9qTDLbrx8FhgBYbqGm3iV/wkTfzrNJfjGsMeFRkJRQ==}
     engines: {node: '>=22.0.0'}
@@ -1817,6 +1890,10 @@ packages:
   cookie@0.6.0:
     resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
     engines: {node: '>= 0.6'}
+
+  cookie@1.1.1:
+    resolution: {integrity: sha512-ei8Aos7ja0weRpFzJnEA9UHJ/7XQmqglbRwnf2ATjcB9Wq874VKH9kfjjirM6UhU2/E5fFYadylyhFldcqSidQ==}
+    engines: {node: '>=18'}
 
   core-js-compat@3.49.0:
     resolution: {integrity: sha512-VQXt1jr9cBz03b331DFDCCP90b3fanciLkgiOoy8SBHy06gNf+vQ1A3WFLqG7I8TipYIKeYK9wxd0tUrvHcOZA==}
@@ -4891,6 +4968,11 @@ snapshots:
       '@supabase/phoenix': 0.4.4
       tslib: 2.8.1
 
+  '@supabase/ssr@0.12.0(@supabase/supabase-js@2.110.0)':
+    dependencies:
+      '@supabase/supabase-js': 2.110.0
+      cookie: 1.1.1
+
   '@supabase/storage-js@2.110.0':
     dependencies:
       iceberg-js: 0.8.1
@@ -5413,6 +5495,8 @@ snapshots:
   convert-source-map@2.0.0: {}
 
   cookie@0.6.0: {}
+
+  cookie@1.1.1: {}
 
   core-js-compat@3.49.0:
     dependencies:
