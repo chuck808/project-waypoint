@@ -47,7 +47,9 @@ export function CheckInRecorded({
         <AppText variant="title">Visit remembered.</AppText>
 
         <AppText muted>
-          {placeName} · {businessName}
+          {businessName !== placeName
+            ? `${placeName} · ${businessName}`
+            : placeName}
         </AppText>
       </View>
 

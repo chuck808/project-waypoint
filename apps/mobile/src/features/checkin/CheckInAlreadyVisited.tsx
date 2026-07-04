@@ -25,7 +25,9 @@ export function CheckInAlreadyVisited({
 
         <AppText variant="title">{placeName}</AppText>
 
-        <AppText muted>{businessName}</AppText>
+        {businessName !== placeName ? (
+          <AppText muted>{businessName}</AppText>
+        ) : null}
       </View>
 
       <View style={styles.card}>

@@ -27,7 +27,9 @@ export function CheckInReady({
 
         <AppText variant="title">{resolution.placeName}</AppText>
 
-        <AppText muted>{resolution.businessName}</AppText>
+        {resolution.businessName !== resolution.placeName ? (
+          <AppText muted>{resolution.businessName}</AppText>
+        ) : null}
       </View>
 
       {resolution.welcomeMessage ? (
