@@ -79,7 +79,7 @@ export default function PlaceDetailScreen() {
         </AppText>
       </View>
 
-      <PrimaryLink href="/scan">Record visit</PrimaryLink>
+      <PrimaryLink href="/check-in">Record visit</PrimaryLink>
       <PrimaryLink href="/discover">Back to discover</PrimaryLink>
     </Screen>
   );
