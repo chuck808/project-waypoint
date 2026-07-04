@@ -1,7 +1,7 @@
 # ADR-005 – Businesses See Footfall, Not People
 
 **Project:** Project Waypoint
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-07-04
 **Related:** BP018, BP021, BP023, ADR-004
 
@@ -15,7 +15,7 @@ Those check-ins are valuable to businesses because they show that Waypoint is br
 
 However, check-ins also belong to walkers.
 
-A check-in connects a person, a place and a moment in time. In the Memory Graph, it is part of the walker’s personal journey.
+A check-in connects a person, a place and a moment in time. In the Memory Graph, it is part of the walker's personal journey.
 
 The Business Portal needs to show useful operational information without exposing walker identity or personal history.
 
@@ -69,11 +69,11 @@ Business users must not receive:
 * earned stamps tied to a walker
 * full movement history
 * cross-business visit history
-* anything that allows a business to identify or reconstruct a walker’s journey
+* anything that allows a business to identify or reconstruct a walker's journey
 
 The business owns its operational relationship with a location.
 
-It does not own the walker’s memory.
+It does not own the walker's memory.
 
 ---
 
@@ -102,12 +102,14 @@ business_id
 checked_in_at
 check_in_method
 verification_status
-qr_code_id
+invitation_code
 ```
 
 The view or RPC should be readable only by authorised business members for the relevant business.
 
 The Business Portal should consume this projection rather than `public.check_ins`.
+
+This projection may intentionally require definer semantics. Raw `check_ins` remain protected from direct business access, but the projection is allowed to read them in order to expose a privacy-preserving subset. The view must not expose `user_id` or any stable walker identifier. Do not add `security_invoker` merely for consistency with public map views; the security model is different here.
 
 ---
 
@@ -139,6 +141,8 @@ This decision protects the trust boundary at the heart of Waypoint.
 Businesses need evidence that walkers are visiting.
 
 They do not need to know who those walkers are.
+
+Event-level timestamps can still reveal that a visit occurred at a particular moment. This is acceptable because the business could already observe physical presence at its own location. The privacy boundary prevents the additional digital capability: linking visits across locations, over time, to a walker identity.
 
 This supports:
 
@@ -223,7 +227,7 @@ Until then, the rule remains:
 
 ## Summary
 
-A Waypoint check-in is part of a walker’s memory.
+A Waypoint check-in is part of a walker's memory.
 
 A business may see that a visit happened.
 
