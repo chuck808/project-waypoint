@@ -112,7 +112,11 @@
         <strong>{visit.business_location_name}</strong>
         <span class="muted">
           · {new Date(visit.checked_in_at).toLocaleString("en-GB")}
-          · {visit.check_in_method === "qr" ? "scanned" : visit.check_in_method}
+          · {visit.check_in_method === "qr"
+            ? "scanned"
+            : visit.check_in_method === "manual"
+              ? "typed"
+              : visit.check_in_method}
           {visit.invitation_code ? `· ${visit.invitation_code}` : ""}
         </span>
       </p>

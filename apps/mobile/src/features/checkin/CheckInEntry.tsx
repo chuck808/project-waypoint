@@ -2,10 +2,11 @@ import { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { AppText, FormField, PrimaryButton } from "../../components";
 import { theme } from "../../theme";
+import type { CheckInMethod } from "../../services/checkin";
 import { CheckInScan } from "./CheckInScan";
 
 type CheckInEntryProps = {
-  onSubmit: (code: string) => void;
+  onSubmit: (code: string, method: CheckInMethod) => void;
 };
 
 /**
@@ -31,7 +32,7 @@ export function CheckInEntry({ onSubmit }: CheckInEntryProps) {
 
       {mode === "scan" ? (
         <>
-          <CheckInScan onCode={onSubmit} />
+          <CheckInScan onCode={(code) => onSubmit(code, "qr")} />
 
           <Pressable onPress={() => setMode("manual")} style={styles.switch}>
             <AppText variant="label" muted>
@@ -51,12 +52,12 @@ export function CheckInEntry({ onSubmit }: CheckInEntryProps) {
             placeholder="Waypoint code"
             autoCapitalize="none"
             autoCorrect={false}
-            onSubmitEditing={() => trimmed && onSubmit(trimmed)}
+            onSubmitEditing={() => trimmed && onSubmit(trimmed, "manual")}
             returnKeyType="go"
           />
 
           {trimmed ? (
-            <PrimaryButton onPress={() => onSubmit(trimmed)}>
+            <PrimaryButton onPress={() => onSubmit(trimmed, "manual")}>
               Find this place
             </PrimaryButton>
           ) : null}

@@ -1,4 +1,7 @@
-import type { CheckInResolution } from "../../services/checkin";
+import type {
+  CheckInMethod,
+  CheckInResolution,
+} from "../../services/checkin";
 
 /**
  * The check-in journey as an explicit state machine.
@@ -18,9 +21,14 @@ type NotRecognised = Extract<CheckInResolution, { outcome: "not_recognised" }>;
 
 export type CheckInState =
   | { status: "idle" }
-  | { status: "resolving" }
-  | { status: "ready"; resolution: ReadyResolution; recordError?: string }
-  | { status: "recording"; resolution: ReadyResolution }
+  | { status: "resolving"; method: CheckInMethod }
+  | {
+      status: "ready";
+      resolution: ReadyResolution;
+      method: CheckInMethod;
+      recordError?: string;
+    }
+  | { status: "recording"; resolution: ReadyResolution; method: CheckInMethod }
   | {
       status: "recorded";
       placeName: string;
@@ -36,7 +44,7 @@ export type CheckInState =
   | { status: "not_recognised"; reason: NotRecognised["reason"] };
 
 export type CheckInEvent =
-  | { type: "CODE_SUBMITTED" }
+  | { type: "CODE_SUBMITTED"; method: CheckInMethod }
   | { type: "RESOLUTION_RECEIVED"; resolution: CheckInResolution }
   | { type: "CONFIRMED" }
   | { type: "VISIT_RECORDED" }
@@ -57,7 +65,9 @@ export function checkInReducer(
 ): CheckInState {
   switch (event.type) {
     case "CODE_SUBMITTED":
-      return state.status === "idle" ? { status: "resolving" } : state;
+      return state.status === "idle"
+        ? { status: "resolving", method: event.method }
+        : state;
 
     case "RESOLUTION_RECEIVED": {
       if (state.status !== "resolving") return state;
@@ -66,7 +76,7 @@ export function checkInReducer(
 
       switch (resolution.outcome) {
         case "ready":
-          return { status: "ready", resolution };
+          return { status: "ready", resolution, method: state.method };
         case "already_visited":
           return {
             status: "already_visited",
@@ -81,7 +91,11 @@ export function checkInReducer(
 
     case "CONFIRMED":
       return state.status === "ready"
-        ? { status: "recording", resolution: state.resolution }
+        ? {
+            status: "recording",
+            resolution: state.resolution,
+            method: state.method,
+          }
         : state;
 
     case "VISIT_RECORDED":
@@ -111,6 +125,7 @@ export function checkInReducer(
         ? {
             status: "ready",
             resolution: state.resolution,
+            method: state.method,
             recordError: event.reason,
           }
         : state;

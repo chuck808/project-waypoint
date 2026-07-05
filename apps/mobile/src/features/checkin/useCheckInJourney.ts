@@ -1,5 +1,9 @@
 import { useReducer } from "react";
-import { performCheckIn, resolveCheckIn } from "../../services/checkin";
+import {
+  performCheckIn,
+  resolveCheckIn,
+  type CheckInMethod,
+} from "../../services/checkin";
 import {
   checkInReducer,
   initialCheckInState,
@@ -12,14 +16,14 @@ import {
  */
 export function useCheckInJourney(): {
   state: CheckInState;
-  submitCode: (code: string) => Promise<void>;
+  submitCode: (code: string, method: CheckInMethod) => Promise<void>;
   confirmVisit: () => Promise<void>;
   reset: () => void;
 } {
   const [state, dispatch] = useReducer(checkInReducer, initialCheckInState);
 
-  async function submitCode(code: string) {
-    dispatch({ type: "CODE_SUBMITTED" });
+  async function submitCode(code: string, method: CheckInMethod) {
+    dispatch({ type: "CODE_SUBMITTED", method });
 
     const resolution = await resolveCheckIn(code);
 
@@ -30,10 +34,11 @@ export function useCheckInJourney(): {
     if (state.status !== "ready") return;
 
     const { checkInRef } = state.resolution;
+    const { method } = state;
 
     dispatch({ type: "CONFIRMED" });
 
-    const result = await performCheckIn(checkInRef);
+    const result = await performCheckIn(checkInRef, method);
 
     switch (result.outcome) {
       case "recorded":

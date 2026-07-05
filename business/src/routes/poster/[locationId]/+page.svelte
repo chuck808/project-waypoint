@@ -17,7 +17,7 @@
   <div class="qr">{@html data.qrSvg}</div>
 
   <p class="instruction">
-    Scan to add this visit to your Passport
+    Scan to record your visit
   </p>
   <p class="fallback">
     or open Waypoint and enter the code
@@ -79,15 +79,26 @@
   }
 
   @media print {
+    @page {
+      size: A5;
+      margin: 10mm;
+    }
     .no-print {
       display: none;
     }
     .poster {
       border: none;
-      padding-top: 15vh;
+      padding: 8mm 4mm 0;
+    }
+    .qr {
+      max-width: 80mm;
     }
     :global(body) {
       background: white;
+    }
+    :global(.shell) {
+      max-width: none;
+      padding: 0;
     }
   }
 </style>
