@@ -49,7 +49,8 @@ function formatDuration(minutes: number | null): string {
 
 export function mapTrail(row: TrailRow): Trail {
   return {
-    id: row.slug,
+    id: row.id,
+    slug: row.slug,
     name: row.name,
     region: row.trail_regions?.[0]?.region?.name ?? "Unknown region",
     distance: row.distance_km

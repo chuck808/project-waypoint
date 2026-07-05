@@ -1,9 +1,14 @@
-export { performCheckIn, resolveCheckIn } from "./service";
-export { normalizeCheckInCode } from "./normalizeCheckInCode";
+export {
+  performCheckIn,
+  resolveCheckIn,
+  normalizeCheckInCode,
+} from "../../services/checkin";
 
 export type {
   CheckInMethod,
   CheckInResolution,
   PerformCheckInResult,
   StampPreview,
-} from "./types";
+} from "../../services/checkin";
+
+export { CheckInResolver } from "./CheckInResolver";

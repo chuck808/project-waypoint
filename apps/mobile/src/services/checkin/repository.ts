@@ -46,6 +46,8 @@ export async function createCheckIn(input: {
   userId: string;
   businessLocationId: string;
   qrCodeId: string;
+  checkInMethod: "qr" | "manual";
+  trailId?: string;
 }) {
   const { data, error } = await supabase
     .from("check_ins")
@@ -53,7 +55,8 @@ export async function createCheckIn(input: {
       user_id: input.userId,
       business_location_id: input.businessLocationId,
       qr_code_id: input.qrCodeId,
-      check_in_method: "qr",
+      check_in_method: input.checkInMethod,
+      ...(input.trailId ? { trail_id: input.trailId } : {}),
       verification_status: "verified",
     })
     .select("*")

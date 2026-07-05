@@ -1,3 +1,7 @@
+/** How the code physically arrived. Captured at entry, never defaulted.
+ *  'gps' and 'offline_sync' exist in the schema for future capture paths. */
+export type CheckInMethod = "qr" | "manual";
+
 export type StampPreview = {
   title: string;
   imageUrl?: string;

@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { AppText, PlaceCard, PrimaryLink, Screen } from "../../src/components";
-import type { Place } from "@waypoint/types";
+import type { Place, Trail } from "@waypoint/types";
 import { getPlaces } from "../../src/services/places";
-import { theme } from "../../src/theme";
-import type { Trail } from "@waypoint/types";
 import { getTrail } from "../../src/services/trails";
+import { theme } from "../../src/theme";
 
 export default function TrailDetailScreen() {
-  const { id } = useLocalSearchParams<{ id: string }>();
+  const { slug } = useLocalSearchParams<{ slug: string }>();
 
   const [trail, setTrail] = useState<Trail | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
@@ -17,9 +16,9 @@ export default function TrailDetailScreen() {
 
   useEffect(() => {
     async function load() {
-      if (!id) return;
+      if (!slug) return;
 
-      const result = await getTrail(id);
+      const result = await getTrail(slug);
       setTrail(result);
 
       const nextPlaces = await getPlaces();
@@ -29,7 +28,7 @@ export default function TrailDetailScreen() {
     }
 
     load();
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return (

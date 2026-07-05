@@ -1,5 +1,9 @@
 import { supabase } from "../../lib/supabase";
-import type { CheckInResolution, PerformCheckInResult } from "./types";
+import type {
+  CheckInMethod,
+  CheckInResolution,
+  PerformCheckInResult,
+} from "./types";
 import {
   createCheckIn,
   createEarnedStamp,
@@ -9,6 +13,7 @@ import {
   getUserPassport,
 } from "./repository";
 import { startOfVenueDayISO } from "./time";
+import { getActiveWalk } from "../walks";
 
 type CheckInRef = {
   qrCodeId: string;
@@ -93,6 +98,7 @@ export async function resolveCheckIn(code: string): Promise<CheckInResolution> {
 
 export async function performCheckIn(
   checkInRef: string,
+  method: CheckInMethod,
 ): Promise<PerformCheckInResult> {
   try {
     const { data: auth } = await supabase.auth.getUser();
@@ -120,10 +126,17 @@ export async function performCheckIn(
       };
     }
 
+    // Ambient trail context: consumed, never invented (0003: captured
+    // at write or absent forever). getActiveWalk() has already applied
+    // the venue-day expiry, so a stale walk cannot stamp a false edge.
+    const activeWalk = await getActiveWalk();
+
     const checkIn = await createCheckIn({
       userId: auth.user.id,
       businessLocationId: ref.businessLocationId,
       qrCodeId: ref.qrCodeId,
+      checkInMethod: method,
+      trailId: activeWalk?.trailId,
     });
 
     const passport = await getUserPassport(auth.user.id);

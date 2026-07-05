@@ -10,7 +10,7 @@ type TrailCardProps = {
 
 export function TrailCard({ trail }: TrailCardProps) {
   return (
-    <Link href={`/trail/${trail.id}`} asChild>
+    <Link href={`/trail/${trail.slug}`} asChild>
       <Pressable style={styles.card}>
         <AppText variant="heading">{trail.name}</AppText>
         <AppText muted>{trail.region}</AppText>
