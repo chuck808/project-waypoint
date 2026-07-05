@@ -3,6 +3,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { AppText, FormField, PrimaryButton } from "../../components";
 import { theme } from "../../theme";
 import type { CheckInMethod } from "../../services/checkin";
+import { ActiveWalkPill } from "../walks";
 import { CheckInScan } from "./CheckInScan";
 
 type CheckInEntryProps = {
@@ -29,6 +30,8 @@ export function CheckInEntry({ onSubmit }: CheckInEntryProps) {
 
         <AppText variant="title">Record a visit.</AppText>
       </View>
+
+      <ActiveWalkPill />
 
       {mode === "scan" ? (
         <>

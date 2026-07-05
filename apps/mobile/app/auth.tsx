@@ -1,6 +1,6 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { Alert, StyleSheet, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import {
   AppText,
   FormField,
@@ -9,6 +9,7 @@ import {
   Screen,
   Section,
 } from "../src/components";
+import { notify } from "../src/lib/notify";
 import { supabase } from "../src/lib/supabase";
 import { theme } from "../src/theme";
 
@@ -23,7 +24,7 @@ export default function AuthScreen() {
     });
 
     if (error) {
-      Alert.alert("Sign in failed", error.message);
+      notify("Sign in failed", error.message);
       return;
     }
 
@@ -37,11 +38,11 @@ export default function AuthScreen() {
     });
 
     if (error) {
-      Alert.alert("Registration failed", error.message);
+      notify("Registration failed", error.message);
       return;
     }
 
-    Alert.alert(
+    notify(
       "Account created",
       "You may need to confirm your email before signing in.",
     );

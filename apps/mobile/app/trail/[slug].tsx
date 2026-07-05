@@ -1,11 +1,18 @@
 import { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
 import { StyleSheet, View } from "react-native";
-import { AppText, PlaceCard, PrimaryLink, Screen } from "../../src/components";
+import {
+  AppText,
+  PlaceCard,
+  PrimaryButton,
+  PrimaryLink,
+  Screen,
+} from "../../src/components";
 import type { Place, Trail } from "@waypoint/types";
 import { getPlaces } from "../../src/services/places";
 import { getTrail } from "../../src/services/trails";
 import { theme } from "../../src/theme";
+import { confirmSwitchWalk, useActiveWalk } from "../../src/features/walks";
 
 export default function TrailDetailScreen() {
   const { slug } = useLocalSearchParams<{ slug: string }>();
@@ -13,6 +20,8 @@ export default function TrailDetailScreen() {
   const [trail, setTrail] = useState<Trail | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const { activeWalk, start, finish } = useActiveWalk();
 
   useEffect(() => {
     async function load() {
@@ -46,6 +55,23 @@ export default function TrailDetailScreen() {
     );
   }
 
+  const isActiveTrail = activeWalk?.trailId === trail.id;
+
+  function handleStart() {
+    if (!trail) return;
+
+    // Switching is explicit, never silent: starting a new walk replaces
+    // the current one, so the walker confirms it before it happens.
+    if (activeWalk && !isActiveTrail) {
+      confirmSwitchWalk(activeWalk.trailName, trail.name, () =>
+        start(trail.id, trail.name),
+      );
+      return;
+    }
+
+    start(trail.id, trail.name);
+  }
+
   return (
     <Screen>
       <View style={styles.header}>
@@ -58,6 +84,14 @@ export default function TrailDetailScreen() {
         <AppText muted>
           {trail.distance} · {trail.difficulty} · {trail.duration}
         </AppText>
+      </View>
+
+      <View style={styles.section}>
+        {isActiveTrail ? (
+          <PrimaryButton onPress={finish}>Finish walk</PrimaryButton>
+        ) : (
+          <PrimaryButton onPress={handleStart}>Start this walk</PrimaryButton>
+        )}
       </View>
 
       <View style={styles.section}>

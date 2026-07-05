@@ -2,18 +2,21 @@ export type TrailDifficulty = "easy" | "moderate" | "hard" | "expert";
 
 export type TrailType = "circular" | "linear" | "out_and_back";
 
+/** Matches businesses_category_check in the database exactly. */
 export type PlaceCategory =
   | "cafe"
   | "pub"
   | "farm_shop"
-  | "water"
-  | "viewpoint"
-  | "honesty_box"
-  | "shelter"
+  | "campsite"
+  | "outdoor_shop"
+  | "attraction"
   | "other";
 
 export type Trail = {
+  /** The trail's identity: the database uuid, as written to check_ins.trail_id. */
   id: string;
+  /** The trail's address: the URL-friendly handle used in routes. */
+  slug: string;
   name: string;
   region: string;
   distance: string;

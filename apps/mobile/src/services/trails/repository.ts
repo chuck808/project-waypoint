@@ -35,7 +35,7 @@ export async function getTrailRowBySlug(
       `
       *,
       trail_regions (
-        regions (
+        region:regions (
           name
         )
       )

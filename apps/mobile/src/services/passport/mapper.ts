@@ -26,6 +26,7 @@ export function mapPassportStamp(row: EarnedStampRow): PassportStamp {
   };
 }
 
+import { isPlaceCategory } from "../../theme/categoryStyles";
 import type { CheckInMomentRow, CheckInStampRow } from "./repository";
 import type { PassportMoment } from "./types";
 
@@ -35,12 +36,16 @@ export function mapPassportMoment(
 ): PassportMoment {
   const stampRow = stampsByCheckIn.get(row.id);
   const stampDefinition = stampRow?.stamp_definitions;
+  const rawCategory = row.business_locations?.businesses?.category;
 
   return {
     id: row.id,
     occurredAt: row.checked_in_at,
     placeName: row.business_locations?.name ?? "Unknown place",
     businessName: row.business_locations?.businesses?.name ?? "Unknown business",
+    ...(rawCategory && isPlaceCategory(rawCategory)
+      ? { placeCategory: rawCategory }
+      : {}),
     ...(stampDefinition
       ? {
           stamp: {

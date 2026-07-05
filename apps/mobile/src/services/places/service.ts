@@ -1,6 +1,10 @@
 import type { Place } from "@waypoint/types";
-import { mapPlace } from "./mapper";
-import { getBusinessLocationById, getBusinessLocations } from "./repository";
+import { mapPlace, mapPlaceMapPoint, type PlaceMapPoint } from "./mapper";
+import {
+  getBusinessLocationById,
+  getBusinessLocations,
+  getPlaceMapPointRows,
+} from "./repository";
 
 export async function getPlaces(): Promise<Place[]> {
   const rows = await getBusinessLocations();
@@ -13,4 +17,9 @@ export async function getPlace(id: string): Promise<Place | null> {
   if (!row) return null;
 
   return mapPlace(row);
+}
+
+export async function getPlaceMapPoints(): Promise<PlaceMapPoint[]> {
+  const rows = await getPlaceMapPointRows();
+  return rows.map(mapPlaceMapPoint);
 }

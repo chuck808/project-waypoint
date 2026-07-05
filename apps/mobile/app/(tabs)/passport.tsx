@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
-import { AppText, PrimaryLink, Screen } from "../src/components";
-import { PassportTimeline } from "../src/features/passport";
+import { AppText, Screen } from "../../src/components";
+import { PassportTimeline } from "../../src/features/passport";
+import { ActiveWalkBanner } from "../../src/features/walks";
+import { countDistinctBy } from "../../src/lib/collections";
 import {
   getPassportMoments,
   type PassportMoment,
-} from "../src/services/passport";
-import { theme } from "../src/theme";
+} from "../../src/services/passport";
+import { theme } from "../../src/theme";
 
 export default function PassportScreen() {
   const [moments, setMoments] = useState<PassportMoment[]>([]);
@@ -45,9 +47,37 @@ export default function PassportScreen() {
         </AppText>
       </View>
 
-      <View style={styles.summary}>
-        <AppText variant="heading">{moments.length}</AppText>
-        <AppText muted>memories added so far</AppText>
+      <ActiveWalkBanner />
+
+      <View style={styles.stats}>
+        <View style={styles.stat}>
+          <AppText variant="heading">{moments.length}</AppText>
+          <AppText variant="label" muted>
+            Moments
+          </AppText>
+        </View>
+
+        <View style={styles.statDivider} />
+
+        <View style={styles.stat}>
+          <AppText variant="heading">
+            {countDistinctBy(moments, "trailName")}
+          </AppText>
+          <AppText variant="label" muted>
+            Trails
+          </AppText>
+        </View>
+
+        <View style={styles.statDivider} />
+
+        <View style={styles.stat}>
+          <AppText variant="heading">
+            {countDistinctBy(moments, "placeName")}
+          </AppText>
+          <AppText variant="label" muted>
+            Places
+          </AppText>
+        </View>
       </View>
 
       <View style={styles.list}>
@@ -59,8 +89,6 @@ export default function PassportScreen() {
           <PassportTimeline moments={moments} />
         )}
       </View>
-
-      <PrimaryLink href="/">Back home</PrimaryLink>
     </Screen>
   );
 }
@@ -70,11 +98,23 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
     marginBottom: theme.spacing.xl,
   },
-  summary: {
+  stats: {
+    flexDirection: "row",
+    alignItems: "center",
     padding: theme.spacing.lg,
     borderRadius: theme.radius.card,
     backgroundColor: theme.colors.primarySoft,
     marginBottom: theme.spacing.xl,
+  },
+  stat: {
+    flex: 1,
+    alignItems: "center",
+    gap: theme.spacing.xs,
+  },
+  statDivider: {
+    width: 1,
+    height: 32,
+    backgroundColor: theme.colors.border,
   },
   list: {
     gap: theme.spacing.md,

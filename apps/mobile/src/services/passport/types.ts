@@ -1,3 +1,5 @@
+import type { PlaceCategory } from "@waypoint/types";
+
 /**
  * One remembered visit — a check-in told in Waypoint's language.
  *
@@ -12,6 +14,7 @@ export type PassportMoment = {
   occurredAt: string;
   placeName: string;
   businessName: string;
+  placeCategory?: PlaceCategory;
   stamp?: {
     title: string;
     imageUrl?: string;

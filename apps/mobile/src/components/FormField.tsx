@@ -3,11 +3,11 @@ import { theme } from "../theme";
 
 type FormFieldProps = TextInputProps;
 
-export function FormField(props: FormFieldProps) {
+export function FormField({ style, ...props }: FormFieldProps) {
   return (
     <TextInput
       placeholderTextColor={theme.colors.textMuted}
-      style={styles.input}
+      style={[styles.input, style]}
       {...props}
     />
   );

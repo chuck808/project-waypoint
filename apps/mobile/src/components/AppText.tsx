@@ -1,17 +1,19 @@
 import { ReactNode } from "react";
-import { StyleSheet, Text } from "react-native";
+import { StyleProp, StyleSheet, Text, TextStyle } from "react-native";
 import { theme } from "../theme";
 
 type AppTextProps = {
   children: ReactNode;
   variant?: "title" | "heading" | "body" | "label";
   muted?: boolean;
+  style?: StyleProp<TextStyle>;
 };
 
 export function AppText({
   children,
   variant = "body",
   muted = false,
+  style,
 }: AppTextProps) {
   return (
     <Text
@@ -19,6 +21,7 @@ export function AppText({
         styles.base,
         styles[variant],
         muted ? styles.muted : undefined,
+        style,
       ]}
     >
       {children}

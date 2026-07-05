@@ -38,7 +38,7 @@ export type CheckInMomentRow = {
   checked_in_at: string;
   business_locations: {
     name: string | null;
-    businesses: { name: string } | null;
+    businesses: { name: string; category: string } | null;
   } | null;
   trails: { name: string } | null;
 };
@@ -57,7 +57,7 @@ export async function getCheckInRows(
       `
       id,
       checked_in_at,
-      business_locations ( name, businesses ( name ) ),
+      business_locations ( name, businesses ( name, category ) ),
       trails ( name )
     `,
     )

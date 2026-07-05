@@ -1,6 +1,7 @@
 import { StyleSheet, View } from "react-native";
 import { AppText, Card } from "../../components";
 import { theme } from "../../theme";
+import { getCategoryStyle } from "../../theme/categoryStyles";
 import type { PassportMoment } from "../../services/passport";
 import { dayAndTime } from "./formatMoment";
 
@@ -9,48 +10,55 @@ type MomentCardProps = {
 };
 
 export function MomentCard({ moment }: MomentCardProps) {
+  const category = getCategoryStyle(moment.placeCategory ?? "other");
+
   return (
-    <Card>
-      {moment.stamp ? (
-        <View style={styles.stampRow}>
-          <View style={styles.stampMark}>
-            <AppText variant="label">✓</AppText>
-          </View>
+    <Card style={styles.card}>
+      <View style={[styles.mark, { backgroundColor: category.bg }]}>
+        <AppText variant="label" style={{ color: category.fg }}>
+          {moment.placeCategory ? category.icon : "✓"}
+        </AppText>
+      </View>
+
+      <View style={styles.content}>
+        {moment.stamp ? (
           <AppText variant="label" muted>
             {moment.stamp.title}
           </AppText>
-        </View>
-      ) : null}
+        ) : null}
 
-      <AppText variant="heading">{moment.placeName}</AppText>
+        <AppText variant="heading">{moment.placeName}</AppText>
 
-      {moment.businessName !== moment.placeName ? (
-        <AppText muted>{moment.businessName}</AppText>
-      ) : null}
+        {moment.businessName !== moment.placeName ? (
+          <AppText muted>{moment.businessName}</AppText>
+        ) : null}
 
-      {moment.trailName ? (
-        <AppText muted>Visited after {moment.trailName}</AppText>
-      ) : null}
+        {moment.trailName ? (
+          <AppText muted>Visited after {moment.trailName}</AppText>
+        ) : null}
 
-      <AppText variant="label" muted>
-        {dayAndTime(moment.occurredAt)}
-      </AppText>
+        <AppText variant="label" muted>
+          {dayAndTime(moment.occurredAt)}
+        </AppText>
+      </View>
     </Card>
   );
 }
 
 const styles = StyleSheet.create({
-  stampRow: {
+  card: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.sm,
+    alignItems: "flex-start",
   },
-  stampMark: {
-    width: 26,
-    height: 26,
+  mark: {
+    width: 42,
+    height: 42,
     borderRadius: theme.radius.pill,
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: theme.colors.primarySoft,
+  },
+  content: {
+    flex: 1,
+    gap: theme.spacing.xs,
   },
 });

@@ -1,1 +1,2 @@
-export { getPlace, getPlaces } from "./service";
+export { getPlace, getPlaces, getPlaceMapPoints } from "./service";
+export type { PlaceMapPoint } from "./mapper";
