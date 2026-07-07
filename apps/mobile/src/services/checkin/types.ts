@@ -31,6 +31,7 @@ export type PerformCheckInResult =
   | {
       outcome: "recorded";
       message: string;
+      recognition?: { title: string };
     }
   | {
       outcome: "already_visited";

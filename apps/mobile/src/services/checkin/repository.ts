@@ -67,49 +67,26 @@ export async function createCheckIn(input: {
   return data;
 }
 
-export async function getUserPassport(userId: string) {
-  const { data, error } = await supabase
-    .from("passports")
-    .select("id")
-    .eq("user_id", userId)
-    .single();
 
-  if (error) throw error;
 
-  return data;
-}
 
-export async function getBusinessStampDefinition() {
-  const { data, error } = await supabase
-    .from("stamp_definitions")
-    .select("*")
-    .eq("title", "First Local Stop")
-    .eq("stamp_type", "business")
-    .eq("status", "active")
-    .single();
-
-  if (error) throw error;
-
-  return data;
-}
-
-export async function createEarnedStamp(input: {
-  passportId: string;
-  stampDefinitionId: string;
-  checkInId: string;
-}) {
+/** What the database awarded for this check-in, if anything. Awards are
+ *  written by the check_ins trigger (0012) in the same transaction as
+ *  the insert, so this read is consistent immediately. */
+export async function getRecognitionForCheckIn(
+  checkInId: string,
+): Promise<{ title: string } | null> {
   const { data, error } = await supabase
     .from("earned_stamps")
-    .insert({
-      passport_id: input.passportId,
-      stamp_definition_id: input.stampDefinitionId,
-      source_type: "check_in",
-      source_id: input.checkInId,
-    })
-    .select("*")
-    .single();
+    .select("stamp_definitions ( title )")
+    .eq("source_type", "check_in")
+    .eq("source_id", checkInId)
+    .limit(1)
+    .maybeSingle();
 
   if (error) throw error;
 
-  return data;
+  const title = (data?.stamp_definitions as { title: string } | null)?.title;
+
+  return title ? { title } : null;
 }

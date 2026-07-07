@@ -6,11 +6,9 @@ import type {
 } from "./types";
 import {
   createCheckIn,
-  createEarnedStamp,
-  getBusinessStampDefinition,
   getLatestCheckInSince,
   getQrCode,
-  getUserPassport,
+  getRecognitionForCheckIn,
 } from "./repository";
 import { startOfVenueDayISO } from "./time";
 import { getActiveWalk } from "../walks";
@@ -79,9 +77,10 @@ export async function resolveCheckIn(code: string): Promise<CheckInResolution> {
       outcome: "ready",
       placeName,
       businessName,
-      stamp: {
-        title: "First Local Stop",
-      },
+      // No stamp preview: recognitions are rule-earned server-side and
+      // the client cannot honestly promise one before the write. The
+      // optional StampPreview stays in the type for a future
+      // server-side rules preview.
       checkInRef: mintCheckInRef({
         qrCodeId: qr.id,
         businessLocationId: qr.business_location_id,
@@ -140,18 +139,14 @@ export async function performCheckIn(
       trailId: activeWalk?.trailId,
     });
 
-    const passport = await getUserPassport(auth.user.id);
-    const stampDefinition = await getBusinessStampDefinition();
-
-    await createEarnedStamp({
-      passportId: passport.id,
-      stampDefinitionId: stampDefinition.id,
-      checkInId: checkIn.id,
-    });
+    // The award, if any, was written by the database trigger inside
+    // the same transaction as the check-in. We only ask what happened.
+    const recognition = await getRecognitionForCheckIn(checkIn.id);
 
     return {
       outcome: "recorded",
       message: "Visit remembered.",
+      ...(recognition ? { recognition } : {}),
     };
   } catch (err) {
     return {
