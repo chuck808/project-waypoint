@@ -66,6 +66,26 @@
             {statusNotes[location.status] ?? location.status}
           </p>
 
+          <div class="welcome">
+            <p class="label">Welcome message</p>
+            <p class="muted small">
+              Shown to walkers when they check in here.
+            </p>
+            <form method="POST" action="?/saveWelcome">
+              <input type="hidden" name="locationId" value={location.id} />
+              <textarea
+                name="message"
+                rows="2"
+                maxlength="280"
+                placeholder="e.g. Muddy boots welcome."
+                >{data.welcomeByLocation[location.id] ?? ""}</textarea>
+              <button class="button" type="submit">Save</button>
+            </form>
+            {#if form?.welcomeError}
+              <p class="muted small">{form.welcomeError}</p>
+            {/if}
+          </div>
+
           {#each location.qr_codes as code}
             <div class="token" class:retired={code.status !== "active"}>
               <p class="label">
@@ -129,6 +149,29 @@
 {/if}
 
 <style>
+  .welcome {
+    margin: 1rem 0;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+  .welcome textarea {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    margin: 0.5rem 0 0.75rem;
+    padding: 0.6rem 0.75rem;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--background);
+    font: inherit;
+    color: var(--text);
+    resize: vertical;
+  }
+  .welcome button {
+    border: none;
+    cursor: pointer;
+    font: inherit;
+  }
   .section {
     font-size: 1.3rem;
     margin-top: 2.5rem;

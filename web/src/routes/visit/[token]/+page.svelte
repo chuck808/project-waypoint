@@ -20,6 +20,8 @@
   </title>
 </svelte:head>
 
+<div class="narrow">
+
 {#if data.outcome === "found"}
   <p class="label">You've found a Waypoint place</p>
   <h1>{data.placeName}</h1>
@@ -53,3 +55,5 @@
 
   <a class="button" href="/">What is Waypoint?</a>
 {/if}
+</div>
+

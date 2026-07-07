@@ -77,6 +77,11 @@ export async function resolveCheckIn(code: string): Promise<CheckInResolution> {
       outcome: "ready",
       placeName,
       businessName,
+      // Business-authored, per location (0013). Absent until the host
+      // writes one -- the card renders only what is genuinely said.
+      ...(qr.business_locations?.welcome_message
+        ? { welcomeMessage: qr.business_locations.welcome_message }
+        : {}),
       // No stamp preview: recognitions are rule-earned server-side and
       // the client cannot honestly promise one before the write. The
       // optional StampPreview stays in the type for a future

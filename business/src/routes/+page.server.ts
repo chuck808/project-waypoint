@@ -35,6 +35,7 @@ export const load: PageServerLoad = async ({ locals }) => {
       email: user.email,
       memberships: [],
       footfall: [],
+      welcomeByLocation: {} as Record<string, string>,
       loadError: error.message,
     };
   }
@@ -70,10 +71,24 @@ export const load: PageServerLoad = async ({ locals }) => {
     .order("checked_in_at", { ascending: false })
     .limit(15);
 
+  // welcome_message postdates the generated types (regen after 0013).
+  type WelcomeRow = { id: string; welcome_message: string | null };
+
+  const { data: welcomes } = await (fromView("business_locations") as unknown as {
+    select: (c: string) => PromiseLike<{ data: WelcomeRow[] | null }>;
+  }).select("id, welcome_message");
+
+  const welcomeByLocation: Record<string, string> = {};
+
+  for (const row of welcomes ?? []) {
+    if (row.welcome_message) welcomeByLocation[row.id] = row.welcome_message;
+  }
+
   return {
     email: user.email,
     memberships: data ?? [],
     footfall: footfall ?? [],
+    welcomeByLocation,
     loadError: null,
   };
 };
@@ -82,6 +97,35 @@ export const actions: Actions = {
   signout: async ({ locals }) => {
     await locals.supabase.auth.signOut();
     redirect(303, "/sign-in");
+  },
+
+  saveWelcome: async ({ request, locals }) => {
+    const { user } = await locals.safeGetSession();
+
+    if (!user) redirect(303, "/sign-in");
+
+    const form = await request.formData();
+    const locationId = String(form.get("locationId") ?? "");
+    const message = String(form.get("message") ?? "").trim().slice(0, 280);
+
+    if (!locationId) return { welcomeError: "Missing location." };
+
+    // Column grant (0013) means only welcome_message is writable; RLS
+    // means only for the caller's own business. Both enforced in the
+    // database -- this action is just a form.
+    const update = locals.supabase.from("business_locations")
+      .update as unknown as (v: Record<string, string | null>) => {
+      eq: (c: string, v: string) => PromiseLike<{ error: { message: string } | null }>;
+    };
+
+    const { error } = await update({ welcome_message: message || null }).eq(
+      "id",
+      locationId,
+    );
+
+    if (error) return { welcomeError: error.message };
+
+    return { welcomeError: null };
   },
 
   createInvitation: async ({ request, locals }) => {
