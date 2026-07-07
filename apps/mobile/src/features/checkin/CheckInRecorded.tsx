@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { AppText, PrimaryButton, PrimaryLink } from "../../components";
+import { VenueStamp, resolveMark } from "../stamps";
 import { theme } from "../../theme";
 
 type CheckInRecordedProps = {
@@ -40,7 +41,18 @@ export function CheckInRecorded({
       <Animated.View
         style={[styles.stampMark, { opacity, transform: [{ scale }] }]}
       >
-        <AppText variant="title">✓</AppText>
+        <VenueStamp
+          mark={resolveMark(businessName)}
+          size={132}
+          seed={placeName}
+          dateText={new Date()
+            .toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })
+            .toUpperCase()}
+        />
       </Animated.View>
 
       <View style={styles.header}>
@@ -75,13 +87,9 @@ const styles = StyleSheet.create({
     alignItems: "stretch",
   },
   stampMark: {
-    width: 88,
-    height: 88,
-    borderRadius: 999,
     alignSelf: "center",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: theme.colors.primarySoft,
     marginTop: theme.spacing.xl,
   },
   header: {

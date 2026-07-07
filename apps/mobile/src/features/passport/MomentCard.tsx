@@ -1,7 +1,7 @@
 import { StyleSheet, View } from "react-native";
 import { AppText, Card } from "../../components";
 import { theme } from "../../theme";
-import { getCategoryStyle } from "../../theme/categoryStyles";
+import { VenueStamp, resolveMark } from "../stamps";
 import type { PassportMoment } from "../../services/passport";
 import { dayAndTime } from "./formatMoment";
 
@@ -10,14 +10,12 @@ type MomentCardProps = {
 };
 
 export function MomentCard({ moment }: MomentCardProps) {
-  const category = getCategoryStyle(moment.placeCategory ?? "other");
+  const mark = resolveMark(moment.businessName, moment.placeCategory);
 
   return (
     <Card style={styles.card}>
-      <View style={[styles.mark, { backgroundColor: category.bg }]}>
-        <AppText variant="label" style={{ color: category.fg }}>
-          {moment.placeCategory ? category.icon : "✓"}
-        </AppText>
+      <View style={styles.mark}>
+        <VenueStamp mark={mark} size={56} seed={moment.id} />
       </View>
 
       <View style={styles.content}>
@@ -51,9 +49,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-start",
   },
   mark: {
-    width: 42,
-    height: 42,
-    borderRadius: theme.radius.pill,
+    width: 56,
     alignItems: "center",
     justifyContent: "center",
   },

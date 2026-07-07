@@ -1,8 +1,4 @@
-export {
-  performCheckIn,
-  resolveCheckIn,
-  normalizeCheckInCode,
-} from "../../services/checkin";
+export { performCheckIn, resolveCheckIn } from "../../services/checkin";
 
 export type {
   CheckInMethod,

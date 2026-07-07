@@ -14,6 +14,7 @@ import {
 } from "./repository";
 import { startOfVenueDayISO } from "./time";
 import { getActiveWalk } from "../walks";
+import { normaliseInvitation } from "@waypoint/validation";
 
 type CheckInRef = {
   qrCodeId: string;
@@ -57,7 +58,7 @@ async function findTodaysVisit(businessLocationId: string) {
 
 export async function resolveCheckIn(code: string): Promise<CheckInResolution> {
   try {
-    const qr = await getQrCode(code.trim());
+    const qr = await getQrCode(normaliseInvitation(code));
 
     const placeName = qr.business_locations?.name ?? "Unknown place";
     const businessName =
