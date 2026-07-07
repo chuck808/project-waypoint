@@ -13,9 +13,9 @@ This repository is in active early development. Product foundation and blueprint
 
 Per **BP023 – Product Surface Architecture**, Waypoint is one platform expressed through four product surfaces, all of which now have real code:
 
-- **`apps/mobile`** (Walker App, Expo / React Native) — the most developed surface. Has working auth (Supabase), a home screen, a discover flow for trails and places, a full QR check-in journey (scan → resolve → record → already-visited / not-recognised states), a live Passport timeline backed by Supabase, and a MapLibre map spike.
+- **`apps/mobile`** (Walker App, Expo / React Native) — the most developed surface. Has working auth (Supabase), a home screen, a discover flow for trails and places, a full QR check-in journey driven by an explicit state machine (scan → resolve → record → already-visited / not-recognised states), an active-walk banner/context spanning screens, a live Passport timeline backed by Supabase with passport stamp components, and a MapLibre map with user location and place markers.
 - **`web`** (Public Front Door, SvelteKit) — a small landing page plus `/visit/{token}` invitation resolution, per ADR-004 (QR codes are public invitations, not identifiers).
-- **`business`** (Business Portal, SvelteKit) — sign-in and a dashboard that lists the signed-in user's business memberships, locations and current QR invitation codes, respecting RLS-scoped queries.
+- **`business`** (Business Portal, SvelteKit) — sign-in and a dashboard that lists the signed-in user's business memberships, locations, current QR invitation codes and per-location welcome messages, respecting RLS-scoped queries. Also includes a printable QR poster page per location, and a footfall view built on the ADR-005 projection (visit events without walker identity).
 - **`admin`** (Admin Portal, SvelteKit) — sign-in gated behind a server-side `is_admin` check (RLS remains the real authority). The dashboard lets admins approve/suspend businesses, and shows a read-only view of trails, regions and recent check-ins for auditing.
 
 Supporting the surfaces:
@@ -52,7 +52,7 @@ project-waypoint/
 ├── apps/
 │   └── mobile/              # Walker App — Expo / React Native (auth, discover, check-in, passport, map)
 ├── web/                     # Public Front Door — SvelteKit (landing page, /visit/{token})
-├── business/                # Business Portal — SvelteKit (sign-in, business/location/QR dashboard)
+├── business/                # Business Portal — SvelteKit (sign-in, business/location/QR dashboard, welcome messages, QR posters, footfall)
 ├── admin/                   # Admin Portal — SvelteKit (sign-in, business approval, trails/regions/check-ins audit)
 ├── packages/
 │   ├── types/                # Shared domain types
@@ -64,7 +64,7 @@ project-waypoint/
 │   ├── migrations/            # SQL migrations (initial core schema)
 │   └── seeds/                  # Seed data
 ├── supabase/                # Reserved for Supabase CLI project config (empty)
-└── docs/                    # Blueprints (BP001–BP023), ADRs, API & component docs
+└── docs/                    # Blueprints (BP001–BP024), ADRs, API & component docs, design field guide
 ```
 
 ---
@@ -134,13 +134,15 @@ Full documentation lives in [`docs/`](./docs). Key blueprints:
 | BP021     | The Waypoint Memory Graph                      | Draft        |
 | BP022     | Evolution Rules                                | Draft        |
 | BP023     | Product Surface Architecture                   | Draft        |
+| BP024     | Waypoint Design Library                        | Draft        |
 | WP000     | Engineering Principles                         | Foundational |
 
 Also see:
 
-- [`docs/decisions/`](./docs/decisions) – Architecture Decision Records (ADR-001 Turborepo, ADR-002 Supabase, ADR-003 Expo — all Accepted; ADR-004 QR Codes as Public Invitations — Proposed)
+- [`docs/decisions/`](./docs/decisions) – Architecture Decision Records (ADR-001 Turborepo, ADR-002 Supabase, ADR-003 Expo, ADR-005 Businesses See Footfall Not People — all Accepted; ADR-004 QR Codes as Public Invitations — Proposed)
 - [`docs/api/`](./docs/api) – OpenAPI contract and API documentation
 - [`docs/components/`](./docs/components) – Reusable component documentation
+- [`docs/field-guide/`](./docs/field-guide) – Design library field guide (surfaces, colours, writing, components, stamps)
 
 ---
 
