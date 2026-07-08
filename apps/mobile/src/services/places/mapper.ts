@@ -1,10 +1,31 @@
 import type { Place, PlaceCategory } from "@waypoint/types";
+import { facilityKeys, walkerCharacteristicKeys } from "@waypoint/ui";
 import { isPlaceCategory } from "../../theme/categoryStyles";
 import type { PlaceMapPointRow } from "./repository";
 
 type BusinessLocationRow = any;
 
+/**
+ * business_locations.walker_characteristics/facilities are jsonb maps of
+ * key -> boolean, written by the Steward Portal's checkbox forms. Only
+ * keys @waypoint/ui actually knows about survive -- an unrecognised key
+ * (renamed column, stale data) is silently dropped rather than shown as
+ * a raw, unlabelled string.
+ */
+function enabledKeys(value: unknown, validKeys: readonly string[]): string[] {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return [];
+
+  const record = value as Record<string, unknown>;
+  return validKeys.filter((key) => record[key] === true);
+}
+
 export function mapPlace(row: BusinessLocationRow): Place {
+  const walkerCharacteristics = enabledKeys(
+    row.walker_characteristics,
+    walkerCharacteristicKeys,
+  );
+  const facilities = enabledKeys(row.facilities, facilityKeys);
+
   return {
     id: row.id,
     name: row.name,
@@ -17,12 +38,13 @@ export function mapPlace(row: BusinessLocationRow): Place {
 
     distance: "Nearby",
 
-    facilities: [],
+    facilities,
 
     welcome: "Walker friendly",
 
     openingHours: "See venue",
 
+    ...(walkerCharacteristics.length ? { walkerCharacteristics } : {}),
     ...(row.walking_context ? { walkingContext: row.walking_context } : {}),
     ...(row.place_story ? { placeStory: row.place_story } : {}),
     ...(row.accessibility_notes

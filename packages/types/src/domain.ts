@@ -34,6 +34,9 @@ export type Place = {
   description: string;
   note: string;
   distance: string;
+  /** Enabled FacilityKey values from @waypoint/ui, e.g. "toilets". Empty
+   *  means the steward hasn't confirmed any facilities yet, not that
+   *  there are none. */
   facilities: string[];
   welcome: string;
   openingHours: string;
@@ -41,6 +44,8 @@ export type Place = {
   placeStory?: string;
   accessibilityNotes?: string;
   bestSeasons?: string[];
+  /** Enabled WalkerCharacteristicKey values from @waypoint/ui, e.g. "boots_welcome". */
+  walkerCharacteristics?: string[];
 };
 
 export type PassportStamp = {

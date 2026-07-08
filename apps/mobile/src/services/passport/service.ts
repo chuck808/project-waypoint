@@ -6,8 +6,11 @@ import { getEarnedStampRows } from "./repository";
 export async function getPassportStamps(): Promise<PassportStamp[]> {
   const { data, error } = await supabase.auth.getUser();
 
-  if (error) throw error;
+  // No session is not a failure -- getUser() reports it as an error
+  // ("Auth session missing!") rather than a bare null user, so the
+  // signed-out case must be checked before the error is treated as real.
   if (!data.user) return [];
+  if (error) throw error;
 
   const rows = await getEarnedStampRows(data.user.id);
 
@@ -25,8 +28,10 @@ import type { PassportMoment } from "./types";
 export async function getPassportMoments(): Promise<PassportMoment[]> {
   const { data, error } = await supabase.auth.getUser();
 
-  if (error) throw error;
+  // Same as getPassportStamps: signed-out is reported as an error, not
+  // just a null user, so it must be checked first.
   if (!data.user) return [];
+  if (error) throw error;
 
   const rows = await getCheckInRows(data.user.id);
   const stamps = await getStampsForCheckIns(rows.map((row) => row.id));

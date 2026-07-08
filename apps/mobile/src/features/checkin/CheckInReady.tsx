@@ -1,6 +1,8 @@
+import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { AppText, PrimaryButton } from "../../components";
 import { theme } from "../../theme";
+import { useAuth } from "../auth/AuthProvider";
 import type { ReadyResolution } from "./checkInMachine";
 
 type CheckInReadyProps = {
@@ -18,6 +20,9 @@ export function CheckInReady({
   onConfirm,
   onDismiss,
 }: CheckInReadyProps) {
+  const { session } = useAuth();
+  const isSignedIn = Boolean(session);
+
   return (
     <View style={styles.container}>
       <View style={styles.header}>
@@ -59,9 +64,15 @@ export function CheckInReady({
         </AppText>
       ) : null}
 
-      <PrimaryButton onPress={onConfirm}>
-        {isRecording ? "Adding to your Passport…" : "Add to my Passport"}
-      </PrimaryButton>
+      {isSignedIn ? (
+        <PrimaryButton onPress={onConfirm}>
+          {isRecording ? "Adding to your Passport…" : "Add to my Passport"}
+        </PrimaryButton>
+      ) : (
+        <PrimaryButton onPress={() => router.push("/auth")}>
+          Sign in to add this to your Passport
+        </PrimaryButton>
+      )}
 
       {!isRecording ? (
         <PrimaryButton onPress={onDismiss}>Not now</PrimaryButton>

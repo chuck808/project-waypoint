@@ -1,4 +1,10 @@
 import type { Place, PlaceCategory } from "@waypoint/types";
+import {
+  facilityGlyphs,
+  facilityLabels,
+  walkerCharacteristicGlyphs,
+  walkerCharacteristicLabels,
+} from "@waypoint/ui";
 
 type WalkerFact = {
   label: string;
@@ -36,17 +42,16 @@ const categoryFacts: Record<PlaceCategory, WalkerFact[]> = {
 };
 
 export function getWalkerFacts(place: Place): WalkerFact[] {
-  const facts = [...categoryFacts[place.category]];
-
-  for (const facility of place.facilities) {
-    const lower = facility.toLowerCase();
-    if (lower.includes("toilet")) facts.push({ label: "Toilets", icon: "🚻" });
-    if (lower.includes("dog")) facts.push({ label: "Dog friendly", icon: "🐕" });
-    if (lower.includes("water")) facts.push({ label: "Water refill", icon: "💧" });
-    if (lower.includes("outdoor")) facts.push({ label: "Outdoor seating", icon: "🌤" });
+  if (place.walkerCharacteristics?.length) {
+    return place.walkerCharacteristics.map((key) => ({
+      label: walkerCharacteristicLabels[key as keyof typeof walkerCharacteristicLabels] ?? key,
+      icon: walkerCharacteristicGlyphs[key as keyof typeof walkerCharacteristicGlyphs] ?? "🥾",
+    }));
   }
 
-  return dedupeFacts(facts).slice(0, 6);
+  // The steward hasn't confirmed anything yet -- category defaults keep
+  // this section from reading empty rather than claiming it's factual.
+  return dedupeFacts([...categoryFacts[place.category]]).slice(0, 6);
 }
 
 export function getPlaceFacilities(place: Place): WalkerFact[] {
@@ -57,7 +62,10 @@ export function getPlaceFacilities(place: Place): WalkerFact[] {
     ];
   }
 
-  return place.facilities.map((facility) => ({ label: facility, icon: "✓" }));
+  return place.facilities.map((key) => ({
+    label: facilityLabels[key as keyof typeof facilityLabels] ?? key,
+    icon: facilityGlyphs[key as keyof typeof facilityGlyphs] ?? "✓",
+  }));
 }
 
 function dedupeFacts(facts: WalkerFact[]): WalkerFact[] {
