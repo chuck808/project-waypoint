@@ -110,7 +110,11 @@ export default function PlaceDetailScreen() {
 
         <DetailSection title="Walker welcome" eyebrow="Before you arrive">
           <Card>
-            <AppText>{place.welcome}</AppText>
+            {place.welcomeMessage ? (
+              <AppText>"{place.welcomeMessage}"</AppText>
+            ) : (
+              <AppText>{place.welcome}</AppText>
+            )}
             <View style={styles.chipGrid}>
               {walkerFacts.map((fact) => (
                 <InfoChip
@@ -137,7 +141,10 @@ export default function PlaceDetailScreen() {
         </DetailSection>
 
         <DetailSection title="Official updates" eyebrow="From the place steward">
-          <OfficialNotes />
+          <OfficialNotes
+            stewardNotice={place.stewardNotice}
+            seasonalInformation={place.seasonalInformation}
+          />
         </DetailSection>
 
         <DetailSection title="Recent conditions" eyebrow="Shared by walkers">

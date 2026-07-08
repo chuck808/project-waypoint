@@ -1,57 +1,66 @@
 import { redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
-type LooseRpc = (
-  fn: string,
-  args?: Record<string, unknown>,
-) => PromiseLike<{ data: unknown; error: { message: string } | null }>;
+const SEVEN_DAYS_AGO = () =>
+  new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
-const BUSINESS_DECISIONS = ["approved", "suspended"] as const;
+export const load: PageServerLoad = async ({ locals, parent }) => {
+  const { authorised } = await parent();
 
-export const load: PageServerLoad = async ({ locals }) => {
-  const { user } = await locals.safeGetSession();
+  if (!authorised) return {};
 
-  if (!user) redirect(303, "/sign-in");
-
-  // The gate. RLS would silently show a non-admin only public rows, but
-  // an explicit check gives an honest "not authorised" instead of a
-  // mysteriously thin dashboard.
-  const rpc = locals.supabase.rpc.bind(locals.supabase) as unknown as LooseRpc;
-  const { data: isAdmin } = await rpc("is_admin");
-
-  if (isAdmin !== true) {
-    return { authorised: false as const, email: user.email };
-  }
-
-  const [businesses, trails, regions, checkIns] = await Promise.all([
+  const [
+    businesses,
+    activeLocations,
+    checkInsLast7Days,
+    fieldNotesPublic,
+    fieldNotesUnresolved,
+    publishedTrails,
+    activeRegions,
+  ] = await Promise.all([
+    locals.supabase.from("businesses").select("status"),
     locals.supabase
-      .from("businesses")
-      .select("id, name, category, status, created_at")
-      .order("created_at", { ascending: false }),
-    locals.supabase
-      .from("trails")
-      .select("id, name, status")
-      .order("name"),
-    locals.supabase
-      .from("regions")
-      .select("id, name, status")
-      .order("name"),
+      .from("business_locations")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "active"),
     locals.supabase
       .from("check_ins")
-      .select(
-        "id, checked_in_at, verification_status, business_locations ( name )",
-      )
-      .order("checked_in_at", { ascending: false })
-      .limit(25),
+      .select("*", { count: "exact", head: true })
+      .gte("checked_in_at", SEVEN_DAYS_AGO()),
+    locals.supabase
+      .from("field_notes")
+      .select("*", { count: "exact", head: true })
+      .eq("visibility", "public")
+      .is("resolved_at", null),
+    locals.supabase
+      .from("field_notes")
+      .select("*", { count: "exact", head: true })
+      .is("resolved_at", null),
+    locals.supabase
+      .from("trails")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "published"),
+    locals.supabase
+      .from("regions")
+      .select("*", { count: "exact", head: true })
+      .eq("status", "published"),
   ]);
 
+  const businessesByStatus: Record<string, number> = {};
+  for (const row of businesses.data ?? []) {
+    businessesByStatus[row.status] = (businessesByStatus[row.status] ?? 0) + 1;
+  }
+
   return {
-    authorised: true as const,
-    email: user.email,
-    businesses: businesses.data ?? [],
-    trails: trails.data ?? [],
-    regions: regions.data ?? [],
-    checkIns: checkIns.data ?? [],
+    kpis: {
+      businessesByStatus,
+      activeLocations: activeLocations.count ?? 0,
+      checkInsLast7Days: checkInsLast7Days.count ?? 0,
+      fieldNotesPublic: fieldNotesPublic.count ?? 0,
+      fieldNotesUnresolved: fieldNotesUnresolved.count ?? 0,
+      publishedTrails: publishedTrails.count ?? 0,
+      activeRegions: activeRegions.count ?? 0,
+    },
   };
 };
 
@@ -59,33 +68,5 @@ export const actions: Actions = {
   signout: async ({ locals }) => {
     await locals.supabase.auth.signOut();
     redirect(303, "/sign-in");
-  },
-
-  decide: async ({ request, locals }) => {
-    const { user } = await locals.safeGetSession();
-
-    if (!user) redirect(303, "/sign-in");
-
-    const form = await request.formData();
-    const businessId = String(form.get("businessId") ?? "");
-    const decision = String(form.get("decision") ?? "");
-
-    if (
-      !businessId ||
-      !BUSINESS_DECISIONS.includes(decision as (typeof BUSINESS_DECISIONS)[number])
-    ) {
-      return { decisionError: "Invalid decision." };
-    }
-
-    // RLS (0010) is the real authority: a non-admin's update matches
-    // zero rows. The is_admin gate above is UX, not security.
-    const { error } = await locals.supabase
-      .from("businesses")
-      .update({ status: decision })
-      .eq("id", businessId);
-
-    if (error) return { decisionError: error.message };
-
-    return { decisionError: null };
   },
 };

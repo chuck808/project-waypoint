@@ -51,6 +51,11 @@ export function mapPlace(row: BusinessLocationRow): Place {
       ? { accessibilityNotes: row.accessibility_notes }
       : {}),
     ...(row.best_seasons?.length ? { bestSeasons: row.best_seasons } : {}),
+    ...(row.welcome_message ? { welcomeMessage: row.welcome_message } : {}),
+    ...(row.steward_notice ? { stewardNotice: row.steward_notice } : {}),
+    ...(row.seasonal_information
+      ? { seasonalInformation: row.seasonal_information }
+      : {}),
   };
 }
 

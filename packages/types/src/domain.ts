@@ -46,6 +46,11 @@ export type Place = {
   bestSeasons?: string[];
   /** Enabled WalkerCharacteristicKey values from @waypoint/ui, e.g. "boots_welcome". */
   walkerCharacteristics?: string[];
+  /** Steward-authored, per-location. See ADR "business_locations.welcome_message". */
+  welcomeMessage?: string;
+  /** Temporary factual notice, e.g. a closure. Not advertising. */
+  stewardNotice?: string;
+  seasonalInformation?: string;
 };
 
 export type PassportStamp = {

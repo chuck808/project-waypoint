@@ -3,14 +3,16 @@ import { AppText, Card } from "../../components";
 import { theme } from "../../theme";
 
 type OfficialNotesProps = {
-  title?: string;
-  message?: string;
+  stewardNotice?: string;
+  seasonalInformation?: string;
 };
 
 export function OfficialNotes({
-  title = "No official updates today",
-  message = "When a steward publishes current access, opening or welcome information, it will appear here.",
+  stewardNotice,
+  seasonalInformation,
 }: OfficialNotesProps) {
+  const hasContent = Boolean(stewardNotice || seasonalInformation);
+
   return (
     <Card style={styles.card}>
       <View style={styles.badge}>
@@ -18,8 +20,25 @@ export function OfficialNotes({
           Official
         </AppText>
       </View>
-      <AppText variant="heading">{title}</AppText>
-      <AppText muted>{message}</AppText>
+
+      {hasContent ? (
+        <>
+          {stewardNotice ? (
+            <AppText variant="heading">{stewardNotice}</AppText>
+          ) : null}
+          {seasonalInformation ? (
+            <AppText muted>{seasonalInformation}</AppText>
+          ) : null}
+        </>
+      ) : (
+        <>
+          <AppText variant="heading">No official updates today</AppText>
+          <AppText muted>
+            When a steward publishes current access, opening or welcome
+            information, it will appear here.
+          </AppText>
+        </>
+      )}
     </Card>
   );
 }

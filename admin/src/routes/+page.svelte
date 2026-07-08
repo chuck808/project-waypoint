@@ -1,106 +1,101 @@
 <script lang="ts">
   export let data;
-  export let form;
 
-  function formatTime(iso: string): string {
-    return new Date(iso).toLocaleString();
-  }
+  const statusOrder = ["draft", "pending_review", "approved", "suspended", "archived"];
+  const statusLabels: Record<string, string> = {
+    draft: "Draft",
+    pending_review: "Awaiting review",
+    approved: "Approved",
+    suspended: "Suspended",
+    archived: "Archived",
+  };
 </script>
 
-<svelte:head><title>Waypoint Admin</title></svelte:head>
+<svelte:head><title>Overview — Waypoint Admin</title></svelte:head>
 
-<header class="top">
-  <p class="label">Waypoint Admin</p>
-  <form method="POST" action="?/signout">
-    <button class="linkish" type="submit">Sign out</button>
-  </form>
-</header>
+<p class="label">Overview</p>
+<h1>Platform at a glance.</h1>
 
-{#if !data.authorised}
-  <h1>Not authorised.</h1>
-  <div class="card">
-    <p>
-      {data.email} is signed in but does not hold the admin role. If it
-      should, the role is assigned server-side.
-    </p>
-  </div>
-{:else}
-  {#if form?.decisionError}
-    <div class="card"><p class="muted">{form.decisionError}</p></div>
-  {/if}
+{#if data.kpis}
+  <div class="grid">
+    {#each statusOrder as status}
+      {#if data.kpis.businessesByStatus[status]}
+        <div class="tile">
+          <strong>{data.kpis.businessesByStatus[status]}</strong>
+          <span class="muted small">{statusLabels[status]} businesses</span>
+        </div>
+      {/if}
+    {/each}
 
-  <h1>Businesses</h1>
-  {#each data.businesses as business}
-    <div class="card row">
-      <div>
-        <strong>{business.name}</strong>
-        <p class="muted small">{business.category} · {business.status}</p>
-      </div>
-      <div class="decisions">
-        {#if business.status !== "approved"}
-          <form method="POST" action="?/decide">
-            <input type="hidden" name="businessId" value={business.id} />
-            <input type="hidden" name="decision" value="approved" />
-            <button class="button" type="submit">Approve</button>
-          </form>
-        {/if}
-        {#if business.status !== "suspended"}
-          <form method="POST" action="?/decide">
-            <input type="hidden" name="businessId" value={business.id} />
-            <input type="hidden" name="decision" value="suspended" />
-            <button class="button quiet" type="submit">Suspend</button>
-          </form>
-        {/if}
-      </div>
+    <div class="tile">
+      <strong>{data.kpis.activeLocations}</strong>
+      <span class="muted small">active locations</span>
     </div>
-  {:else}
-    <p class="muted">No businesses yet.</p>
-  {/each}
 
-  <h1>Trails & regions</h1>
-  <div class="card">
-    {#each data.trails as trail}
-      <p><strong>{trail.name}</strong> <span class="muted">· trail · {trail.status}</span></p>
-    {:else}
-      <p class="muted">No trails.</p>
-    {/each}
-    {#each data.regions as region}
-      <p><strong>{region.name}</strong> <span class="muted">· region · {region.status}</span></p>
-    {:else}
-      <p class="muted">No regions.</p>
-    {/each}
+    <div class="tile">
+      <strong>{data.kpis.checkInsLast7Days}</strong>
+      <span class="muted small">check-ins, last 7 days</span>
+    </div>
+
+    <div class="tile" class:attention={data.kpis.fieldNotesUnresolved > 0}>
+      <strong>{data.kpis.fieldNotesUnresolved}</strong>
+      <span class="muted small">field notes unresolved</span>
+    </div>
+
+    <div class="tile">
+      <strong>{data.kpis.fieldNotesPublic}</strong>
+      <span class="muted small">field notes live to walkers</span>
+    </div>
+
+    <div class="tile">
+      <strong>{data.kpis.publishedTrails}</strong>
+      <span class="muted small">published trails</span>
+    </div>
+
+    <div class="tile">
+      <strong>{data.kpis.activeRegions}</strong>
+      <span class="muted small">published regions</span>
+    </div>
   </div>
 
-  <h1>Recent check-ins</h1>
-  <div class="card">
-    <p class="muted small">
-      Read-only audit. Walker identity is not shown here; investigate
-      specific accounts through the database with cause.
-    </p>
-    {#each data.checkIns as checkIn}
+  {#if data.kpis.fieldNotesUnresolved > 0}
+    <div class="card">
       <p>
-        <strong>{checkIn.business_locations?.name ?? "Unknown place"}</strong>
-        <span class="muted">
-          · {formatTime(checkIn.checked_in_at)} · {checkIn.verification_status}
-        </span>
+        <a href="/field-notes">{data.kpis.fieldNotesUnresolved} Field Note{data.kpis.fieldNotesUnresolved === 1 ? "" : "s"} waiting for review →</a>
       </p>
-    {:else}
-      <p class="muted">No check-ins yet.</p>
-    {/each}
-  </div>
+    </div>
+  {/if}
 {/if}
 
 <style>
-  .top { display: flex; justify-content: space-between; align-items: baseline; }
-  .linkish {
-    background: none; border: none; color: var(--text-muted);
-    cursor: pointer; font: inherit; text-decoration: underline; padding: 0;
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+    margin-top: 1.5rem;
   }
-  h1 { font-size: 1.4rem; margin-top: 2.5rem; }
-  .row { display: flex; justify-content: space-between; align-items: center; gap: 1rem; }
-  .decisions { display: flex; gap: 0.5rem; }
-  .decisions .button { border: none; cursor: pointer; font: inherit; }
-  .button.quiet { background: var(--background); color: var(--text); border: 1px solid var(--border); }
-  .small { font-size: 0.85rem; }
-  .card p { margin: 0.4rem 0; }
+
+  .tile {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .tile.attention {
+    border-color: var(--primary);
+    background: var(--primary-soft);
+  }
+
+  .tile strong {
+    font-size: 1.7rem;
+  }
+
+  a {
+    color: var(--primary);
+    font-weight: 600;
+  }
 </style>
