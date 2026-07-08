@@ -1,0 +1,4 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Bridge">
+  <rect x="6" y="6" width="52" height="52" rx="14" fill="#F4EFE4" stroke="#4F6F52" stroke-width="3"/>
+  <path d="M13 40h38M17 40c4-12 26-12 30 0M20 30v10m8-14v14m8-14v14m8-10v10" fill="none" stroke="#2F3A2F" stroke-width="3" stroke-linecap="round"/>
+</svg>

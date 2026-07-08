@@ -7,3 +7,4 @@ export {
   qrPosterCopy,
   seasonalContent,
 } from "@waypoint/ui";
+export type { EmptyStateKey } from "@waypoint/ui";

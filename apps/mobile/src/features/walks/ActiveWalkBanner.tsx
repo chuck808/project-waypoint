@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import { StyleSheet, View } from "react-native";
 import { AppText, Card, PrimaryButton } from "../../components";
 import { theme } from "../../theme";
@@ -6,7 +7,7 @@ import { useActiveWalk } from "./ActiveWalkContext";
 /** Nothing to show once no walk is active -- the banner earns its
  *  place only while there is something to finish. */
 export function ActiveWalkBanner() {
-  const { activeWalk, finish } = useActiveWalk();
+  const { activeWalk } = useActiveWalk();
 
   if (!activeWalk) return null;
 
@@ -19,7 +20,7 @@ export function ActiveWalkBanner() {
         <AppText variant="heading">{activeWalk.trailName}</AppText>
       </View>
 
-      <PrimaryButton onPress={finish}>Finish walk</PrimaryButton>
+      <PrimaryButton onPress={() => router.push("/walk/finish")}>Finish walk</PrimaryButton>
     </Card>
   );
 }

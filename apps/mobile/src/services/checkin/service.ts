@@ -11,7 +11,7 @@ import {
   getRecognitionForCheckIn,
 } from "./repository";
 import { startOfVenueDayISO } from "./time";
-import { getActiveWalk } from "../walks";
+import { addVisitToActiveWalk, getActiveWalk } from "../walks";
 import { normaliseInvitation } from "@waypoint/validation";
 
 type CheckInRef = {
@@ -144,6 +144,20 @@ export async function performCheckIn(
       trailId: activeWalk?.trailId,
     });
 
+    if (activeWalk) {
+      // Pass the walk already resolved above, not a fresh getActiveWalk()
+      // call -- the journal entry must land against the same walk that
+      // was used to decide this check-in's trailId, not whatever is
+      // active by the time this write completes.
+      await addVisitToActiveWalk(activeWalk, {
+        checkInId: checkIn.id,
+        businessLocationId: ref.businessLocationId,
+        placeName: ref.placeName,
+        businessName: ref.businessName,
+        visitedAt: checkIn.checked_in_at,
+      });
+    }
+
     // The award, if any, was written by the database trigger inside
     // the same transaction as the check-in. We only ask what happened.
     const recognition = await getRecognitionForCheckIn(checkIn.id);
@@ -153,7 +167,7 @@ export async function performCheckIn(
       message: "Visit remembered.",
       checkInId: checkIn.id,
       businessLocationId: ref.businessLocationId,
-      ...(activeWalk?.trailId ? { trailId: activeWalk.trailId } : {}),
+      trailId: activeWalk?.trailId,
       ...(recognition ? { recognition } : {}),
     };
   } catch (err) {

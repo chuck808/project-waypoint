@@ -37,6 +37,10 @@ export type Place = {
   facilities: string[];
   welcome: string;
   openingHours: string;
+  walkingContext?: string;
+  placeStory?: string;
+  accessibilityNotes?: string;
+  bestSeasons?: string[];
 };
 
 export type PassportStamp = {

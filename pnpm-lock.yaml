@@ -69,6 +69,9 @@ importers:
       '@waypoint/types':
         specifier: workspace:*
         version: link:../../packages/types
+      '@waypoint/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@waypoint/validation':
         specifier: workspace:*
         version: link:../../packages/validation

@@ -30,7 +30,9 @@ export function WaypointEmptyState({ state, onAction }: WaypointEmptyStateProps)
         <AppText variant="heading">{copy.title}</AppText>
         <AppText muted>{copy.body}</AppText>
       </View>
-      {copy.action && onAction ? <PrimaryButton label={copy.action} onPress={onAction} /> : null}
+      {copy.action && onAction ? (
+        <PrimaryButton onPress={onAction}>{copy.action}</PrimaryButton>
+      ) : null}
     </View>
   );
 }

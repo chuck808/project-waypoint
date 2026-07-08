@@ -4,6 +4,7 @@ import {
   readActiveWalk,
   writeActiveWalk,
 } from "./activeWalkStorage";
+import { clearWalkJournal } from "./walkJournalStorage";
 import type { ActiveWalk } from "./types";
 
 /**
@@ -21,6 +22,7 @@ export async function getActiveWalk(): Promise<ActiveWalk | null> {
   if (!walk) return null;
 
   if (hasExpired(walk, startOfVenueDayISO())) {
+    await clearWalkJournal(walk.trailId, walk.startedAt);
     await clearActiveWalk();
     return null;
   }
@@ -28,12 +30,18 @@ export async function getActiveWalk(): Promise<ActiveWalk | null> {
   return walk;
 }
 
-/** Starting is a deliberate ceremony. One walk max: starting a new one
+/** Starting is a deliberate ceremony. One walk max: starting a new walk
  *  replaces any current walk, and the UI says so before the tap. */
 export async function startWalk(
   trailId: string,
   trailName: string,
 ): Promise<ActiveWalk> {
+  const current = await readActiveWalk();
+
+  if (current) {
+    await clearWalkJournal(current.trailId, current.startedAt);
+  }
+
   const walk: ActiveWalk = {
     trailId,
     trailName,
@@ -46,5 +54,11 @@ export async function startWalk(
 }
 
 export async function finishWalk(): Promise<void> {
+  const walk = await readActiveWalk();
+
+  if (walk) {
+    await clearWalkJournal(walk.trailId, walk.startedAt);
+  }
+
   await clearActiveWalk();
 }

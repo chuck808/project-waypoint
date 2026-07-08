@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 160" role="img" aria-label="Soft contour background">
+  <rect width="240" height="160" fill="#F7F2E8"/>
+  <path d="M-20 60c40-30 80-30 120 0s80 30 160-10" fill="none" stroke="#D8CCB7" stroke-width="2"/>
+  <path d="M-10 90c50-25 95-20 130 5s80 20 135-15" fill="none" stroke="#D8CCB7" stroke-width="2"/>
+  <path d="M20 125c35-25 72-24 110 0s66 22 105-8" fill="none" stroke="#D8CCB7" stroke-width="2"/>
+</svg>

@@ -22,6 +22,13 @@ export function mapPlace(row: BusinessLocationRow): Place {
     welcome: "Walker friendly",
 
     openingHours: "See venue",
+
+    ...(row.walking_context ? { walkingContext: row.walking_context } : {}),
+    ...(row.place_story ? { placeStory: row.place_story } : {}),
+    ...(row.accessibility_notes
+      ? { accessibilityNotes: row.accessibility_notes }
+      : {}),
+    ...(row.best_seasons?.length ? { bestSeasons: row.best_seasons } : {}),
   };
 }
 

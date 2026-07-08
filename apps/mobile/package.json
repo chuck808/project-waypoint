@@ -8,6 +8,7 @@
     "@supabase/supabase-js": "^2.110.0",
     "@waypoint/database": "workspace:*",
     "@waypoint/types": "workspace:*",
+    "@waypoint/ui": "workspace:*",
     "@waypoint/validation": "workspace:*",
     "expo": "~57.0.4",
     "expo-camera": "~57.0.1",

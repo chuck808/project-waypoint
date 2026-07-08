@@ -16,6 +16,7 @@ import {
   getPlaceFacilities,
   getWalkerFacts,
 } from "../../src/features/places/placeExperience";
+import { PlaceContentSections } from "../../src/features/places/PlaceContentSections";
 import { OfficialNotes } from "../../src/features/steward/OfficialNotes";
 import type { FieldNote } from "../../src/services/field_notes";
 import { getFieldNotesForPlace } from "../../src/services/field_notes";
@@ -81,6 +82,8 @@ export default function PlaceDetailScreen() {
             <AppText muted>{place.description}</AppText>
           </View>
         </View>
+
+        <PlaceContentSections content={place} />
 
         <DetailSection title="Walker welcome" eyebrow="Before you arrive">
           <Card>
