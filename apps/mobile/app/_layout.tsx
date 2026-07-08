@@ -11,6 +11,7 @@ export default function RootLayout() {
           <Stack.Screen name="trail/[slug]" />
           <Stack.Screen name="places/[id]" />
           <Stack.Screen name="auth" />
+          <Stack.Screen name="onboarding" />
         </Stack>
       </ActiveWalkProvider>
     </AuthProvider>
