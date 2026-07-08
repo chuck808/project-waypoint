@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, TextInput, View } from "react-native";
+import * as Haptics from "expo-haptics";
 import {
   AppText,
   Card,
@@ -72,6 +73,7 @@ export function FieldNotePrompt({
       });
 
       setSaved(true);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       onSaved?.();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not save note.");
@@ -105,7 +107,10 @@ export function FieldNotePrompt({
             key={note.category}
             label={note.label}
             active={selected === note.category}
-            onPress={() => setSelected(note.category)}
+            onPress={() => {
+              Haptics.selectionAsync();
+              setSelected(note.category);
+            }}
           />
         ))}
       </View>
@@ -127,7 +132,7 @@ export function FieldNotePrompt({
       </PrimaryButton>
 
       {onSkip ? (
-        <Pressable onPress={onSkip} style={styles.skip}>
+        <Pressable onPress={onSkip} style={styles.skip} accessibilityRole="button">
           <AppText variant="label" muted>
             Skip for now
           </AppText>

@@ -31,19 +31,33 @@ export default function PlaceDetailScreen() {
   const [place, setPlace] = useState<Place | null>(null);
   const [fieldNotes, setFieldNotes] = useState<FieldNote[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     async function load() {
       if (!id) return;
 
-      const [nextPlace, nextNotes] = await Promise.all([
-        getPlace(id),
-        getFieldNotesForPlace(id).catch(() => []),
-      ]);
+      try {
+        const [nextPlace, nextNotes] = await Promise.all([
+          getPlace(id),
+          getFieldNotesForPlace(id).catch(() => []),
+        ]);
 
-      setPlace(nextPlace);
-      setFieldNotes(nextNotes);
-      setLoading(false);
+        setPlace(nextPlace);
+        setFieldNotes(nextNotes);
+      } catch (err) {
+        // PGRST116 ("no rows") from a bad/stale/deleted id is not an
+        // error -- it's handled by the !place "not found" branch below.
+        // Anything else (network, RLS, etc.) gets its own message.
+        const code = (err as { code?: string } | null)?.code;
+        if (code !== "PGRST116") {
+          setLoadError(
+            err instanceof Error ? err.message : "Unable to load this place.",
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
     }
 
     load();
@@ -53,6 +67,15 @@ export default function PlaceDetailScreen() {
     return (
       <Screen>
         <AppText>Loading place...</AppText>
+      </Screen>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <Screen>
+        <AppText variant="title">Something went wrong.</AppText>
+        <AppText muted>{loadError}</AppText>
       </Screen>
     );
   }

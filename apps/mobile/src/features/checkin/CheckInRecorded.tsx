@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
+import * as Haptics from "expo-haptics";
 import { AppText, PrimaryButton, PrimaryLink } from "../../components";
 import { FieldNotePrompt } from "../field_notes";
 import { VenueStamp, resolveMark } from "../stamps";
@@ -28,6 +29,10 @@ export function CheckInRecorded({
   const opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
+    // The tactile echo of the stamp landing -- same success feedback as
+    // a successful scan, timed to the visual celebration.
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+
     Animated.parallel([
       Animated.spring(scale, {
         toValue: 1,

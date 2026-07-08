@@ -19,7 +19,10 @@ export function ActiveWalkPill() {
         🚶 Walking {activeWalk.trailName}
       </AppText>
 
-      <Pressable onPress={() => router.push("/discover")}>
+      <Pressable
+        onPress={() => router.push("/discover")}
+        accessibilityRole="button"
+      >
         <AppText variant="label" style={styles.change}>
           Change
         </AppText>

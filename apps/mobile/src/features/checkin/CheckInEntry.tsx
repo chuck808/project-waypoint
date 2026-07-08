@@ -37,7 +37,11 @@ export function CheckInEntry({ onSubmit }: CheckInEntryProps) {
         <>
           <CheckInScan onCode={(code) => onSubmit(code, "qr")} />
 
-          <Pressable onPress={() => setMode("manual")} style={styles.switch}>
+          <Pressable
+            onPress={() => setMode("manual")}
+            style={styles.switch}
+            accessibilityRole="button"
+          >
             <AppText variant="label" muted>
               Can't scan? Enter the code instead
             </AppText>
@@ -65,7 +69,11 @@ export function CheckInEntry({ onSubmit }: CheckInEntryProps) {
             </PrimaryButton>
           ) : null}
 
-          <Pressable onPress={() => setMode("scan")} style={styles.switch}>
+          <Pressable
+            onPress={() => setMode("scan")}
+            style={styles.switch}
+            accessibilityRole="button"
+          >
             <AppText variant="label" muted>
               Scan the code instead
             </AppText>

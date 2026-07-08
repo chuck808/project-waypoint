@@ -13,6 +13,8 @@ export function FilterChip({ label, active, onPress }: FilterChipProps) {
     <Pressable
       onPress={onPress}
       style={[styles.chip, active ? styles.chipActive : undefined]}
+      accessibilityRole="button"
+      accessibilityState={{ selected: active }}
     >
       <AppText
         variant="label"

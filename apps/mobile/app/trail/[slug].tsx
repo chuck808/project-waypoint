@@ -30,6 +30,7 @@ export default function TrailDetailScreen() {
   const [places, setPlaces] = useState<Place[]>([]);
   const [fieldNotes, setFieldNotes] = useState<FieldNote[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   const { activeWalk, start, finish } = useActiveWalk();
 
@@ -37,18 +38,30 @@ export default function TrailDetailScreen() {
     async function load() {
       if (!slug) return;
 
-      const result = await getTrail(slug);
-      setTrail(result);
+      try {
+        const result = await getTrail(slug);
+        setTrail(result);
 
-      const [nextPlaces, nextNotes] = await Promise.all([
-        getPlaces(),
-        result ? getFieldNotesForTrail(result.id).catch(() => []) : [],
-      ]);
+        const [nextPlaces, nextNotes] = await Promise.all([
+          getPlaces(),
+          result ? getFieldNotesForTrail(result.id).catch(() => []) : [],
+        ]);
 
-      setPlaces(nextPlaces);
-      setFieldNotes(nextNotes);
-
-      setLoading(false);
+        setPlaces(nextPlaces);
+        setFieldNotes(nextNotes);
+      } catch (err) {
+        // PGRST116 ("no rows") from a bad/stale slug is not an error --
+        // it's handled by the !trail "not found" branch below. Anything
+        // else (network, RLS, etc.) gets its own message.
+        const code = (err as { code?: string } | null)?.code;
+        if (code !== "PGRST116") {
+          setLoadError(
+            err instanceof Error ? err.message : "Unable to load this walk.",
+          );
+        }
+      } finally {
+        setLoading(false);
+      }
     }
 
     load();
@@ -58,6 +71,15 @@ export default function TrailDetailScreen() {
     return (
       <Screen>
         <AppText>Loading trail...</AppText>
+      </Screen>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <Screen>
+        <AppText variant="title">Something went wrong.</AppText>
+        <AppText muted>{loadError}</AppText>
       </Screen>
     );
   }

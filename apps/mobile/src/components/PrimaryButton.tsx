@@ -19,6 +19,8 @@ export function PrimaryButton({
       style={[styles.button, disabled ? styles.buttonDisabled : undefined]}
       onPress={onPress}
       disabled={disabled}
+      accessibilityRole="button"
+      accessibilityState={{ disabled }}
     >
       <AppText variant="label">{children}</AppText>
     </Pressable>
