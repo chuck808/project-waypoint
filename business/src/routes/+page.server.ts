@@ -1,14 +1,51 @@
 import { redirect } from "@sveltejs/kit";
 import type { Actions, PageServerLoad } from "./$types";
 
+const boolKeys = [
+  "boots_welcome",
+  "dogs_welcome",
+  "water_refill",
+  "outdoor_seating",
+  "packed_lunches",
+  "phone_charging",
+  "family_friendly",
+  "wheelchair_friendly",
+  "toilets",
+  "parking",
+  "bike_parking",
+  "public_transport",
+  "wifi",
+  "food",
+  "hot_drinks",
+  "shelter",
+] as const;
+
+function flagsFromForm(form: FormData, keys: readonly string[]) {
+  return Object.fromEntries(keys.map((key) => [key, form.get(key) === "on"]));
+}
+
+function asText(form: FormData, key: string, max = 500) {
+  return String(form.get(key) ?? "").trim().slice(0, max) || null;
+}
+
+async function updateLocation(
+  locals: App.Locals,
+  locationId: string,
+  values: Record<string, unknown>,
+) {
+  const update = locals.supabase.from("business_locations")
+    .update as unknown as (v: Record<string, unknown>) => {
+    eq: (c: string, v: string) => PromiseLike<{ error: { message: string } | null }>;
+  };
+
+  return update(values).eq("id", locationId);
+}
+
 export const load: PageServerLoad = async ({ locals }) => {
   const { user } = await locals.safeGetSession();
 
   if (!user) redirect(303, "/sign-in");
 
-  // RLS scopes every layer: memberships to the caller (0007), businesses,
-  // locations and codes to membership (0008). No user_id filter needed --
-  // the security model is the query.
   const { data, error } = await locals.supabase
     .from("business_memberships")
     .select(
@@ -19,10 +56,23 @@ export const load: PageServerLoad = async ({ locals }) => {
         name,
         category,
         status,
+        description,
         business_locations (
           id,
           name,
+          address,
+          opening_hours,
           status,
+          welcome_message,
+          steward_notice,
+          seasonal_information,
+          website_url,
+          phone,
+          email,
+          hero_image_url,
+          walker_characteristics,
+          facilities,
+          accessibility_notes,
           qr_codes ( code_value, status )
         )
       )
@@ -35,14 +85,11 @@ export const load: PageServerLoad = async ({ locals }) => {
       email: user.email,
       memberships: [],
       footfall: [],
-      welcomeByLocation: {} as Record<string, string>,
+      footfallByLocation: {} as Record<string, number>,
       loadError: error.message,
     };
   }
 
-  // ADR-005 projection: visit events without walker identity. The view
-  // gates membership internally -- no filter needed here either.
-  // Loosely typed until @waypoint/database is regenerated after 0011.
   type FootfallRow = {
     visit_id: string;
     business_location_name: string;
@@ -69,26 +116,19 @@ export const load: PageServerLoad = async ({ locals }) => {
       "visit_id, business_location_name, checked_in_at, check_in_method, invitation_code",
     )
     .order("checked_in_at", { ascending: false })
-    .limit(15);
+    .limit(30);
 
-  // welcome_message postdates the generated types (regen after 0013).
-  type WelcomeRow = { id: string; welcome_message: string | null };
-
-  const { data: welcomes } = await (fromView("business_locations") as unknown as {
-    select: (c: string) => PromiseLike<{ data: WelcomeRow[] | null }>;
-  }).select("id, welcome_message");
-
-  const welcomeByLocation: Record<string, string> = {};
-
-  for (const row of welcomes ?? []) {
-    if (row.welcome_message) welcomeByLocation[row.id] = row.welcome_message;
+  const footfallByLocation: Record<string, number> = {};
+  for (const visit of footfall ?? []) {
+    footfallByLocation[visit.business_location_name] =
+      (footfallByLocation[visit.business_location_name] ?? 0) + 1;
   }
 
   return {
     email: user.email,
     memberships: data ?? [],
     footfall: footfall ?? [],
-    welcomeByLocation,
+    footfallByLocation,
     loadError: null,
   };
 };
@@ -99,47 +139,74 @@ export const actions: Actions = {
     redirect(303, "/sign-in");
   },
 
-  saveWelcome: async ({ request, locals }) => {
+  saveLocationDetails: async ({ request, locals }) => {
     const { user } = await locals.safeGetSession();
-
     if (!user) redirect(303, "/sign-in");
 
     const form = await request.formData();
     const locationId = String(form.get("locationId") ?? "");
-    const message = String(form.get("message") ?? "").trim().slice(0, 280);
+    if (!locationId) return { locationError: "Missing location." };
 
-    if (!locationId) return { welcomeError: "Missing location." };
+    const { error } = await updateLocation(locals, locationId, {
+      name: asText(form, "name", 120),
+      address: asText(form, "address", 240),
+      website_url: asText(form, "websiteUrl", 240),
+      phone: asText(form, "phone", 80),
+      email: asText(form, "email", 160),
+      hero_image_url: asText(form, "heroImageUrl", 500),
+    });
 
-    // Column grant (0013) means only welcome_message is writable; RLS
-    // means only for the caller's own business. Both enforced in the
-    // database -- this action is just a form.
-    const update = locals.supabase.from("business_locations")
-      .update as unknown as (v: Record<string, string | null>) => {
-      eq: (c: string, v: string) => PromiseLike<{ error: { message: string } | null }>;
-    };
+    if (error) return { locationError: error.message };
+    return { locationSaved: true };
+  },
 
-    const { error } = await update({ welcome_message: message || null }).eq(
-      "id",
-      locationId,
-    );
+  saveWalkerInfo: async ({ request, locals }) => {
+    const { user } = await locals.safeGetSession();
+    if (!user) redirect(303, "/sign-in");
 
-    if (error) return { welcomeError: error.message };
+    const form = await request.formData();
+    const locationId = String(form.get("locationId") ?? "");
+    if (!locationId) return { walkerInfoError: "Missing location." };
 
-    return { welcomeError: null };
+    const walker_characteristics = flagsFromForm(form, boolKeys.slice(0, 8));
+    const facilities = flagsFromForm(form, boolKeys.slice(8));
+
+    const { error } = await updateLocation(locals, locationId, {
+      walker_characteristics,
+      facilities,
+      accessibility_notes: asText(form, "accessibilityNotes", 1000),
+    });
+
+    if (error) return { walkerInfoError: error.message };
+    return { walkerInfoSaved: true };
+  },
+
+  saveStewardNotice: async ({ request, locals }) => {
+    const { user } = await locals.safeGetSession();
+    if (!user) redirect(303, "/sign-in");
+
+    const form = await request.formData();
+    const locationId = String(form.get("locationId") ?? "");
+    if (!locationId) return { noticeError: "Missing location." };
+
+    const { error } = await updateLocation(locals, locationId, {
+      welcome_message: asText(form, "welcomeMessage", 280),
+      steward_notice: asText(form, "stewardNotice", 500),
+      seasonal_information: asText(form, "seasonalInformation", 800),
+    });
+
+    if (error) return { noticeError: error.message };
+    return { noticeSaved: true };
   },
 
   createInvitation: async ({ request, locals }) => {
     const { user } = await locals.safeGetSession();
-
     if (!user) redirect(303, "/sign-in");
 
     const form = await request.formData();
     const locationId = String(form.get("locationId") ?? "");
-
     if (!locationId) return { invitationError: "Missing location." };
 
-    // Loosely typed until @waypoint/database is regenerated after 0009;
-    // membership and uniqueness are enforced inside the function itself.
     const rpc = locals.supabase.rpc.bind(locals.supabase) as unknown as (
       fn: string,
       args?: Record<string, unknown>,
@@ -150,7 +217,6 @@ export const actions: Actions = {
     });
 
     if (error) return { invitationError: error.message };
-
-    return { invitationError: null };
+    return { invitationCreated: true };
   },
 };

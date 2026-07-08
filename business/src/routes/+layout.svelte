@@ -17,6 +17,10 @@
     --primary-soft: #dde8d5;
     --border: #ddd3c2;
     --radius-card: 18px;
+    --radius-panel: 24px;
+    --shadow-card: 0 14px 34px rgba(47, 51, 40, 0.08);
+    --warning-soft: #f3e2c8;
+    --danger-soft: #f1d8d2;
   }
 
   :global(body) {
@@ -32,7 +36,7 @@
   }
 
   .shell {
-    max-width: 560px;
+    max-width: 1120px;
     margin: 0 auto;
     padding: 3rem 1.5rem 4rem;
   }
