@@ -34,6 +34,9 @@ export type CheckInState =
       placeName: string;
       businessName: string;
       stampTitle?: string;
+      checkInId: string;
+      businessLocationId: string;
+      trailId?: string;
     }
   | {
       status: "already_visited";
@@ -47,7 +50,13 @@ export type CheckInEvent =
   | { type: "CODE_SUBMITTED"; method: CheckInMethod }
   | { type: "RESOLUTION_RECEIVED"; resolution: CheckInResolution }
   | { type: "CONFIRMED" }
-  | { type: "VISIT_RECORDED" }
+  | {
+      type: "VISIT_RECORDED";
+      checkInId: string;
+      businessLocationId: string;
+      trailId?: string;
+      recognitionTitle?: string;
+    }
   | {
       type: "VISIT_ALREADY_RECORDED";
       placeName?: string;
@@ -104,7 +113,10 @@ export function checkInReducer(
             status: "recorded",
             placeName: state.resolution.placeName,
             businessName: state.resolution.businessName,
-            stampTitle: state.resolution.stamp?.title,
+            stampTitle: event.recognitionTitle ?? state.resolution.stamp?.title,
+            checkInId: event.checkInId,
+            businessLocationId: event.businessLocationId,
+            ...(event.trailId ? { trailId: event.trailId } : {}),
           }
         : state;
 

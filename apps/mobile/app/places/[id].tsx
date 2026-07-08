@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { StyleSheet, View } from "react-native";
 import type { Place } from "@waypoint/types";
 import { AppText, PrimaryLink, Screen } from "../../src/components";
+import { RecentFieldNotes } from "../../src/features/field_notes";
+import type { FieldNote } from "../../src/services/field_notes";
+import { getFieldNotesForPlace } from "../../src/services/field_notes";
 import { getPlace } from "../../src/services/places";
 import { theme } from "../../src/theme";
 
@@ -11,14 +14,20 @@ export default function PlaceDetailScreen() {
   const id = Array.isArray(rawId) ? rawId[0] : rawId;
 
   const [place, setPlace] = useState<Place | null>(null);
+  const [fieldNotes, setFieldNotes] = useState<FieldNote[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       if (!id) return;
 
-      const nextPlace = await getPlace(id);
+      const [nextPlace, nextNotes] = await Promise.all([
+        getPlace(id),
+        getFieldNotesForPlace(id).catch(() => []),
+      ]);
+
       setPlace(nextPlace);
+      setFieldNotes(nextNotes);
       setLoading(false);
     }
 
@@ -71,6 +80,14 @@ export default function PlaceDetailScreen() {
       <View style={styles.section}>
         <AppText variant="label">Opening</AppText>
         <AppText muted>{place.openingHours}</AppText>
+      </View>
+
+      <View style={styles.section}>
+        <AppText variant="label">Recent Field Notes</AppText>
+        <RecentFieldNotes
+          notes={fieldNotes}
+          emptyText="No recent notes for this place yet."
+        />
       </View>
 
       <View style={styles.mapPlaceholder}>

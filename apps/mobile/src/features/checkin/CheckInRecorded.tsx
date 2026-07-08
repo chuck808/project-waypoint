@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Animated, StyleSheet, View } from "react-native";
 import { AppText, PrimaryButton, PrimaryLink } from "../../components";
+import { FieldNotePrompt } from "../field_notes";
 import { VenueStamp, resolveMark } from "../stamps";
 import { theme } from "../../theme";
 
@@ -8,6 +9,9 @@ type CheckInRecordedProps = {
   placeName: string;
   businessName: string;
   stampTitle?: string;
+  checkInId: string;
+  businessLocationId: string;
+  trailId?: string;
   onDismiss: () => void;
 };
 
@@ -15,6 +19,9 @@ export function CheckInRecorded({
   placeName,
   businessName,
   stampTitle,
+  checkInId,
+  businessLocationId,
+  trailId,
   onDismiss,
 }: CheckInRecordedProps) {
   const scale = useRef(new Animated.Value(0.3)).current;
@@ -73,6 +80,13 @@ export function CheckInRecorded({
           <AppText variant="heading">{stampTitle}</AppText>
         </View>
       ) : null}
+
+      <FieldNotePrompt
+        checkInId={checkInId}
+        businessLocationId={businessLocationId}
+        trailId={trailId}
+        onSkip={onDismiss}
+      />
 
       <PrimaryLink href="/passport">View my Passport</PrimaryLink>
 

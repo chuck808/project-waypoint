@@ -9,6 +9,9 @@ import {
   Screen,
 } from "../../src/components";
 import type { Place, Trail } from "@waypoint/types";
+import { RecentFieldNotes } from "../../src/features/field_notes";
+import type { FieldNote } from "../../src/services/field_notes";
+import { getFieldNotesForTrail } from "../../src/services/field_notes";
 import { getPlaces } from "../../src/services/places";
 import { getTrail } from "../../src/services/trails";
 import { theme } from "../../src/theme";
@@ -19,6 +22,7 @@ export default function TrailDetailScreen() {
 
   const [trail, setTrail] = useState<Trail | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
+  const [fieldNotes, setFieldNotes] = useState<FieldNote[]>([]);
   const [loading, setLoading] = useState(true);
 
   const { activeWalk, start, finish } = useActiveWalk();
@@ -30,8 +34,13 @@ export default function TrailDetailScreen() {
       const result = await getTrail(slug);
       setTrail(result);
 
-      const nextPlaces = await getPlaces();
+      const [nextPlaces, nextNotes] = await Promise.all([
+        getPlaces(),
+        result ? getFieldNotesForTrail(result.id).catch(() => []) : [],
+      ]);
+
       setPlaces(nextPlaces);
+      setFieldNotes(nextNotes);
 
       setLoading(false);
     }
@@ -97,6 +106,14 @@ export default function TrailDetailScreen() {
       <View style={styles.section}>
         <AppText variant="label">About this walk</AppText>
         <AppText muted>{trail.description}</AppText>
+      </View>
+
+      <View style={styles.section}>
+        <AppText variant="label">Recent Field Notes</AppText>
+        <RecentFieldNotes
+          notes={fieldNotes}
+          emptyText="No recent notes for this walk yet."
+        />
       </View>
 
       <View style={styles.section}>

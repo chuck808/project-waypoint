@@ -42,7 +42,13 @@ export function useCheckInJourney(): {
 
     switch (result.outcome) {
       case "recorded":
-        dispatch({ type: "VISIT_RECORDED" });
+        dispatch({
+          type: "VISIT_RECORDED",
+          checkInId: result.checkInId,
+          businessLocationId: result.businessLocationId,
+          trailId: result.trailId,
+          recognitionTitle: result.recognition?.title,
+        });
         return;
       case "already_visited":
         dispatch({

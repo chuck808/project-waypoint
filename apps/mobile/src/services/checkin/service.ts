@@ -151,6 +151,9 @@ export async function performCheckIn(
     return {
       outcome: "recorded",
       message: "Visit remembered.",
+      checkInId: checkIn.id,
+      businessLocationId: ref.businessLocationId,
+      ...(activeWalk?.trailId ? { trailId: activeWalk.trailId } : {}),
       ...(recognition ? { recognition } : {}),
     };
   } catch (err) {

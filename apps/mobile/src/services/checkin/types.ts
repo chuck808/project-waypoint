@@ -31,6 +31,9 @@ export type PerformCheckInResult =
   | {
       outcome: "recorded";
       message: string;
+      checkInId: string;
+      businessLocationId: string;
+      trailId?: string;
       recognition?: { title: string };
     }
   | {

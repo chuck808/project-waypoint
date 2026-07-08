@@ -67,6 +67,9 @@ export function CheckInResolver() {
             placeName={state.placeName}
             businessName={state.businessName}
             stampTitle={state.stampTitle}
+            checkInId={state.checkInId}
+            businessLocationId={state.businessLocationId}
+            trailId={state.trailId}
             onDismiss={reset}
           />
         );
