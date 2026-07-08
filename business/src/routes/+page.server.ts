@@ -1,24 +1,6 @@
 import { redirect } from "@sveltejs/kit";
+import { facilityKeys, walkerCharacteristicKeys } from "@waypoint/ui";
 import type { Actions, PageServerLoad } from "./$types";
-
-const boolKeys = [
-  "boots_welcome",
-  "dogs_welcome",
-  "water_refill",
-  "outdoor_seating",
-  "packed_lunches",
-  "phone_charging",
-  "family_friendly",
-  "wheelchair_friendly",
-  "toilets",
-  "parking",
-  "bike_parking",
-  "public_transport",
-  "wifi",
-  "food",
-  "hot_drinks",
-  "shelter",
-] as const;
 
 function flagsFromForm(form: FormData, keys: readonly string[]) {
   return Object.fromEntries(keys.map((key) => [key, form.get(key) === "on"]));
@@ -35,10 +17,28 @@ async function updateLocation(
 ) {
   const update = locals.supabase.from("business_locations")
     .update as unknown as (v: Record<string, unknown>) => {
-    eq: (c: string, v: string) => PromiseLike<{ error: { message: string } | null }>;
+    eq: (
+      c: string,
+      v: string,
+    ) => {
+      select: (c: string) => PromiseLike<{
+        data: { id: string }[] | null;
+        error: { message: string } | null;
+      }>;
+    };
   };
 
-  return update(values).eq("id", locationId);
+  const { data, error } = await update(values).eq("id", locationId).select("id");
+
+  if (error) return { error };
+
+  // RLS silently filters rows it denies rather than erroring: a
+  // tampered or stale locationId returns 0 rows here, not an error.
+  if (!data || data.length === 0) {
+    return { error: { message: "That location could not be updated." } };
+  }
+
+  return { error: null };
 }
 
 export const load: PageServerLoad = async ({ locals }) => {
@@ -168,8 +168,8 @@ export const actions: Actions = {
     const locationId = String(form.get("locationId") ?? "");
     if (!locationId) return { walkerInfoError: "Missing location." };
 
-    const walker_characteristics = flagsFromForm(form, boolKeys.slice(0, 8));
-    const facilities = flagsFromForm(form, boolKeys.slice(8));
+    const walker_characteristics = flagsFromForm(form, walkerCharacteristicKeys);
+    const facilities = flagsFromForm(form, facilityKeys);
 
     const { error } = await updateLocation(locals, locationId, {
       walker_characteristics,

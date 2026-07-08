@@ -31,12 +31,22 @@
     paused: "Paused",
   };
 
-  function enabled(record: Record<string, unknown> | null | undefined, key: string) {
-    return Boolean(record?.[key]);
+  // walker_characteristics/facilities are jsonb columns, typed as the
+  // broad Supabase `Json` union; narrow defensively rather than assume
+  // the stored shape.
+  function asRecord(value: unknown): Record<string, unknown> {
+    if (value && typeof value === "object" && !Array.isArray(value)) {
+      return value as Record<string, unknown>;
+    }
+    return {};
   }
 
-  function activeCount(record: Record<string, unknown> | null | undefined) {
-    return Object.values(record ?? {}).filter(Boolean).length;
+  function enabled(record: unknown, key: string) {
+    return Boolean(asRecord(record)[key]);
+  }
+
+  function activeCount(record: unknown) {
+    return Object.values(asRecord(record)).filter(Boolean).length;
   }
 </script>
 

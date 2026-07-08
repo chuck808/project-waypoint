@@ -36,6 +36,17 @@ create policy "Members can update managed location details"
 
 -- Column grants keep the portal focused on management fields and prevent
 -- accidental mutation of identity/status/provenance columns via PostgREST.
+--
+-- Postgres grants are additive: a narrower column-level grant can never
+-- restrict access already held via Supabase's default bootstrap grant
+-- (`grant all on all tables in schema public to authenticated`, applied
+-- when the project was created). No prior migration in this repo has
+-- ever revoked that, so it must be revoked here first, or the grant
+-- below has no effect and every column (including status, business_id
+-- and location) stays updatable by any business member via a direct
+-- PostgREST/Supabase call.
+revoke update on public.business_locations from authenticated;
+
 grant update (
   name,
   address,
