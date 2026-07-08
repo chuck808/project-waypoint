@@ -1,0 +1,54 @@
+@import "tailwindcss";
+@plugin 'flowbite/plugin';
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source "../node_modules/flowbite-svelte/dist";
+@source "../node_modules/flowbite-svelte-icons/dist";
+
+/*
+ * Waypoint's earthy palette, carried over from the shared design system
+ * (mirrors apps/mobile/src/theme/colors.ts) into Tailwind v4's CSS-first
+ * theme so Flowbite's components read as Waypoint, not their default
+ * blue theme. Admin is the only portal on Tailwind/Flowbite -- this is
+ * a deliberate visual fork from web/business, not a shared token file.
+ */
+@theme {
+  --color-background: #f7f3ea;
+  --color-surface: #fffdf7;
+  --color-text: #2f3328;
+  --color-text-muted: #4f5648;
+  --color-primary-soft: #dde8d5;
+  --color-border: #ddd3c2;
+  --color-warning: #9a6a2f;
+  --color-warning-soft: #f3e4c8;
+  --color-danger: #8a3a32;
+  --color-danger-soft: #f1d8d2;
+
+  /*
+   * Flowbite's own components (Button, focus rings, etc.) reference a
+   * full numbered shade scale -- e.g. `bg-primary-700 hover:bg-primary-800`
+   * -- not a single flat colour. A flat --color-primary alone left every
+   * Flowbite Button transparent (no `primary-700` utility existed to
+   * generate). 700 is set to the exact original brand hex (#3c5f46);
+   * the rest of the scale is derived from it, same hue/saturation.
+   */
+  --color-primary-50: #f2f7f4;
+  --color-primary-100: #e3ede6;
+  --color-primary-200: #caddcf;
+  --color-primary-300: #a4c6ae;
+  --color-primary-400: #7cac8a;
+  --color-primary-500: #578a65;
+  --color-primary-600: #477153;
+  --color-primary-700: #3c5f46;
+  --color-primary-800: #2f4b37;
+  --color-primary-900: #243829;
+  --color-primary-950: #162219;
+  --color-primary: var(--color-primary-700);
+
+  --radius-card: 18px;
+}
+
+body {
+  background-color: var(--color-background);
+  color: var(--color-text);
+}

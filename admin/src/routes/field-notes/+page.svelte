@@ -1,4 +1,18 @@
 <script lang="ts">
+  import {
+    Table,
+    TableHead,
+    TableHeadCell,
+    TableBody,
+    TableBodyRow,
+    TableBodyCell,
+    Badge,
+    Button,
+    Select,
+    Checkbox,
+    Card,
+  } from "flowbite-svelte";
+
   export let data;
   export let form;
 
@@ -20,9 +34,28 @@
     return value.replace(/_/g, " ");
   }
 
+  function severityColor(severity: string): "red" | "yellow" | "gray" {
+    if (severity === "hazard") return "red";
+    if (severity === "watch") return "yellow";
+    return "gray";
+  }
+
   $: categories = Array.from(new Set(data.fieldNotes.map((n) => n.category))).sort();
   $: severities = Array.from(new Set(data.fieldNotes.map((n) => n.severity))).sort();
   $: sources = Array.from(new Set(data.fieldNotes.map((n) => n.source))).sort();
+
+  $: categoryItems = [
+    { value: "all", name: "All categories" },
+    ...categories.map((c) => ({ value: c, name: prettify(c) })),
+  ];
+  $: severityItems = [
+    { value: "all", name: "All severities" },
+    ...severities.map((s) => ({ value: s, name: prettify(s) })),
+  ];
+  $: sourceItems = [
+    { value: "all", name: "All sources" },
+    ...sources.map((s) => ({ value: s, name: prettify(s) })),
+  ];
 
   $: filtered = data.fieldNotes.filter((note) => {
     if (categoryFilter !== "all" && note.category !== categoryFilter) return false;
@@ -35,113 +68,66 @@
 
 <svelte:head><title>Field Notes — Waypoint Admin</title></svelte:head>
 
-<p class="label">Field Notes</p>
-<h1>Moderation queue.</h1>
+<p class="text-xs font-semibold uppercase tracking-wide text-text-muted">Field Notes</p>
+<h1 class="mt-1 text-2xl font-bold">Moderation queue.</h1>
 
 {#if form?.resolveError}
-  <div class="card"><p class="muted">{form.resolveError}</p></div>
+  <Card class="mt-4 max-w-none border-danger bg-danger-soft p-4">
+    <p>{form.resolveError}</p>
+  </Card>
 {/if}
 
 {#if data.loadError}
-  <div class="card"><p class="muted">{data.loadError}</p></div>
+  <Card class="mt-4 max-w-none border-danger bg-danger-soft p-4">
+    <p>{data.loadError}</p>
+  </Card>
 {/if}
 
-<div class="filters">
-  <select bind:value={categoryFilter}>
-    <option value="all">All categories</option>
-    {#each categories as category}
-      <option value={category}>{prettify(category)}</option>
-    {/each}
-  </select>
-
-  <select bind:value={severityFilter}>
-    <option value="all">All severities</option>
-    {#each severities as severity}
-      <option value={severity}>{prettify(severity)}</option>
-    {/each}
-  </select>
-
-  <select bind:value={sourceFilter}>
-    <option value="all">All sources</option>
-    {#each sources as source}
-      <option value={source}>{prettify(source)}</option>
-    {/each}
-  </select>
-
-  <label class="check">
-    <input type="checkbox" bind:checked={showResolved} />
-    Show resolved
-  </label>
+<div class="mt-4 flex flex-wrap items-center gap-3">
+  <Select class="w-44" items={categoryItems} bind:value={categoryFilter} />
+  <Select class="w-40" items={severityItems} bind:value={severityFilter} />
+  <Select class="w-40" items={sourceItems} bind:value={sourceFilter} />
+  <Checkbox bind:checked={showResolved}>Show resolved</Checkbox>
 </div>
 
-{#each filtered as note}
-  <div class="card row" class:resolved={note.resolved_at}>
-    <div>
-      <strong>{prettify(note.category)}</strong>
-      <span class="muted small">
-        · {prettify(note.severity)} · {prettify(note.source)} ·
-        {note.business_locations?.name ?? note.trails?.name ?? "Unattributed"}
-        · {formatTime(note.observed_at)}
-      </span>
-      {#if note.message}
-        <p>{note.message}</p>
-      {/if}
-      {#if note.visibility !== "public"}
-        <p class="muted small">visibility: {note.visibility}</p>
-      {/if}
-      {#if note.resolved_at}
-        <p class="muted small">Resolved {formatTime(note.resolved_at)}</p>
-      {/if}
-    </div>
-    {#if !note.resolved_at}
-      <form method="POST" action="?/resolve">
-        <input type="hidden" name="fieldNoteId" value={note.id} />
-        <button class="button quiet" type="submit">Resolve</button>
-      </form>
-    {/if}
-  </div>
-{:else}
-  <p class="muted">Nothing matches these filters.</p>
-{/each}
-
-<style>
-  .filters {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    align-items: center;
-    margin: 1.25rem 0;
-  }
-
-  select {
-    padding: 0.5rem 0.7rem;
-    border-radius: 10px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    color: var(--text);
-    font: inherit;
-  }
-
-  .check {
-    display: flex;
-    align-items: center;
-    gap: 0.4rem;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-  }
-
-  .row {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 1rem;
-  }
-
-  .row p {
-    margin: 0.4rem 0 0;
-  }
-
-  .resolved {
-    opacity: 0.6;
-  }
-</style>
+<Card class="mt-4 max-w-none border-border bg-surface p-0">
+  <Table>
+    <TableHead>
+      <TableHeadCell>Category</TableHeadCell>
+      <TableHeadCell>Severity</TableHeadCell>
+      <TableHeadCell>Source</TableHeadCell>
+      <TableHeadCell>Where</TableHeadCell>
+      <TableHeadCell>Observed</TableHeadCell>
+      <TableHeadCell>Message</TableHeadCell>
+      <TableHeadCell>Actions</TableHeadCell>
+    </TableHead>
+    <TableBody>
+      {#each filtered as note}
+        <TableBodyRow class={note.resolved_at ? "opacity-60" : ""}>
+          <TableBodyCell class="font-medium">{prettify(note.category)}</TableBodyCell>
+          <TableBodyCell><Badge color={severityColor(note.severity)}>{prettify(note.severity)}</Badge></TableBodyCell>
+          <TableBodyCell class="text-text-muted">{prettify(note.source)}</TableBodyCell>
+          <TableBodyCell class="text-text-muted">
+            {note.business_locations?.name ?? note.trails?.name ?? "Unattributed"}
+          </TableBodyCell>
+          <TableBodyCell class="text-text-muted">{formatTime(note.observed_at)}</TableBodyCell>
+          <TableBodyCell class="max-w-xs text-text-muted">{note.message ?? ""}</TableBodyCell>
+          <TableBodyCell>
+            {#if note.resolved_at}
+              <span class="text-xs text-text-muted">Resolved {formatTime(note.resolved_at)}</span>
+            {:else}
+              <form method="POST" action="?/resolve">
+                <input type="hidden" name="fieldNoteId" value={note.id} />
+                <Button size="xs" color="alternative" type="submit">Resolve</Button>
+              </form>
+            {/if}
+          </TableBodyCell>
+        </TableBodyRow>
+      {:else}
+        <TableBodyRow>
+          <TableBodyCell colspan={7} class="text-text-muted">Nothing matches these filters.</TableBodyCell>
+        </TableBodyRow>
+      {/each}
+    </TableBody>
+  </Table>
+</Card>

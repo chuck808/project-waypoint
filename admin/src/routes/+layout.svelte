@@ -1,5 +1,12 @@
 <script lang="ts">
+  import "../app.css";
   import { page } from "$app/state";
+  import {
+    Sidebar,
+    SidebarWrapper,
+    SidebarGroup,
+    SidebarItem,
+  } from "flowbite-svelte";
 
   export let data;
 
@@ -14,190 +21,56 @@
   $: isSignInRoute = page.url.pathname === "/sign-in";
 </script>
 
-<div class="shell" class:narrow={isSignInRoute}>
+<div class="min-h-screen bg-background text-text">
   {#if isSignInRoute}
-    <slot />
+    <div class="mx-auto max-w-md px-6 py-16">
+      <slot />
+    </div>
   {:else if !data.authorised}
-    <header class="top">
-      <p class="label">Waypoint Admin</p>
-    </header>
-    <h1>Not authorised.</h1>
-    <div class="card">
-      <p>
-        {data.email} is signed in but does not hold the admin role. If it
-        should, the role is assigned server-side.
+    <div class="mx-auto max-w-2xl px-6 py-16">
+      <p class="text-xs font-semibold uppercase tracking-wide text-text-muted">
+        Waypoint Admin
       </p>
+      <h1 class="mt-1 text-2xl font-bold">Not authorised.</h1>
+      <div class="mt-4 rounded-card border border-border bg-surface p-6">
+        <p>
+          {data.email} is signed in but does not hold the admin role. If it
+          should, the role is assigned server-side.
+        </p>
+      </div>
     </div>
   {:else}
-    <div class="layout">
-      <nav class="nav">
-        <p class="label">Waypoint Admin</p>
-        <ul>
-          {#each navItems as item}
-            <li>
-              <a
-                href={item.href}
-                class:active={page.url.pathname === item.href}
-              >
-                {item.label}
-              </a>
-            </li>
-          {/each}
-        </ul>
-        <form method="POST" action="/?/signout">
-          <button class="linkish" type="submit">Sign out</button>
-        </form>
-      </nav>
+    <div class="flex">
+      <Sidebar
+        activeUrl={page.url.pathname}
+        position="static"
+        class="h-screen shrink-0 border-r border-border bg-surface"
+        activeClass="flex items-center rounded-lg p-2 text-base font-normal bg-primary-soft text-primary"
+        nonActiveClass="flex items-center rounded-lg p-2 text-base font-normal text-text-muted hover:bg-primary-soft/50"
+      >
+        <SidebarWrapper class="bg-surface px-3 py-4">
+          <p class="mb-4 px-2 text-xs font-semibold uppercase tracking-wide text-text-muted">
+            Waypoint Admin
+          </p>
+          <SidebarGroup>
+            {#each navItems as item}
+              <SidebarItem href={item.href} label={item.label} />
+            {/each}
+          </SidebarGroup>
+          <form method="POST" action="/?/signout" class="mt-6 px-2">
+            <button
+              type="submit"
+              class="text-sm text-text-muted underline underline-offset-2 hover:text-text"
+            >
+              Sign out
+            </button>
+          </form>
+        </SidebarWrapper>
+      </Sidebar>
 
-      <main class="content">
+      <main class="min-w-0 flex-1 px-8 py-10">
         <slot />
       </main>
     </div>
   {/if}
 </div>
-
-<style>
-  :global(:root) {
-    --background: #f7f3ea;
-    --surface: #fffdf7;
-    --text: #2f3328;
-    --text-muted: #4f5648;
-    --primary: #3c5f46;
-    --primary-soft: #dde8d5;
-    --border: #ddd3c2;
-    --radius-card: 18px;
-  }
-
-  :global(body) {
-    margin: 0;
-    background: var(--background);
-    color: var(--text);
-    font-family:
-      system-ui,
-      -apple-system,
-      "Segoe UI",
-      sans-serif;
-    line-height: 1.5;
-  }
-
-  :global(h1) {
-    font-size: 1.8rem;
-    margin: 0.25rem 0 1.25rem;
-  }
-
-  :global(h2) {
-    font-size: 1.25rem;
-    margin: 2rem 0 0.75rem;
-  }
-
-  :global(.label) {
-    font-size: 0.8rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-  }
-
-  :global(.muted) {
-    color: var(--text-muted);
-  }
-
-  :global(.small) {
-    font-size: 0.85rem;
-  }
-
-  :global(.card) {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-card);
-    padding: 1.5rem;
-    margin: 1.25rem 0;
-  }
-
-  :global(.button) {
-    display: inline-block;
-    background: var(--primary);
-    color: var(--surface);
-    border-radius: 999px;
-    padding: 0.65rem 1.25rem;
-    text-decoration: none;
-    font-weight: 600;
-    border: none;
-    cursor: pointer;
-    font: inherit;
-  }
-
-  :global(.button.quiet) {
-    background: var(--background);
-    color: var(--text);
-    border: 1px solid var(--border);
-  }
-
-  .shell {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem 4rem;
-  }
-
-  .shell.narrow {
-    max-width: 560px;
-  }
-
-  .layout {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: 2.5rem;
-    align-items: start;
-  }
-
-  .nav {
-    position: sticky;
-    top: 2rem;
-    display: flex;
-    flex-direction: column;
-    gap: 1.25rem;
-  }
-
-  .nav ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  .nav a {
-    display: block;
-    padding: 0.5rem 0.75rem;
-    border-radius: 10px;
-    color: var(--text-muted);
-    text-decoration: none;
-    font-weight: 600;
-  }
-
-  .nav a.active {
-    background: var(--primary-soft);
-    color: var(--primary);
-  }
-
-  .content {
-    min-width: 0;
-  }
-
-  .top {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-  }
-
-  .linkish {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    cursor: pointer;
-    font: inherit;
-    text-decoration: underline;
-    padding: 0;
-    text-align: left;
-  }
-</style>

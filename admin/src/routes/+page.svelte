@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { Card } from "flowbite-svelte";
+
   export let data;
 
   const statusOrder = ["draft", "pending_review", "approved", "suspended", "archived"];
@@ -13,89 +15,60 @@
 
 <svelte:head><title>Overview — Waypoint Admin</title></svelte:head>
 
-<p class="label">Overview</p>
-<h1>Platform at a glance.</h1>
+<p class="text-xs font-semibold uppercase tracking-wide text-text-muted">Overview</p>
+<h1 class="mt-1 text-2xl font-bold">Platform at a glance.</h1>
 
 {#if data.kpis}
-  <div class="grid">
+  <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
     {#each statusOrder as status}
       {#if data.kpis.businessesByStatus[status]}
-        <div class="tile">
-          <strong>{data.kpis.businessesByStatus[status]}</strong>
-          <span class="muted small">{statusLabels[status]} businesses</span>
-        </div>
+        <Card class="max-w-none border-border bg-surface p-4">
+          <strong class="text-2xl font-bold">{data.kpis.businessesByStatus[status]}</strong>
+          <span class="text-sm text-text-muted">{statusLabels[status]} businesses</span>
+        </Card>
       {/if}
     {/each}
 
-    <div class="tile">
-      <strong>{data.kpis.activeLocations}</strong>
-      <span class="muted small">active locations</span>
-    </div>
+    <Card class="max-w-none border-border bg-surface p-4">
+      <strong class="text-2xl font-bold">{data.kpis.activeLocations}</strong>
+      <span class="text-sm text-text-muted">active locations</span>
+    </Card>
 
-    <div class="tile">
-      <strong>{data.kpis.checkInsLast7Days}</strong>
-      <span class="muted small">check-ins, last 7 days</span>
-    </div>
+    <Card class="max-w-none border-border bg-surface p-4">
+      <strong class="text-2xl font-bold">{data.kpis.checkInsLast7Days}</strong>
+      <span class="text-sm text-text-muted">check-ins, last 7 days</span>
+    </Card>
 
-    <div class="tile" class:attention={data.kpis.fieldNotesUnresolved > 0}>
-      <strong>{data.kpis.fieldNotesUnresolved}</strong>
-      <span class="muted small">field notes unresolved</span>
-    </div>
+    <Card
+      class="max-w-none p-4 {data.kpis.fieldNotesUnresolved > 0
+        ? 'border-primary bg-primary-soft'
+        : 'border-border bg-surface'}"
+    >
+      <strong class="text-2xl font-bold">{data.kpis.fieldNotesUnresolved}</strong>
+      <span class="text-sm text-text-muted">field notes unresolved</span>
+    </Card>
 
-    <div class="tile">
-      <strong>{data.kpis.fieldNotesPublic}</strong>
-      <span class="muted small">field notes live to walkers</span>
-    </div>
+    <Card class="max-w-none border-border bg-surface p-4">
+      <strong class="text-2xl font-bold">{data.kpis.fieldNotesPublic}</strong>
+      <span class="text-sm text-text-muted">field notes live to walkers</span>
+    </Card>
 
-    <div class="tile">
-      <strong>{data.kpis.publishedTrails}</strong>
-      <span class="muted small">published trails</span>
-    </div>
+    <Card class="max-w-none border-border bg-surface p-4">
+      <strong class="text-2xl font-bold">{data.kpis.publishedTrails}</strong>
+      <span class="text-sm text-text-muted">published trails</span>
+    </Card>
 
-    <div class="tile">
-      <strong>{data.kpis.activeRegions}</strong>
-      <span class="muted small">published regions</span>
-    </div>
+    <Card class="max-w-none border-border bg-surface p-4">
+      <strong class="text-2xl font-bold">{data.kpis.activeRegions}</strong>
+      <span class="text-sm text-text-muted">published regions</span>
+    </Card>
   </div>
 
   {#if data.kpis.fieldNotesUnresolved > 0}
-    <div class="card">
-      <p>
-        <a href="/field-notes">{data.kpis.fieldNotesUnresolved} Field Note{data.kpis.fieldNotesUnresolved === 1 ? "" : "s"} waiting for review →</a>
-      </p>
-    </div>
+    <Card class="mt-4 max-w-none border-border bg-surface p-5">
+      <a href="/field-notes" class="font-semibold text-primary hover:underline">
+        {data.kpis.fieldNotesUnresolved} Field Note{data.kpis.fieldNotesUnresolved === 1 ? "" : "s"} waiting for review →
+      </a>
+    </Card>
   {/if}
 {/if}
-
-<style>
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-    gap: 1rem;
-    margin-top: 1.5rem;
-  }
-
-  .tile {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-card);
-    padding: 1.1rem;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-  }
-
-  .tile.attention {
-    border-color: var(--primary);
-    background: var(--primary-soft);
-  }
-
-  .tile strong {
-    font-size: 1.7rem;
-  }
-
-  a {
-    color: var(--primary);
-    font-weight: 600;
-  }
-</style>

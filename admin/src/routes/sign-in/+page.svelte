@@ -1,38 +1,31 @@
 <script lang="ts">
+  import { Card, Label, Input, Button } from "flowbite-svelte";
+
   export let form;
 </script>
 
 <svelte:head><title>Sign in — Waypoint Admin</title></svelte:head>
 
-<p class="label">Waypoint Admin</p>
-<h1>Sign in</h1>
-<p class="muted">Platform governance. Authorised accounts only.</p>
+<p class="text-xs font-semibold uppercase tracking-wide text-text-muted">Waypoint Admin</p>
+<h1 class="mt-1 text-2xl font-bold">Sign in</h1>
+<p class="mt-1 text-text-muted">Platform governance. Authorised accounts only.</p>
 
-<form method="POST" class="card">
-  <label>
-    <span class="label">Email</span>
-    <input name="email" type="email" value={form?.email ?? ""} required />
-  </label>
+<Card class="mt-6 max-w-none border-border bg-surface p-6">
+  <form method="POST" class="flex flex-col gap-4">
+    <Label class="space-y-1">
+      <span>Email</span>
+      <Input name="email" type="email" value={form?.email ?? ""} required />
+    </Label>
 
-  <label>
-    <span class="label">Password</span>
-    <input name="password" type="password" required />
-  </label>
+    <Label class="space-y-1">
+      <span>Password</span>
+      <Input name="password" type="password" required />
+    </Label>
 
-  {#if form?.message}
-    <p class="muted">{form.message}</p>
-  {/if}
+    {#if form?.message}
+      <p class="text-sm text-danger">{form.message}</p>
+    {/if}
 
-  <button class="button" type="submit">Sign in</button>
-</form>
-
-<style>
-  label { display: block; margin-bottom: 1rem; }
-  input {
-    display: block; width: 100%; box-sizing: border-box;
-    margin-top: 0.35rem; padding: 0.65rem 0.8rem;
-    border: 1px solid var(--border); border-radius: 10px;
-    background: var(--background); font: inherit; color: var(--text);
-  }
-  button { border: none; cursor: pointer; font: inherit; }
-</style>
+    <Button type="submit">Sign in</Button>
+  </form>
+</Card>
