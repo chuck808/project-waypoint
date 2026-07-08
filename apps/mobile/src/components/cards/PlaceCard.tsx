@@ -1,6 +1,7 @@
 import { Link } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { AppText } from "../AppText";
+import { InfoChip } from "../InfoChip";
 import { theme } from "../../theme";
 import { getCategoryStyle } from "../../theme/categoryStyles";
 import type { Place } from "@waypoint/types";
@@ -13,39 +14,38 @@ export function PlaceCard({ place }: PlaceCardProps) {
   const category = getCategoryStyle(place.category);
 
   return (
-    <Link href={`/places/${place.id}`} style={styles.link}>
-      <View style={styles.card}>
+    <Link href={`/places/${place.id}`} asChild>
+      <Pressable style={styles.card}>
         <View style={[styles.swatch, { backgroundColor: category.bg }]}>
           <AppText variant="heading">{category.icon}</AppText>
         </View>
 
         <View style={styles.content}>
-          <AppText variant="heading">{place.name}</AppText>
+          <View style={styles.titleRow}>
+            <AppText variant="heading" style={styles.title}>{place.name}</AppText>
+            <AppText variant="label" muted>{place.distance}</AppText>
+          </View>
 
           <AppText variant="label" muted>
-            {place.displayCategory} · {place.distance}
+            {place.displayCategory}
           </AppText>
 
-          {place.welcome ? (
-            <View style={styles.badge}>
-              <AppText variant="label" style={{ color: category.fg }}>
-                {place.welcome}
-              </AppText>
-            </View>
-          ) : null}
+          <View style={styles.chips}>
+            {place.welcome ? (
+              <InfoChip label={place.welcome} icon="🥾" tone="success" />
+            ) : null}
+            <InfoChip label="Useful stop" icon="📍" />
+          </View>
         </View>
-      </View>
+      </Pressable>
     </Link>
   );
 }
 
 const styles = StyleSheet.create({
-  link: {
-    textDecorationLine: "none",
-  },
   card: {
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     padding: theme.spacing.md,
     borderRadius: theme.radius.card,
     backgroundColor: theme.colors.surface,
@@ -54,8 +54,8 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
   },
   swatch: {
-    width: 56,
-    height: 56,
+    width: 58,
+    height: 58,
     borderRadius: theme.radius.card,
     alignItems: "center",
     justifyContent: "center",
@@ -64,12 +64,18 @@ const styles = StyleSheet.create({
     flex: 1,
     gap: theme.spacing.xs,
   },
-  badge: {
-    alignSelf: "flex-start",
+  titleRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    gap: theme.spacing.md,
+  },
+  title: {
+    flex: 1,
+  },
+  chips: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing.xs,
     marginTop: theme.spacing.xs,
-    paddingVertical: theme.spacing.xs,
-    paddingHorizontal: theme.spacing.sm,
-    borderRadius: theme.radius.pill,
-    backgroundColor: theme.colors.primarySoft,
   },
 });

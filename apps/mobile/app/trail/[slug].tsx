@@ -1,8 +1,12 @@
 import { useEffect, useState } from "react";
 import { useLocalSearchParams } from "expo-router";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import {
   AppText,
+  Card,
+  DetailSection,
+  InfoChip,
+  KeyValueRow,
   PlaceCard,
   PrimaryButton,
   PrimaryLink,
@@ -14,6 +18,8 @@ import type { FieldNote } from "../../src/services/field_notes";
 import { getFieldNotesForTrail } from "../../src/services/field_notes";
 import { getPlaces } from "../../src/services/places";
 import { getTrail } from "../../src/services/trails";
+import { getTrailAdvice, getTrailFacts } from "../../src/features/trails/trailExperience";
+import { OfficialNotes } from "../../src/features/steward/OfficialNotes";
 import { theme } from "../../src/theme";
 import { confirmSwitchWalk, useActiveWalk } from "../../src/features/walks";
 
@@ -23,8 +29,6 @@ export default function TrailDetailScreen() {
   const [trail, setTrail] = useState<Trail | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
   const [fieldNotes, setFieldNotes] = useState<FieldNote[]>([]);
-  const [fieldNotesLoading, setFieldNotesLoading] = useState(false);
-  const [fieldNotesError, setFieldNotesError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const { activeWalk, start, finish } = useActiveWalk();
@@ -36,25 +40,15 @@ export default function TrailDetailScreen() {
       const result = await getTrail(slug);
       setTrail(result);
 
-      const nextPlaces = await getPlaces();
+      const [nextPlaces, nextNotes] = await Promise.all([
+        getPlaces(),
+        result ? getFieldNotesForTrail(result.id).catch(() => []) : [],
+      ]);
 
       setPlaces(nextPlaces);
+      setFieldNotes(nextNotes);
+
       setLoading(false);
-
-      if (result) {
-        setFieldNotesLoading(true);
-        setFieldNotesError(null);
-
-        try {
-          setFieldNotes(await getFieldNotesForTrail(result.id));
-        } catch (err) {
-          setFieldNotesError(
-            err instanceof Error ? err.message : "Could not load recent notes.",
-          );
-        } finally {
-          setFieldNotesLoading(false);
-        }
-      }
     }
 
     load();
@@ -77,12 +71,11 @@ export default function TrailDetailScreen() {
   }
 
   const isActiveTrail = activeWalk?.trailId === trail.id;
+  const trailFacts = getTrailFacts(trail);
 
   function handleStart() {
     if (!trail) return;
 
-    // Switching is explicit, never silent: starting a new walk replaces
-    // the current one, so the walker confirms it before it happens.
     if (activeWalk && !isActiveTrail) {
       confirmSwitchWalk(activeWalk.trailName, trail.name, () =>
         start(trail.id, trail.name),
@@ -95,66 +88,114 @@ export default function TrailDetailScreen() {
 
   return (
     <Screen>
-      <View style={styles.header}>
-        <AppText variant="label" muted>
-          {trail.region}
-        </AppText>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.hero}>
+          <AppText style={styles.heroGlyph}>⛰</AppText>
+          <View style={styles.heroContent}>
+            <AppText variant="label" muted>
+              {trail.region}
+            </AppText>
+            <AppText variant="title">{trail.name}</AppText>
+            <AppText muted>{trail.distance} · {trail.difficulty} · {trail.duration}</AppText>
+          </View>
+        </View>
 
-        <AppText variant="title">{trail.name}</AppText>
+        <View style={styles.section}>
+          {isActiveTrail ? (
+            <PrimaryButton onPress={finish}>Finish walk</PrimaryButton>
+          ) : (
+            <PrimaryButton onPress={handleStart}>Start this walk</PrimaryButton>
+          )}
+        </View>
 
-        <AppText muted>
-          {trail.distance} · {trail.difficulty} · {trail.duration}
-        </AppText>
-      </View>
+        <DetailSection title="About this walk" eyebrow="What to expect">
+          <Card>
+            <AppText muted>{trail.description}</AppText>
+            <View style={styles.chipGrid}>
+              <InfoChip label={trail.type.replace("_", " ")} icon="🧭" tone="accent" />
+              <InfoChip label={trail.difficulty} icon="🥾" tone="success" />
+              <InfoChip label={trail.duration} icon="⏱" />
+            </View>
+          </Card>
+        </DetailSection>
 
-      <View style={styles.section}>
-        {isActiveTrail ? (
-          <PrimaryButton onPress={finish}>Finish walk</PrimaryButton>
-        ) : (
-          <PrimaryButton onPress={handleStart}>Start this walk</PrimaryButton>
-        )}
-      </View>
+        <DetailSection title="Walk facts">
+          <Card>
+            {trailFacts.map((fact) => (
+              <KeyValueRow key={fact.label} label={fact.label} value={fact.value} />
+            ))}
+          </Card>
+        </DetailSection>
 
-      <View style={styles.section}>
-        <AppText variant="label">About this walk</AppText>
-        <AppText muted>{trail.description}</AppText>
-      </View>
+        <DetailSection title="Recent conditions" eyebrow="Shared by walkers">
+          <RecentFieldNotes
+            notes={fieldNotes}
+            emptyText="No recent observations for this walk yet. If you notice something useful, leave a Field Note after check-in."
+          />
+        </DetailSection>
 
-      <View style={styles.section}>
-        <AppText variant="label">Recent Field Notes</AppText>
-        <RecentFieldNotes
-          notes={fieldNotes}
-          loading={fieldNotesLoading}
-          error={fieldNotesError}
-          emptyText="No recent notes for this walk yet. Add one after check-in if something would help the next walker."
-        />
-      </View>
+        <DetailSection title="Official updates" eyebrow="Access and stewardship">
+          <OfficialNotes />
+        </DetailSection>
 
-      <View style={styles.section}>
-        <AppText variant="label">Along the way</AppText>
+        <DetailSection title="Before you set off">
+          <Card>
+            <AppText muted>{getTrailAdvice(trail)}</AppText>
+          </Card>
+        </DetailSection>
 
-        {places.map((place) => (
-          <PlaceCard key={place.id} place={place} />
-        ))}
-      </View>
+        <DetailSection title="Useful places along the way">
+          {places.length === 0 ? (
+            <Card>
+              <AppText muted>Useful places will appear here as the local walking network grows.</AppText>
+            </Card>
+          ) : (
+            places.map((place) => <PlaceCard key={place.id} place={place} />)
+          )}
+        </DetailSection>
 
-      <PrimaryLink href="/discover">Back to discover</PrimaryLink>
+        <View style={styles.actions}>
+          <PrimaryLink href="/discover">Back to discover</PrimaryLink>
+        </View>
+      </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    gap: theme.spacing.md,
+  hero: {
+    minHeight: 220,
+    borderRadius: theme.radius.frame,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.primarySoft,
+    justifyContent: "flex-end",
     marginBottom: theme.spacing.xl,
+    padding: theme.spacing.lg,
+    overflow: "hidden",
+  },
+  heroGlyph: {
+    position: "absolute",
+    right: theme.spacing.lg,
+    top: theme.spacing.lg,
+    fontSize: 64,
+    opacity: 0.35,
+  },
+  heroContent: {
+    gap: theme.spacing.sm,
   },
   section: {
     gap: theme.spacing.md,
     marginBottom: theme.spacing.xl,
   },
-  place: {
-    paddingVertical: theme.spacing.sm,
-    borderBottomWidth: 1,
-    borderBottomColor: theme.colors.border,
+  chipGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing.sm,
+    marginTop: theme.spacing.sm,
+  },
+  actions: {
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.xl,
   },
 });

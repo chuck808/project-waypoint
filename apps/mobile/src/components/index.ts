@@ -9,3 +9,7 @@ export { Section } from "./Section";
 export { TrailCard } from "./cards/TrailCard";
 export { PlaceCard } from "./cards/PlaceCard";
 export { PassportStamp } from "./cards/PassportStamp";
+
+export { DetailSection } from "./DetailSection";
+export { InfoChip } from "./InfoChip";
+export { KeyValueRow } from "./KeyValueRow";

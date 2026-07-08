@@ -1,18 +1,17 @@
 import { StyleSheet, View } from "react-native";
-import { AppText, Card } from "../../components";
+import { AppText, Card, InfoChip } from "../../components";
 import {
   fieldNoteSeverityLabels,
   fieldNoteSourceLabels,
   getFieldNoteCategoryMeta,
   type FieldNote,
+  type FieldNoteSeverity,
 } from "../../services/field_notes";
 import { theme } from "../../theme";
 
 type RecentFieldNotesProps = {
   notes: FieldNote[];
   emptyText?: string;
-  loading?: boolean;
-  error?: string | null;
 };
 
 function formatObservedAt(value: string): string {
@@ -30,39 +29,20 @@ function formatObservedAt(value: string): string {
   return `${diffDays}d ago`;
 }
 
-function severityStyle(severity: FieldNote["severity"]) {
-  if (severity === "hazard") return styles.hazardPill;
-  if (severity === "watch") return styles.watchPill;
-  return styles.infoPill;
+function severityTone(severity: FieldNoteSeverity): "neutral" | "warning" | "accent" | "error" {
+  if (severity === "hazard") return "error";
+  if (severity === "watch") return "accent";
+  return "neutral";
 }
 
 export function RecentFieldNotes({
   notes,
   emptyText = "No recent Field Notes yet.",
-  loading = false,
-  error = null,
 }: RecentFieldNotesProps) {
-  if (loading) {
-    return (
-      <Card style={styles.stateCard}>
-        <AppText muted>Checking recent conditions…</AppText>
-      </Card>
-    );
-  }
-
-  if (error) {
-    return (
-      <Card style={styles.stateCard}>
-        <AppText variant="label">Recent conditions unavailable</AppText>
-        <AppText muted>{error}</AppText>
-      </Card>
-    );
-  }
-
   if (notes.length === 0) {
     return (
-      <Card style={styles.stateCard}>
-        <AppText variant="label">Nothing recent reported</AppText>
+      <Card style={styles.empty}>
+        <AppText variant="heading">A quiet patch of map.</AppText>
         <AppText muted>{emptyText}</AppText>
       </Card>
     );
@@ -75,38 +55,30 @@ export function RecentFieldNotes({
 
         return (
           <Card key={note.id} style={styles.note}>
-            <View style={styles.row}>
-              <View style={styles.glyph}>
-                <AppText variant="heading">{meta.glyph}</AppText>
-              </View>
-
-              <View style={styles.content}>
-                <View style={styles.header}>
-                  <AppText variant="label">{meta.label}</AppText>
-                  <AppText variant="label" muted>
-                    {formatObservedAt(note.observedAt)}
-                  </AppText>
-                </View>
-
-                <AppText muted>
-                  {note.message ??
-                    (note.source === "steward"
-                      ? "Official update from a place steward."
-                      : "Reported by another walker.")}
+            <View style={styles.header}>
+              <View style={styles.titleGroup}>
+                <AppText variant="heading">
+                  {meta.glyph} {note.categoryLabel}
                 </AppText>
-
-                <View style={styles.metaRow}>
-                  <View style={[styles.pill, severityStyle(note.severity)]}>
-                    <AppText variant="label" style={styles.pillText}>
-                      {fieldNoteSeverityLabels[note.severity]}
-                    </AppText>
-                  </View>
-
-                  <AppText variant="label" muted>
-                    {fieldNoteSourceLabels[note.source]}
-                  </AppText>
-                </View>
+                <AppText variant="label" muted>
+                  {fieldNoteSourceLabels[note.source]} · {formatObservedAt(note.observedAt)}
+                </AppText>
               </View>
+            </View>
+
+            <AppText muted>
+              {note.message ??
+                (note.source === "steward"
+                  ? "Official update from a place steward."
+                  : "Shared to help the next walker.")}
+            </AppText>
+
+            <View style={styles.chips}>
+              <InfoChip
+                label={fieldNoteSeverityLabels[note.severity]}
+                tone={severityTone(note.severity)}
+              />
+              {note.source !== "explorer" ? <InfoChip label="Verified source" icon="✓" tone="success" /> : null}
             </View>
           </Card>
         );
@@ -119,55 +91,24 @@ const styles = StyleSheet.create({
   list: {
     gap: theme.spacing.sm,
   },
-  stateCard: {
-    gap: theme.spacing.xs,
-  },
   note: {
-    gap: theme.spacing.xs,
+    gap: theme.spacing.sm,
   },
-  row: {
-    flexDirection: "row",
-    gap: theme.spacing.md,
-  },
-  glyph: {
-    width: 44,
-    height: 44,
-    borderRadius: theme.radius.card,
-    backgroundColor: theme.colors.primarySoft,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  content: {
-    flex: 1,
-    gap: theme.spacing.xs,
+  empty: {
+    backgroundColor: theme.colors.surface,
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     gap: theme.spacing.md,
   },
-  metaRow: {
+  titleGroup: {
+    flex: 1,
+    gap: theme.spacing.xs,
+  },
+  chips: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing.sm,
     flexWrap: "wrap",
-    marginTop: theme.spacing.xs,
-  },
-  pill: {
-    borderRadius: theme.radius.pill,
-    paddingHorizontal: theme.spacing.sm,
-    paddingVertical: 2,
-  },
-  infoPill: {
-    backgroundColor: theme.colors.primarySoft,
-  },
-  watchPill: {
-    backgroundColor: theme.colors.warningSoft,
-  },
-  hazardPill: {
-    backgroundColor: theme.colors.errorSoft,
-  },
-  pillText: {
-    color: theme.colors.text,
+    gap: theme.spacing.xs,
   },
 });

@@ -1,6 +1,7 @@
 import { Link } from "expo-router";
 import { Pressable, StyleSheet, View } from "react-native";
 import { AppText } from "../AppText";
+import { InfoChip } from "../InfoChip";
 import { theme } from "../../theme";
 import type { Trail, TrailType } from "@waypoint/types";
 
@@ -35,15 +36,15 @@ export function TrailCard({ trail }: TrailCardProps) {
           </View>
         </View>
 
-        <View style={styles.meta}>
-          <AppText variant="label" muted>
-            {trail.distance}
-          </AppText>
-          <AppText variant="label" muted>
-            {trail.difficulty}
-          </AppText>
-          <AppText variant="label" muted>
-            {trail.duration}
+        <View style={styles.body}>
+          <View style={styles.meta}>
+            <InfoChip label={trail.distance} icon="↔" />
+            <InfoChip label={trail.difficulty} icon="🥾" tone="success" />
+            <InfoChip label={trail.duration} icon="⏱" />
+          </View>
+
+          <AppText muted>
+            Check recent observations before setting off.
           </AppText>
         </View>
       </Pressable>
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
     paddingBottom: theme.spacing.md,
   },
   hero: {
-    height: 140,
+    height: 150,
     backgroundColor: theme.colors.primarySoft,
     justifyContent: "flex-end",
     padding: theme.spacing.md,
@@ -71,7 +72,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: theme.spacing.sm,
     right: theme.spacing.md,
-    fontSize: 40,
+    fontSize: 44,
     opacity: 0.35,
   },
   heroBadge: {
@@ -96,10 +97,13 @@ const styles = StyleSheet.create({
   heroSubtitle: {
     color: theme.colors.textMuted,
   },
+  body: {
+    gap: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.md,
+  },
   meta: {
     flexDirection: "row",
-    gap: theme.spacing.md,
+    gap: theme.spacing.sm,
     flexWrap: "wrap",
-    paddingHorizontal: theme.spacing.md,
   },
 });

@@ -1,12 +1,26 @@
 import { useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
-import { StyleSheet, View } from "react-native";
+import { ScrollView, StyleSheet, View } from "react-native";
 import type { Place } from "@waypoint/types";
-import { AppText, PrimaryLink, Screen } from "../../src/components";
+import {
+  AppText,
+  Card,
+  DetailSection,
+  InfoChip,
+  KeyValueRow,
+  PrimaryLink,
+  Screen,
+} from "../../src/components";
 import { RecentFieldNotes } from "../../src/features/field_notes";
+import {
+  getPlaceFacilities,
+  getWalkerFacts,
+} from "../../src/features/places/placeExperience";
+import { OfficialNotes } from "../../src/features/steward/OfficialNotes";
 import type { FieldNote } from "../../src/services/field_notes";
 import { getFieldNotesForPlace } from "../../src/services/field_notes";
 import { getPlace } from "../../src/services/places";
+import { getCategoryStyle } from "../../src/theme/categoryStyles";
 import { theme } from "../../src/theme";
 
 export default function PlaceDetailScreen() {
@@ -15,33 +29,20 @@ export default function PlaceDetailScreen() {
 
   const [place, setPlace] = useState<Place | null>(null);
   const [fieldNotes, setFieldNotes] = useState<FieldNote[]>([]);
-  const [fieldNotesLoading, setFieldNotesLoading] = useState(false);
-  const [fieldNotesError, setFieldNotesError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       if (!id) return;
 
-      const nextPlace = await getPlace(id);
+      const [nextPlace, nextNotes] = await Promise.all([
+        getPlace(id),
+        getFieldNotesForPlace(id).catch(() => []),
+      ]);
 
       setPlace(nextPlace);
+      setFieldNotes(nextNotes);
       setLoading(false);
-
-      if (nextPlace) {
-        setFieldNotesLoading(true);
-        setFieldNotesError(null);
-
-        try {
-          setFieldNotes(await getFieldNotesForPlace(id));
-        } catch (err) {
-          setFieldNotesError(
-            err instanceof Error ? err.message : "Could not load recent notes.",
-          );
-        } finally {
-          setFieldNotesLoading(false);
-        }
-      }
     }
 
     load();
@@ -63,77 +64,127 @@ export default function PlaceDetailScreen() {
     );
   }
 
+  const category = getCategoryStyle(place.category);
+  const walkerFacts = getWalkerFacts(place);
+  const facilities = getPlaceFacilities(place);
+
   return (
     <Screen>
-      <View style={styles.header}>
-        <AppText variant="label" muted>
-          {place.category} · {place.distance}
-        </AppText>
+      <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={[styles.hero, { backgroundColor: category.bg }]}> 
+          <AppText style={styles.heroGlyph}>{category.icon}</AppText>
+          <View style={styles.heroContent}>
+            <AppText variant="label" style={{ color: category.fg }}>
+              {place.displayCategory} · {place.distance}
+            </AppText>
+            <AppText variant="title">{place.name}</AppText>
+            <AppText muted>{place.description}</AppText>
+          </View>
+        </View>
 
-        <AppText variant="title">{place.name}</AppText>
+        <DetailSection title="Walker welcome" eyebrow="Before you arrive">
+          <Card>
+            <AppText>{place.welcome}</AppText>
+            <View style={styles.chipGrid}>
+              {walkerFacts.map((fact) => (
+                <InfoChip
+                  key={fact.label}
+                  icon={fact.icon}
+                  label={fact.label}
+                  tone="success"
+                />
+              ))}
+            </View>
+          </Card>
+        </DetailSection>
 
-        <AppText muted>{place.description}</AppText>
-      </View>
+        <DetailSection title="Facilities" eyebrow="Useful facts, not reviews">
+          <View style={styles.chipGrid}>
+            {facilities.map((facility) => (
+              <InfoChip
+                key={facility.label}
+                icon={facility.icon}
+                label={facility.label}
+              />
+            ))}
+          </View>
+        </DetailSection>
 
-      <View style={styles.section}>
-        <AppText variant="label">Walker welcome</AppText>
-        <AppText muted>{place.welcome}</AppText>
-      </View>
+        <DetailSection title="Official updates" eyebrow="From the place steward">
+          <OfficialNotes />
+        </DetailSection>
 
-      <View style={styles.section}>
-        <AppText variant="label">Facilities</AppText>
+        <DetailSection title="Recent conditions" eyebrow="Shared by walkers">
+          <RecentFieldNotes
+            notes={fieldNotes}
+            emptyText="Nobody has shared observations for this place yet. Be the first to help the next walker."
+          />
+        </DetailSection>
 
-        {place.facilities.map((facility) => (
-          <AppText key={facility} muted>
-            {facility}
+        <DetailSection title="Planning details">
+          <Card>
+            <KeyValueRow label="Opening" value={place.openingHours} />
+            <KeyValueRow label="Category" value={place.displayCategory} />
+            <KeyValueRow label="Distance" value={place.distance} />
+          </Card>
+        </DetailSection>
+
+        <View style={styles.mapPlaceholder}>
+          <AppText variant="label" muted>
+            Map preview
           </AppText>
-        ))}
-      </View>
+          <AppText muted>Nearby walks and check-in points will appear here.</AppText>
+        </View>
 
-      <View style={styles.section}>
-        <AppText variant="label">Opening</AppText>
-        <AppText muted>{place.openingHours}</AppText>
-      </View>
-
-      <View style={styles.section}>
-        <AppText variant="label">Recent Field Notes</AppText>
-        <RecentFieldNotes
-          notes={fieldNotes}
-          loading={fieldNotesLoading}
-          error={fieldNotesError}
-          emptyText="No recent notes for this place yet. Be the first to leave something useful."
-        />
-      </View>
-
-      <View style={styles.mapPlaceholder}>
-        <AppText variant="label" muted>
-          Map preview
-        </AppText>
-      </View>
-
-      <PrimaryLink href="/check-in">Record visit</PrimaryLink>
-      <PrimaryLink href="/discover">Back to discover</PrimaryLink>
+        <View style={styles.actions}>
+          <PrimaryLink href="/check-in">Record visit</PrimaryLink>
+          <PrimaryLink href="/discover">Back to discover</PrimaryLink>
+        </View>
+      </ScrollView>
     </Screen>
   );
 }
 
 const styles = StyleSheet.create({
-  header: {
-    gap: theme.spacing.md,
-    marginBottom: theme.spacing.xl,
-  },
-  section: {
-    gap: theme.spacing.sm,
-    marginBottom: theme.spacing.lg,
-  },
-  mapPlaceholder: {
-    height: 120,
-    borderRadius: 18,
+  hero: {
+    minHeight: 220,
+    borderRadius: theme.radius.frame,
     borderWidth: 1,
     borderColor: theme.colors.border,
-    backgroundColor: theme.colors.surface,
+    justifyContent: "flex-end",
+    overflow: "hidden",
+    marginBottom: theme.spacing.xl,
+    padding: theme.spacing.lg,
+  },
+  heroGlyph: {
+    position: "absolute",
+    right: theme.spacing.lg,
+    top: theme.spacing.lg,
+    fontSize: 64,
+    opacity: 0.35,
+  },
+  heroContent: {
+    gap: theme.spacing.sm,
+  },
+  chipGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    gap: theme.spacing.sm,
+  },
+  mapPlaceholder: {
+    minHeight: 140,
+    borderRadius: theme.radius.frame,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.mapWash,
     alignItems: "center",
     justifyContent: "center",
+    gap: theme.spacing.xs,
     marginBottom: theme.spacing.lg,
+    padding: theme.spacing.lg,
+  },
+  actions: {
+    gap: theme.spacing.md,
+    marginBottom: theme.spacing.xl,
   },
 });
