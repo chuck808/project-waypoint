@@ -15,20 +15,15 @@ async function updateLocation(
   locationId: string,
   values: Record<string, unknown>,
 ) {
-  const update = locals.supabase.from("business_locations")
-    .update as unknown as (v: Record<string, unknown>) => {
-    eq: (
-      c: string,
-      v: string,
-    ) => {
-      select: (c: string) => PromiseLike<{
-        data: { id: string }[] | null;
-        error: { message: string } | null;
-      }>;
-    };
-  };
-
-  const { data, error } = await update(values).eq("id", locationId).select("id");
+  // Call .update() inline on the query builder chain -- extracting it as
+  // a standalone function reference (as the old `const update = ...update`
+  // cast did) drops its `this` binding to the builder instance, which
+  // crashes inside postgrest-js at request-build time.
+  const { data, error } = await locals.supabase
+    .from("business_locations")
+    .update(values as never)
+    .eq("id", locationId)
+    .select("id");
 
   if (error) return { error };
 
