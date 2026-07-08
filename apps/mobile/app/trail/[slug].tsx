@@ -23,6 +23,8 @@ export default function TrailDetailScreen() {
   const [trail, setTrail] = useState<Trail | null>(null);
   const [places, setPlaces] = useState<Place[]>([]);
   const [fieldNotes, setFieldNotes] = useState<FieldNote[]>([]);
+  const [fieldNotesLoading, setFieldNotesLoading] = useState(false);
+  const [fieldNotesError, setFieldNotesError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   const { activeWalk, start, finish } = useActiveWalk();
@@ -34,15 +36,25 @@ export default function TrailDetailScreen() {
       const result = await getTrail(slug);
       setTrail(result);
 
-      const [nextPlaces, nextNotes] = await Promise.all([
-        getPlaces(),
-        result ? getFieldNotesForTrail(result.id).catch(() => []) : [],
-      ]);
+      const nextPlaces = await getPlaces();
 
       setPlaces(nextPlaces);
-      setFieldNotes(nextNotes);
-
       setLoading(false);
+
+      if (result) {
+        setFieldNotesLoading(true);
+        setFieldNotesError(null);
+
+        try {
+          setFieldNotes(await getFieldNotesForTrail(result.id));
+        } catch (err) {
+          setFieldNotesError(
+            err instanceof Error ? err.message : "Could not load recent notes.",
+          );
+        } finally {
+          setFieldNotesLoading(false);
+        }
+      }
     }
 
     load();
@@ -112,7 +124,9 @@ export default function TrailDetailScreen() {
         <AppText variant="label">Recent Field Notes</AppText>
         <RecentFieldNotes
           notes={fieldNotes}
-          emptyText="No recent notes for this walk yet."
+          loading={fieldNotesLoading}
+          error={fieldNotesError}
+          emptyText="No recent notes for this walk yet. Add one after check-in if something would help the next walker."
         />
       </View>
 

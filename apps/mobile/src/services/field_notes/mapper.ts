@@ -1,3 +1,4 @@
+import { fieldNoteCategoryMeta } from "./metadata";
 import type {
   FieldNote,
   FieldNoteCategory,
@@ -7,17 +8,17 @@ import type {
 import type { FieldNoteRow } from "./repository";
 
 const categoryLabels: Record<FieldNoteCategory, string> = {
-  mud_bog: "Muddy / boggy",
-  bridge_stile_gate: "Bridge / stile / gate",
-  fallen_tree: "Fallen tree",
-  livestock: "Livestock",
-  water: "Water",
-  weather: "Weather",
-  access: "Access",
-  facilities: "Facilities",
-  welcome: "Welcome",
-  viewpoint: "Viewpoint",
-  other: "Other",
+  mud_bog: fieldNoteCategoryMeta.mud_bog.label,
+  bridge_stile_gate: fieldNoteCategoryMeta.bridge_stile_gate.label,
+  fallen_tree: fieldNoteCategoryMeta.fallen_tree.label,
+  livestock: fieldNoteCategoryMeta.livestock.label,
+  water: fieldNoteCategoryMeta.water.label,
+  weather: fieldNoteCategoryMeta.weather.label,
+  access: fieldNoteCategoryMeta.access.label,
+  facilities: fieldNoteCategoryMeta.facilities.label,
+  welcome: fieldNoteCategoryMeta.welcome.label,
+  viewpoint: fieldNoteCategoryMeta.viewpoint.label,
+  other: fieldNoteCategoryMeta.other.label,
 };
 
 function isCategory(value: string): value is FieldNoteCategory {

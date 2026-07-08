@@ -15,20 +15,33 @@ export default function PlaceDetailScreen() {
 
   const [place, setPlace] = useState<Place | null>(null);
   const [fieldNotes, setFieldNotes] = useState<FieldNote[]>([]);
+  const [fieldNotesLoading, setFieldNotesLoading] = useState(false);
+  const [fieldNotesError, setFieldNotesError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
       if (!id) return;
 
-      const [nextPlace, nextNotes] = await Promise.all([
-        getPlace(id),
-        getFieldNotesForPlace(id).catch(() => []),
-      ]);
+      const nextPlace = await getPlace(id);
 
       setPlace(nextPlace);
-      setFieldNotes(nextNotes);
       setLoading(false);
+
+      if (nextPlace) {
+        setFieldNotesLoading(true);
+        setFieldNotesError(null);
+
+        try {
+          setFieldNotes(await getFieldNotesForPlace(id));
+        } catch (err) {
+          setFieldNotesError(
+            err instanceof Error ? err.message : "Could not load recent notes.",
+          );
+        } finally {
+          setFieldNotesLoading(false);
+        }
+      }
     }
 
     load();
@@ -86,7 +99,9 @@ export default function PlaceDetailScreen() {
         <AppText variant="label">Recent Field Notes</AppText>
         <RecentFieldNotes
           notes={fieldNotes}
-          emptyText="No recent notes for this place yet."
+          loading={fieldNotesLoading}
+          error={fieldNotesError}
+          emptyText="No recent notes for this place yet. Be the first to leave something useful."
         />
       </View>
 

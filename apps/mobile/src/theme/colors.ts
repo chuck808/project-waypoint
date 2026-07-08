@@ -8,6 +8,9 @@ export const colors = {
   accent: "#8A6F3D",
   border: "#DDD3C2",
   success: "#3F6F4F",
+  successSoft: "#DFEBDD",
   warning: "#9A6A2F",
+  warningSoft: "#EFE2C8",
   error: "#8A3A32",
+  errorSoft: "#EBD5D1",
 };
