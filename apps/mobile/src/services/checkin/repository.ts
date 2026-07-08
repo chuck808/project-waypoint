@@ -86,7 +86,11 @@ export async function getRecognitionForCheckIn(
 
   if (error) throw error;
 
-  const title = (data?.stamp_definitions as { title: string } | null)?.title;
+  // PostgREST embeds a belongs-to relationship as a single object, but
+  // supabase-js's generated type for a raw select string widens it to
+  // an array; normalise both shapes instead of asserting past the type.
+  const embedded = data?.stamp_definitions;
+  const stampDefinition = Array.isArray(embedded) ? embedded[0] : embedded;
 
-  return title ? { title } : null;
+  return stampDefinition?.title ? { title: stampDefinition.title } : null;
 }

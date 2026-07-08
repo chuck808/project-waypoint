@@ -53,7 +53,7 @@ export function FieldNotePrompt({
   }, [selected]);
 
   async function handleSave() {
-    if (!selected) return;
+    if (!selected || saving || saved) return;
 
     setSaving(true);
     setError(null);
@@ -122,7 +122,7 @@ export function FieldNotePrompt({
 
       {error ? <AppText style={styles.error}>{error}</AppText> : null}
 
-      <PrimaryButton onPress={handleSave}>
+      <PrimaryButton onPress={handleSave} disabled={!canSave}>
         {saving ? "Adding note…" : "Add Field Note"}
       </PrimaryButton>
 

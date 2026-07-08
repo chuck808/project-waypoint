@@ -6,11 +6,20 @@ import { theme } from "../theme";
 type PrimaryButtonProps = {
   children: ReactNode;
   onPress: () => void;
+  disabled?: boolean;
 };
 
-export function PrimaryButton({ children, onPress }: PrimaryButtonProps) {
+export function PrimaryButton({
+  children,
+  onPress,
+  disabled = false,
+}: PrimaryButtonProps) {
   return (
-    <Pressable style={styles.button} onPress={onPress}>
+    <Pressable
+      style={[styles.button, disabled ? styles.buttonDisabled : undefined]}
+      onPress={onPress}
+      disabled={disabled}
+    >
       <AppText variant="label">{children}</AppText>
     </Pressable>
   );
@@ -24,5 +33,8 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.primarySoft,
     alignItems: "center",
     marginBottom: theme.spacing.sm,
+  },
+  buttonDisabled: {
+    opacity: 0.5,
   },
 });

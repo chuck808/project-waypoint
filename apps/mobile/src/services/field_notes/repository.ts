@@ -1,15 +1,11 @@
+import type { Database } from "@waypoint/database";
 import { supabase } from "../../lib/supabase";
 import type { CreateFieldNoteInput } from "./types";
 
-type FieldNoteRow = {
-  id: string;
-  category: string;
-  severity: string;
-  message: string | null;
-  source: string;
-  observed_at: string;
-  expires_at: string | null;
-};
+export type FieldNoteRow = Pick<
+  Database["public"]["Tables"]["field_notes"]["Row"],
+  "id" | "category" | "severity" | "message" | "source" | "observed_at" | "expires_at"
+>;
 
 const fieldNoteSelect =
   "id, category, severity, message, source, observed_at, expires_at";

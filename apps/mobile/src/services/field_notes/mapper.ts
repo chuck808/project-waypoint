@@ -4,16 +4,7 @@ import type {
   FieldNoteSeverity,
   FieldNoteSource,
 } from "./types";
-
-type FieldNoteRow = {
-  id: string;
-  category: string;
-  severity: string;
-  message: string | null;
-  source: string;
-  observed_at: string;
-  expires_at: string | null;
-};
+import type { FieldNoteRow } from "./repository";
 
 const categoryLabels: Record<FieldNoteCategory, string> = {
   mud_bog: "Muddy / boggy",
