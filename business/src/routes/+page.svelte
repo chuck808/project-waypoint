@@ -75,9 +75,56 @@
     <p class="eyebrow">No steward access</p>
     <h2>No managed place yet</h2>
     <p class="muted">
-      Your account ({data.email}) is not linked to a business or place. Once a
-      claim is approved, the operational tools will appear here.
+      Your account ({data.email}) is not linked to a business or place. Search
+      for it below and ask to take over management -- once an admin approves
+      your request, the operational tools will appear here.
     </p>
+  </section>
+
+  {#if data.myClaims.length > 0}
+    <section class="panel">
+      <p class="eyebrow">Your requests</p>
+      <h2>Claim history</h2>
+      <ul class="claim-list">
+        {#each data.myClaims as claim}
+          <li>
+            <strong>{claim.businesses?.name ?? "Unknown business"}</strong>
+            <span class={`claim-status ${claim.status}`}>{claim.status}</span>
+          </li>
+        {/each}
+      </ul>
+    </section>
+  {/if}
+
+  <section class="panel">
+    <p class="eyebrow">Find your place</p>
+    <h2>Search businesses</h2>
+    <form method="GET" class="search-row">
+      <input type="text" name="q" placeholder="Business name…" value={data.claimSearch} />
+      <button class="button" type="submit">Search</button>
+    </form>
+
+    {#if form?.claimError}<p class="error">{form.claimError}</p>{/if}
+    {#if form?.claimRequested}<p class="success">Request sent -- an admin will review it.</p>{/if}
+
+    {#if data.claimSearch && data.businessResults.length === 0}
+      <p class="muted">No approved businesses match "{data.claimSearch}".</p>
+    {/if}
+
+    {#each data.businessResults as business}
+      <div class="panel claim-result">
+        <p class="eyebrow">{business.category}</p>
+        <h3>{business.name}</h3>
+        <form method="POST" action="?/requestClaim">
+          <input type="hidden" name="businessId" value={business.id} />
+          <label class="full">
+            Message to the admin team (optional)
+            <textarea name="message" rows="2" placeholder="I'm the owner/manager of this place…"></textarea>
+          </label>
+          <button class="button" type="submit">Request to manage this place</button>
+        </form>
+      </div>
+    {/each}
   </section>
 {:else}
   {#each data.memberships as membership}
@@ -552,6 +599,46 @@
   }
   .visits p {
     margin: 0.5rem 0;
+  }
+  .claim-list {
+    list-style: none;
+    padding: 0;
+    margin: 0.5rem 0 0;
+  }
+  .claim-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .claim-status {
+    text-transform: capitalize;
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    background: var(--background);
+  }
+  .claim-status.approved {
+    color: #3c5f46;
+    background: var(--primary-soft);
+  }
+  .claim-status.rejected {
+    color: #8d3d2f;
+    background: #f3e2c8;
+  }
+  .search-row {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0.5rem 0 1rem;
+  }
+  .search-row input {
+    flex: 1;
+  }
+  .claim-result {
+    margin-top: 0.75rem;
+    background: #fffaf0;
   }
   @media (max-width: 820px) {
     .grid,

@@ -36,7 +36,7 @@ async function updateLocation(
   return { error: null };
 }
 
-export const load: PageServerLoad = async ({ locals }) => {
+export const load: PageServerLoad = async ({ locals, url }) => {
   const { user } = await locals.safeGetSession();
 
   if (!user) redirect(303, "/sign-in");
@@ -82,8 +82,28 @@ export const load: PageServerLoad = async ({ locals }) => {
       footfall: [],
       footfallByLocation: {} as Record<string, number>,
       loadError: error.message,
+      myClaims: [],
+      businessResults: [],
+      claimSearch: "",
     };
   }
+
+  const claimSearch = url.searchParams.get("q")?.trim() ?? "";
+
+  const [{ data: myClaims }, { data: businessResults }] = await Promise.all([
+    locals.supabase
+      .from("business_claim_requests")
+      .select("id, business_id, status, message, created_at, businesses ( name )")
+      .eq("requester_user_id", user.id)
+      .order("created_at", { ascending: false }),
+    claimSearch
+      ? locals.supabase
+          .from("businesses")
+          .select("id, name, category, status")
+          .ilike("name", `%${claimSearch}%`)
+          .limit(20)
+      : Promise.resolve({ data: [] }),
+  ]);
 
   type FootfallRow = {
     visit_id: string;
@@ -125,6 +145,9 @@ export const load: PageServerLoad = async ({ locals }) => {
     footfall: footfall ?? [],
     footfallByLocation,
     loadError: null,
+    myClaims: myClaims ?? [],
+    businessResults: businessResults ?? [],
+    claimSearch,
   };
 };
 
@@ -192,6 +215,26 @@ export const actions: Actions = {
 
     if (error) return { noticeError: error.message };
     return { noticeSaved: true };
+  },
+
+  requestClaim: async ({ request, locals }) => {
+    const { user } = await locals.safeGetSession();
+    if (!user) redirect(303, "/sign-in");
+
+    const form = await request.formData();
+    const businessId = String(form.get("businessId") ?? "");
+    if (!businessId) return { claimError: "Missing business." };
+
+    const { error: claimError } = await locals.supabase
+      .from("business_claim_requests")
+      .insert({
+        business_id: businessId,
+        requester_user_id: user.id,
+        message: asText(form, "message", 500),
+      });
+
+    if (claimError) return { claimError: claimError.message };
+    return { claimRequested: true };
   },
 
   createInvitation: async ({ request, locals }) => {
