@@ -23,6 +23,7 @@ import { getFieldNotesForPlace } from "../../src/services/field_notes";
 import { getPlace } from "../../src/services/places";
 import { getCategoryStyle } from "../../src/theme/categoryStyles";
 import { theme } from "../../src/theme";
+import { TopoContours } from "../../src/components/TopoContours";
 
 export default function PlaceDetailScreen() {
   const { id: rawId } = useLocalSearchParams();
@@ -96,7 +97,10 @@ export default function PlaceDetailScreen() {
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={[styles.hero, { backgroundColor: category.bg }]}> 
-          <AppText style={styles.heroGlyph}>{category.icon}</AppText>
+          <TopoContours color={category.fg} />
+          <View style={styles.heroGlyph}>
+            <category.icon size={64} color={category.fg} strokeWidth={1.5} />
+          </View>
           <View style={styles.heroContent}>
             <AppText variant="label" style={{ color: category.fg }}>
               {place.displayCategory} · {place.distance}
@@ -193,7 +197,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: theme.spacing.lg,
     top: theme.spacing.lg,
-    fontSize: 64,
     opacity: 0.35,
   },
   heroContent: {

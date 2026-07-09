@@ -179,7 +179,8 @@ const styles = StyleSheet.create({
   chipRow: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: theme.spacing.sm,
+    columnGap: theme.spacing.sm,
+    rowGap: theme.spacing.sm,
     marginBottom: theme.spacing.md,
   },
   scroll: {

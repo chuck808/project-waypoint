@@ -1,51 +1,75 @@
-import type { Place, PlaceCategory } from "@waypoint/types";
 import {
-  facilityGlyphs,
-  facilityLabels,
-  walkerCharacteristicGlyphs,
-  walkerCharacteristicLabels,
-} from "@waypoint/ui";
+  BookOpen,
+  Coffee,
+  Compass,
+  CloudSun,
+  Backpack,
+  Droplets,
+  Dog,
+  Footprints,
+  Info,
+  Landmark,
+  MapPin,
+  Sandwich,
+  ShoppingBasket,
+  Tent,
+  Utensils,
+  type LucideIcon,
+} from "lucide-react-native";
+import type { Place, PlaceCategory } from "@waypoint/types";
+import { facilityLabels, walkerCharacteristicLabels } from "@waypoint/ui";
+import {
+  facilityIcons,
+  fallbackFactIcons,
+  walkerCharacteristicIcons,
+} from "../../theme/factIcons";
 
 type WalkerFact = {
   label: string;
-  icon: string;
+  icon: LucideIcon;
 };
 
 const categoryFacts: Record<PlaceCategory, WalkerFact[]> = {
   cafe: [
-    { label: "Boots welcome", icon: "🥾" },
-    { label: "Water refill", icon: "💧" },
-    { label: "Good rest stop", icon: "☕" },
+    { label: "Boots welcome", icon: Footprints },
+    { label: "Water refill", icon: Droplets },
+    { label: "Good rest stop", icon: Coffee },
   ],
   pub: [
-    { label: "Boots welcome", icon: "🥾" },
-    { label: "Dogs often welcome", icon: "🐕" },
-    { label: "Food after a walk", icon: "🍽" },
+    { label: "Boots welcome", icon: Footprints },
+    { label: "Dogs often welcome", icon: Dog },
+    { label: "Food after a walk", icon: Utensils },
   ],
   farm_shop: [
-    { label: "Local supplies", icon: "🧺" },
-    { label: "Good picnic stop", icon: "🥪" },
+    { label: "Local supplies", icon: ShoppingBasket },
+    { label: "Good picnic stop", icon: Sandwich },
   ],
   campsite: [
-    { label: "Overnight stop", icon: "⛺" },
-    { label: "Water nearby", icon: "💧" },
+    { label: "Overnight stop", icon: Tent },
+    { label: "Water nearby", icon: Droplets },
   ],
   outdoor_shop: [
-    { label: "Kit and repairs", icon: "🎒" },
-    { label: "Weather advice", icon: "🌦" },
+    { label: "Kit and repairs", icon: Backpack },
+    { label: "Weather advice", icon: CloudSun },
   ],
   attraction: [
-    { label: "Worth lingering", icon: "🏛" },
-    { label: "Good memory stop", icon: "📖" },
+    { label: "Worth lingering", icon: Landmark },
+    { label: "Good memory stop", icon: BookOpen },
   ],
-  other: [{ label: "Useful waypoint", icon: "📍" }],
+  other: [{ label: "Useful waypoint", icon: MapPin }],
 };
 
 export function getWalkerFacts(place: Place): WalkerFact[] {
   if (place.walkerCharacteristics?.length) {
     return place.walkerCharacteristics.map((key) => ({
-      label: walkerCharacteristicLabels[key as keyof typeof walkerCharacteristicLabels] ?? key,
-      icon: walkerCharacteristicGlyphs[key as keyof typeof walkerCharacteristicGlyphs] ?? "🥾",
+      label:
+        walkerCharacteristicLabels[
+          key as keyof typeof walkerCharacteristicLabels
+        ] ?? key,
+      icon:
+        walkerCharacteristicIcons[
+          key as keyof typeof walkerCharacteristicIcons
+        ] ?? fallbackFactIcons.characteristic,
     }));
   }
 
@@ -57,14 +81,16 @@ export function getWalkerFacts(place: Place): WalkerFact[] {
 export function getPlaceFacilities(place: Place): WalkerFact[] {
   if (place.facilities.length === 0) {
     return [
-      { label: "Information not confirmed yet", icon: "ℹ️" },
-      { label: "Check locally before relying on facilities", icon: "🧭" },
+      { label: "Information not confirmed yet", icon: Info },
+      { label: "Check locally before relying on facilities", icon: Compass },
     ];
   }
 
   return place.facilities.map((key) => ({
     label: facilityLabels[key as keyof typeof facilityLabels] ?? key,
-    icon: facilityGlyphs[key as keyof typeof facilityGlyphs] ?? "✓",
+    icon:
+      facilityIcons[key as keyof typeof facilityIcons] ??
+      fallbackFactIcons.facility,
   }));
 }
 

@@ -1,5 +1,4 @@
 import { StyleSheet, View } from "react-native";
-import { AppText } from "../../components";
 import { getCategoryStyle } from "../../theme/categoryStyles";
 import type { PlaceMapPoint } from "../../services/places";
 
@@ -9,6 +8,7 @@ type PlaceMarkerProps = {
 
 export function PlaceMarker({ place }: PlaceMarkerProps) {
   const category = getCategoryStyle(place.category);
+  const CategoryIcon = category.icon;
 
   return (
     <View
@@ -17,7 +17,7 @@ export function PlaceMarker({ place }: PlaceMarkerProps) {
         { backgroundColor: category.bg, borderColor: category.fg },
       ]}
     >
-      <AppText variant="label">{category.icon}</AppText>
+      <CategoryIcon size={16} color={category.fg} strokeWidth={2.25} />
     </View>
   );
 }

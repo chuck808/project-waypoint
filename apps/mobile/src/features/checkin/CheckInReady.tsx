@@ -1,4 +1,5 @@
 import { router } from "expo-router";
+import { Check } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 import { AppText, PrimaryButton } from "../../components";
 import { theme } from "../../theme";
@@ -46,7 +47,7 @@ export function CheckInReady({
       {resolution.stamp ? (
         <View style={styles.stampCard}>
           <View style={styles.stampMark}>
-            <AppText variant="label">✓</AppText>
+            <Check size={20} color={theme.colors.primary} strokeWidth={2.5} />
           </View>
 
           <View style={styles.stampContent}>

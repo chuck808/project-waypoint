@@ -1,3 +1,4 @@
+import { ShieldCheck } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 import { AppText, Card, InfoChip } from "../../components";
 import {
@@ -57,9 +58,14 @@ export function RecentFieldNotes({
           <Card key={note.id} style={styles.note}>
             <View style={styles.header}>
               <View style={styles.titleGroup}>
-                <AppText variant="heading">
-                  {meta.glyph} {note.categoryLabel}
-                </AppText>
+                <View style={styles.titleRow}>
+                  <meta.icon
+                    size={20}
+                    color={theme.colors.primary}
+                    strokeWidth={2}
+                  />
+                  <AppText variant="heading">{note.categoryLabel}</AppText>
+                </View>
                 <AppText variant="label" muted>
                   {fieldNoteSourceLabels[note.source]} · {formatObservedAt(note.observedAt)}
                 </AppText>
@@ -78,7 +84,7 @@ export function RecentFieldNotes({
                 label={fieldNoteSeverityLabels[note.severity]}
                 tone={severityTone(note.severity)}
               />
-              {note.source !== "explorer" ? <InfoChip label="Verified source" icon="✓" tone="success" /> : null}
+              {note.source !== "explorer" ? <InfoChip label="Verified source" icon={ShieldCheck} tone="success" /> : null}
             </View>
           </Card>
         );
@@ -101,6 +107,11 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     gap: theme.spacing.md,
+  },
+  titleRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing.sm,
   },
   titleGroup: {
     flex: 1,

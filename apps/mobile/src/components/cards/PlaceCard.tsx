@@ -1,4 +1,5 @@
 import { Link } from "expo-router";
+import { Footprints, MapPin } from "lucide-react-native";
 import { Pressable, StyleSheet, View } from "react-native";
 import { AppText } from "../AppText";
 import { InfoChip } from "../InfoChip";
@@ -12,12 +13,15 @@ type PlaceCardProps = {
 
 export function PlaceCard({ place }: PlaceCardProps) {
   const category = getCategoryStyle(place.category);
+  const CategoryIcon = category.icon;
 
   return (
     <Link href={`/places/${place.id}`} asChild>
-      <Pressable style={styles.card}>
+      <Pressable
+        style={({ pressed }) => [styles.card, pressed && styles.cardPressed]}
+      >
         <View style={[styles.swatch, { backgroundColor: category.bg }]}>
-          <AppText variant="heading">{category.icon}</AppText>
+          <CategoryIcon size={26} color={category.fg} strokeWidth={2} />
         </View>
 
         <View style={styles.content}>
@@ -32,9 +36,9 @@ export function PlaceCard({ place }: PlaceCardProps) {
 
           <View style={styles.chips}>
             {place.welcome ? (
-              <InfoChip label={place.welcome} icon="🥾" tone="success" />
+              <InfoChip label={place.welcome} icon={Footprints} tone="success" />
             ) : null}
-            <InfoChip label="Useful stop" icon="📍" />
+            <InfoChip label="Useful stop" icon={MapPin} />
           </View>
         </View>
       </Pressable>
@@ -52,6 +56,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
     gap: theme.spacing.md,
+    boxShadow: "0 2px 6px rgba(47, 51, 40, 0.05)",
+  },
+  cardPressed: {
+    opacity: 0.92,
+    transform: [{ scale: 0.99 }],
   },
   swatch: {
     width: 58,
@@ -75,7 +84,8 @@ const styles = StyleSheet.create({
   chips: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: theme.spacing.xs,
+    columnGap: theme.spacing.sm,
+    rowGap: theme.spacing.sm,
     marginTop: theme.spacing.xs,
   },
 });

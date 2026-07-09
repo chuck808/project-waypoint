@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Clock, Compass, Footprints, Mountain } from "lucide-react-native";
 import { useLocalSearchParams } from "expo-router";
 import { ScrollView, StyleSheet, View } from "react-native";
 import {
@@ -21,6 +22,7 @@ import { getTrail } from "../../src/services/trails";
 import { getTrailAdvice, getTrailFacts } from "../../src/features/trails/trailExperience";
 import { OfficialNotes } from "../../src/features/steward/OfficialNotes";
 import { theme } from "../../src/theme";
+import { TopoContours } from "../../src/components/TopoContours";
 import { confirmSwitchWalk, useActiveWalk } from "../../src/features/walks";
 
 export default function TrailDetailScreen() {
@@ -112,7 +114,10 @@ export default function TrailDetailScreen() {
     <Screen>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.hero}>
-          <AppText style={styles.heroGlyph}>⛰</AppText>
+          <TopoContours />
+          <View style={styles.heroGlyph}>
+            <Mountain size={64} color={theme.colors.primary} strokeWidth={1.5} />
+          </View>
           <View style={styles.heroContent}>
             <AppText variant="label" muted>
               {trail.region}
@@ -134,9 +139,9 @@ export default function TrailDetailScreen() {
           <Card>
             <AppText muted>{trail.description}</AppText>
             <View style={styles.chipGrid}>
-              <InfoChip label={trail.type.replace("_", " ")} icon="🧭" tone="accent" />
-              <InfoChip label={trail.difficulty} icon="🥾" tone="success" />
-              <InfoChip label={trail.duration} icon="⏱" />
+              <InfoChip label={trail.type.replace("_", " ")} icon={Compass} tone="accent" />
+              <InfoChip label={trail.difficulty} icon={Footprints} tone="success" />
+              <InfoChip label={trail.duration} icon={Clock} />
             </View>
           </Card>
         </DetailSection>
@@ -192,6 +197,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.primarySoft,
     justifyContent: "flex-end",
+    overflow: "hidden",
     marginBottom: theme.spacing.xl,
     padding: theme.spacing.lg,
     overflow: "hidden",
@@ -200,7 +206,6 @@ const styles = StyleSheet.create({
     position: "absolute",
     right: theme.spacing.lg,
     top: theme.spacing.lg,
-    fontSize: 64,
     opacity: 0.35,
   },
   heroContent: {
@@ -213,7 +218,8 @@ const styles = StyleSheet.create({
   chipGrid: {
     flexDirection: "row",
     flexWrap: "wrap",
-    gap: theme.spacing.sm,
+    columnGap: theme.spacing.sm,
+    rowGap: theme.spacing.sm,
     marginTop: theme.spacing.sm,
   },
   actions: {

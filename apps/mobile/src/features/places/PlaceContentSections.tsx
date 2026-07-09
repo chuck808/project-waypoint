@@ -1,3 +1,4 @@
+import { Leaf } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 import { AppText, Card, DetailSection, InfoChip, KeyValueRow } from "../../components";
 import { theme } from "../../theme";
@@ -43,7 +44,7 @@ export function PlaceContentSections({ content }: PlaceContentSectionsProps) {
             {content.bestSeasons?.length ? (
               <View style={styles.chips}>
                 {content.bestSeasons.map((season) => (
-                  <InfoChip key={season} icon="◌" label={season} />
+                  <InfoChip key={season} icon={Leaf} label={season} />
                 ))}
               </View>
             ) : null}

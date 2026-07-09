@@ -1,3 +1,4 @@
+import { Check } from "lucide-react-native";
 import { StyleSheet, View } from "react-native";
 import { AppText } from "../AppText";
 import { theme } from "../../theme";
@@ -11,7 +12,7 @@ export function PassportStamp({ stamp }: PassportStampProps) {
   return (
     <View style={styles.card}>
       <View style={styles.mark}>
-        <AppText variant="label">✓</AppText>
+        <Check size={20} color={theme.colors.primary} strokeWidth={2.5} />
       </View>
 
       <View style={styles.content}>

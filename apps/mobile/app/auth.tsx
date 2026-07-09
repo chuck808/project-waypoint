@@ -49,7 +49,7 @@ export default function AuthScreen() {
   }
 
   return (
-    <Screen>
+    <Screen centered>
       <Section>
         <AppText variant="label" muted>
           Waypoint account

@@ -1,4 +1,11 @@
 import { router } from "expo-router";
+import {
+  BookOpen,
+  Footprints,
+  Leaf,
+  Map as MapIcon,
+  type LucideIcon,
+} from "lucide-react-native";
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { AppText, Card, PrimaryButton, Screen } from "../../components";
@@ -9,7 +16,7 @@ type OnboardingStep = {
   eyebrow: string;
   title: string;
   body: string;
-  illustration: string;
+  illustration: LucideIcon;
   points: string[];
 };
 
@@ -19,7 +26,7 @@ const steps: OnboardingStep[] = [
     title: "Make every walk worth remembering.",
     body:
       "Waypoint helps you discover meaningful walks, check in along the way, and keep the moments that made the day special.",
-    illustration: "🥾",
+    illustration: Footprints,
     points: ["Discover walks and places", "Check in with QR waypoints", "Build a walking Passport"],
   },
   {
@@ -27,7 +34,7 @@ const steps: OnboardingStep[] = [
     title: "Find walks with places built in.",
     body:
       "Routes, cafés, viewpoints, heritage spots and practical stops all support the walk rather than distract from it.",
-    illustration: "🗺️",
+    illustration: MapIcon,
     points: ["Browse trails", "Find walker-friendly places", "See what is useful nearby"],
   },
   {
@@ -35,7 +42,7 @@ const steps: OnboardingStep[] = [
     title: "Your Passport grows as you explore.",
     body:
       "Check-ins become a timeline of walks, visits and memories you can return to long after the mud has dried.",
-    illustration: "📖",
+    illustration: BookOpen,
     points: ["Record visits", "Keep moments", "Reconnect with favourite walks"],
   },
   {
@@ -43,7 +50,7 @@ const steps: OnboardingStep[] = [
     title: "Leave the next walker better informed.",
     body:
       "A quick Field Note can warn someone about a boggy stretch, a wobbly bridge, or a café that welcomes muddy boots.",
-    illustration: "🌿",
+    illustration: Leaf,
     points: ["Report current conditions", "Share factual tips", "Help places and walkers"],
   },
 ];
@@ -99,7 +106,11 @@ export function OnboardingScreen() {
 
         <Card style={styles.card}>
           <View style={styles.illustrationWrap}>
-            <AppText style={styles.illustration}>{step.illustration}</AppText>
+            <step.illustration
+              size={40}
+              color={theme.colors.primary}
+              strokeWidth={1.75}
+            />
           </View>
 
           <AppText variant="label" muted style={styles.eyebrow}>
@@ -173,9 +184,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     marginBottom: theme.spacing.sm,
-  },
-  illustration: {
-    fontSize: 40,
   },
   eyebrow: {
     textTransform: "uppercase",

@@ -1,22 +1,30 @@
+/**
+ * Waypoint type scale.
+ *
+ * Playfair Display carries headings (the "field journal" voice from the
+ * design library); Inter carries body and UI text. Weight lives in the
+ * font family name, not fontWeight -- mixing the two makes Android fall
+ * back to a synthetic bold of the wrong file.
+ */
 export const typography = {
   title: {
-    fontSize: 36,
+    fontFamily: "PlayfairDisplay_700Bold",
+    fontSize: 34,
     lineHeight: 42,
-    fontWeight: "700" as const,
   },
   heading: {
-    fontSize: 28,
+    fontFamily: "PlayfairDisplay_700Bold",
+    fontSize: 26,
     lineHeight: 34,
-    fontWeight: "700" as const,
   },
   body: {
-    fontSize: 18,
-    lineHeight: 28,
-    fontWeight: "400" as const,
+    fontFamily: "Inter_400Regular",
+    fontSize: 17,
+    lineHeight: 26,
   },
   label: {
-    fontSize: 16,
+    fontFamily: "Inter_600SemiBold",
+    fontSize: 15,
     lineHeight: 22,
-    fontWeight: "600" as const,
   },
 };

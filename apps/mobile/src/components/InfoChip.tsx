@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import type { LucideIcon } from "lucide-react-native";
 import { StyleSheet, View, type ViewStyle } from "react-native";
 import { AppText } from "./AppText";
 import { theme } from "../theme";
@@ -7,7 +7,7 @@ type InfoChipTone = "neutral" | "success" | "warning" | "accent" | "error";
 
 type InfoChipProps = {
   label: string;
-  icon?: ReactNode;
+  icon?: LucideIcon;
   tone?: InfoChipTone;
 };
 
@@ -19,10 +19,12 @@ const toneStyles: Record<InfoChipTone, ViewStyle> = {
   error: { backgroundColor: theme.colors.errorSoft },
 };
 
-export function InfoChip({ label, icon, tone = "neutral" }: InfoChipProps) {
+export function InfoChip({ label, icon: Icon, tone = "neutral" }: InfoChipProps) {
   return (
     <View style={[styles.chip, toneStyles[tone]]}>
-      {icon ? <AppText variant="label">{icon}</AppText> : null}
+      {Icon ? (
+        <Icon size={14} color={theme.colors.text} strokeWidth={2} />
+      ) : null}
       <AppText variant="label" style={styles.label}>
         {label}
       </AppText>
@@ -36,8 +38,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: theme.spacing.xs,
     alignSelf: "flex-start",
-    paddingVertical: theme.spacing.xs,
-    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: 6,
+    paddingHorizontal: theme.spacing.sm + 2,
     borderRadius: theme.radius.pill,
     borderWidth: 1,
     borderColor: theme.colors.border,

@@ -35,7 +35,7 @@ export default function Index() {
 
   if (isLoading || onboardingComplete === null) {
     return (
-      <Screen>
+      <Screen centered>
         <AppText muted>Preparing Waypoint…</AppText>
       </Screen>
     );
