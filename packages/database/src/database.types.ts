@@ -459,6 +459,53 @@ export type Database = {
         }
         Relationships: []
       }
+      points_of_interest: {
+        Row: {
+          category: string
+          created_at: string
+          description: string | null
+          id: string
+          location: unknown
+          name: string
+          source: string
+          status: string
+          trail_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          location: unknown
+          name: string
+          source?: string
+          status?: string
+          trail_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          description?: string | null
+          id?: string
+          location?: unknown
+          name?: string
+          source?: string
+          status?: string
+          trail_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "points_of_interest_trail_id_fkey"
+            columns: ["trail_id"]
+            isOneToOne: false
+            referencedRelation: "trails"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -838,6 +885,53 @@ export type Database = {
           type?: string | null
         }
         Relationships: []
+      }
+      points_of_interest_map_points: {
+        Row: {
+          category: string | null
+          created_at: string | null
+          description: string | null
+          id: string | null
+          latitude: number | null
+          longitude: number | null
+          name: string | null
+          source: string | null
+          status: string | null
+          trail_id: string | null
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          latitude?: never
+          longitude?: never
+          name?: string | null
+          source?: string | null
+          status?: string | null
+          trail_id?: string | null
+        }
+        Update: {
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          id?: string | null
+          latitude?: never
+          longitude?: never
+          name?: string | null
+          source?: string | null
+          status?: string | null
+          trail_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "points_of_interest_trail_id_fkey"
+            columns: ["trail_id"]
+            isOneToOne: false
+            referencedRelation: "trails"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       walk_experience_check_ins: {
         Row: {

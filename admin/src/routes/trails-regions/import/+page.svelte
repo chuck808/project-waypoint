@@ -8,10 +8,21 @@
     Select,
     Fileupload,
     Radio,
+    Checkbox,
   } from "flowbite-svelte";
 
   export let data;
   export let form;
+
+  const POI_CATEGORIES = [
+    { value: "viewpoint", name: "Viewpoint" },
+    { value: "waterfall", name: "Waterfall" },
+    { value: "historical_site", name: "Historical site" },
+    { value: "honesty_box", name: "Honesty box" },
+    { value: "picnic_spot", name: "Picnic spot" },
+    { value: "landmark", name: "Landmark" },
+    { value: "other", name: "Other" },
+  ];
 
   let target: "new" | "existing" = "new";
   let existingTrailId = data.trails[0]?.id ?? "";
@@ -22,8 +33,8 @@
 <p class="text-xs font-semibold uppercase tracking-wide text-text-muted">Trails & Regions</p>
 <h1 class="mt-1 text-2xl font-bold">Import a GPX route.</h1>
 <p class="mt-1 text-sm text-text-muted">
-  Upload a .gpx file to preview its distance, elevation and shape before creating or updating a
-  trail. Only the route itself is imported -- named waypoints in the file aren't saved.
+  Upload a .gpx file to preview its distance, elevation and shape, plus any named waypoints, before
+  creating or updating a trail.
 </p>
 
 {#if form?.previewError}
@@ -68,6 +79,7 @@
 
     <form method="POST" action="?/confirm" class="mt-6 space-y-4">
       <input type="hidden" name="pointsJson" value={form.preview.pointsJson} />
+      <input type="hidden" name="waypointsJson" value={form.preview.waypointsJson} />
       <input type="hidden" name="distanceKm" value={form.preview.distanceKm} />
       <input type="hidden" name="elevationGainM" value={form.preview.elevationGainM} />
       <input type="hidden" name="trailType" value={form.preview.trailType} />
@@ -107,6 +119,30 @@
           This replaces the selected trail's stored route only -- name, description and stats are
           left as they are.
         </p>
+      {/if}
+
+      {#if form.preview.waypoints.length > 0}
+        <fieldset class="space-y-3 border-t border-border pt-4">
+          <legend class="text-sm font-medium">
+            Waypoints found in this file ({form.preview.waypoints.length})
+          </legend>
+          <p class="text-xs text-text-muted">
+            Imported as draft points of interest linked to this trail -- review and publish from
+            the Points of Interest page.
+          </p>
+          {#each form.preview.waypoints as wp, i}
+            <div class="flex items-center gap-3">
+              <Checkbox name={`poi-${i}-selected`} checked class="shrink-0" />
+              <span class="min-w-0 flex-1 truncate text-sm">{wp.name}</span>
+              <Select
+                class="w-40 shrink-0"
+                name={`poi-${i}-category`}
+                items={POI_CATEGORIES}
+                value="landmark"
+              />
+            </div>
+          {/each}
+        </fieldset>
       {/if}
 
       <Button type="submit">Confirm import</Button>

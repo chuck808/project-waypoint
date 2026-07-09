@@ -7,7 +7,19 @@ import {
   toLineStringWkt,
   inferTrailType,
   type GpxPoint,
+  type GpxWaypoint,
 } from "$lib/gpx";
+import { toPointWkt } from "$lib/geo";
+
+const POI_CATEGORIES = [
+  "viewpoint",
+  "waterfall",
+  "historical_site",
+  "honesty_box",
+  "picnic_spot",
+  "landmark",
+  "other",
+] as const;
 
 function slugify(value: string) {
   return value
@@ -62,6 +74,8 @@ export const actions: Actions = {
         pointCount: stats.pointCount,
         trailType,
         pointsJson: JSON.stringify(thinned),
+        waypoints: parsed.waypoints,
+        waypointsJson: JSON.stringify(parsed.waypoints),
       },
     };
   },
@@ -80,6 +94,7 @@ export const actions: Actions = {
     }
 
     const route = toLineStringWkt(points);
+    let trailId: string;
 
     if (target === "new") {
       const name = String(form.get("name") ?? "").trim();
@@ -89,28 +104,64 @@ export const actions: Actions = {
       const elevationGainM = Number(form.get("elevationGainM"));
       const trailType = String(form.get("trailType") ?? "circular");
 
-      const { error } = await locals.supabase.from("trails").insert({
-        name,
-        slug: slugify(name),
-        description: String(form.get("description") ?? "").trim() || null,
-        status: "draft",
-        difficulty: "moderate",
-        trail_type: trailType === "out_and_back" ? "out_and_back" : "circular",
-        distance_km: Number.isFinite(distanceKm) ? distanceKm : null,
-        elevation_gain_m: Number.isFinite(elevationGainM) ? Math.round(elevationGainM) : null,
-        route,
-      });
+      const { data, error } = await locals.supabase
+        .from("trails")
+        .insert({
+          name,
+          slug: slugify(name),
+          description: String(form.get("description") ?? "").trim() || null,
+          status: "draft",
+          difficulty: "moderate",
+          trail_type: trailType === "out_and_back" ? "out_and_back" : "circular",
+          distance_km: Number.isFinite(distanceKm) ? distanceKm : null,
+          elevation_gain_m: Number.isFinite(elevationGainM) ? Math.round(elevationGainM) : null,
+          route,
+        })
+        .select("id")
+        .single();
 
+      if (error || !data) return fail(400, { confirmError: error?.message ?? "Could not create trail." });
+      trailId = data.id;
+    } else {
+      const { error } = await locals.supabase.from("trails").update({ route }).eq("id", target);
       if (error) return fail(400, { confirmError: error.message });
-      return { imported: true };
+      trailId = target;
     }
 
-    const { error } = await locals.supabase
-      .from("trails")
-      .update({ route })
-      .eq("id", target);
+    const waypointsJson = String(form.get("waypointsJson") ?? "[]");
+    let waypoints: GpxWaypoint[];
+    try {
+      waypoints = JSON.parse(waypointsJson);
+      if (!Array.isArray(waypoints)) waypoints = [];
+    } catch {
+      waypoints = [];
+    }
 
-    if (error) return fail(400, { confirmError: error.message });
+    const poisToInsert = waypoints
+      .map((wp, i) => {
+        const selected = form.get(`poi-${i}-selected`) === "on";
+        if (!selected) return null;
+
+        const category = String(form.get(`poi-${i}-category`) ?? "landmark");
+        return {
+          trail_id: trailId,
+          name: wp.name,
+          description: wp.description,
+          category: POI_CATEGORIES.includes(category as (typeof POI_CATEGORIES)[number])
+            ? category
+            : "landmark",
+          location: toPointWkt(wp.lat, wp.lon),
+          status: "draft",
+          source: "gpx_import",
+        };
+      })
+      .filter((poi): poi is NonNullable<typeof poi> => poi !== null);
+
+    if (poisToInsert.length > 0) {
+      const { error: poiError } = await locals.supabase.from("points_of_interest").insert(poisToInsert);
+      if (poiError) return fail(400, { confirmError: poiError.message });
+    }
+
     return { imported: true };
   },
 };

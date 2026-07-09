@@ -3,6 +3,7 @@ declare module "gpx-parser-builder" {
     $: { lat: number; lon: number };
     ele?: number;
     name?: string;
+    desc?: string;
   }
 
   export interface GpxTrackSegment {

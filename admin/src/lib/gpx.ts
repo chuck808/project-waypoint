@@ -6,10 +6,18 @@ export interface GpxPoint {
   ele: number | null;
 }
 
+export interface GpxWaypoint {
+  name: string;
+  description: string | null;
+  lat: number;
+  lon: number;
+}
+
 export interface ParsedGpx {
   name: string | null;
   description: string | null;
   points: GpxPoint[];
+  waypoints: GpxWaypoint[];
 }
 
 const EARTH_RADIUS_KM = 6371;
@@ -35,10 +43,23 @@ export function parseGpx(gpxText: string): ParsedGpx | null {
     }
   }
 
+  const waypoints: GpxWaypoint[] = [];
+  for (const wpt of gpx.wpt ?? []) {
+    const name = wpt.name?.trim();
+    if (!name) continue; // an unnamed coordinate isn't an identifiable point of interest
+
+    const lat = Number(wpt.$.lat);
+    const lon = Number(wpt.$.lon);
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) continue;
+
+    waypoints.push({ name, description: wpt.desc?.trim() || null, lat, lon });
+  }
+
   return {
     name: track?.name ?? gpx.metadata?.name ?? null,
     description: track?.desc ?? gpx.metadata?.desc ?? null,
     points,
+    waypoints,
   };
 }
 

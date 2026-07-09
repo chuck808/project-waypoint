@@ -15,6 +15,7 @@
     { href: "/businesses", label: "Businesses" },
     { href: "/field-notes", label: "Field Notes" },
     { href: "/trails-regions", label: "Trails & Regions" },
+    { href: "/points-of-interest", label: "Points of Interest" },
     { href: "/claims", label: "Claims" },
     { href: "/users", label: "Users" },
     { href: "/check-ins", label: "Check-ins" },
