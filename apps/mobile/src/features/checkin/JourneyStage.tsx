@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Animated } from "react-native";
+import { Animated, Platform } from "react-native";
 
 type JourneyStageProps = {
   stageKey: string;
@@ -19,16 +19,20 @@ export function JourneyStage({ stageKey, children }: JourneyStageProps) {
     opacity.setValue(0);
     translateY.setValue(8);
 
+    // The web runtime has no native animation driver, so JS-driven
+    // animation is used there to avoid the unsupported-driver warning.
+    const useNativeDriver = Platform.OS !== "web";
+
     Animated.parallel([
       Animated.timing(opacity, {
         toValue: 1,
         duration: 220,
-        useNativeDriver: true,
+        useNativeDriver,
       }),
       Animated.timing(translateY, {
         toValue: 0,
         duration: 220,
-        useNativeDriver: true,
+        useNativeDriver,
       }),
     ]).start();
   }, [stageKey, opacity, translateY]);

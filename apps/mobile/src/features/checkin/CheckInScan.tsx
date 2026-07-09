@@ -40,8 +40,7 @@ export function CheckInScan({ onCode }: CheckInScanProps) {
     return (
       <View style={styles.permissionCard}>
         <AppText>
-          Waypoint uses your camera to read the code on the sign at each
-          place.
+          Waypoint uses your camera to read the code on the sign at each place.
         </AppText>
 
         <PrimaryButton onPress={requestPermission}>Allow camera</PrimaryButton>
@@ -75,9 +74,9 @@ export function CheckInScan({ onCode }: CheckInScanProps) {
         onBarcodeScanned={handleBarcode}
       />
 
-      <View style={styles.aimFrame} pointerEvents="none" />
+      <View style={[styles.aimFrame, { pointerEvents: "none" }]} />
 
-      <View style={styles.hint} pointerEvents="none">
+      <View style={[styles.hint, { pointerEvents: "none" }]}>
         <AppText variant="label" muted>
           Point your camera at the Waypoint sign
         </AppText>

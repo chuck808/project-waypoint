@@ -23,7 +23,7 @@ export function TopoContours({
   opacity = 0.12,
 }: TopoContoursProps) {
   return (
-    <View pointerEvents="none" style={[StyleSheet.absoluteFill, { opacity }]}>
+    <View style={[StyleSheet.absoluteFill, { opacity, pointerEvents: "none" }]}>
       <Svg
         width="100%"
         height="100%"

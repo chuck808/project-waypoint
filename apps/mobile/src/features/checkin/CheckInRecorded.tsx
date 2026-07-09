@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Animated, StyleSheet, View } from "react-native";
+import { Animated, Platform, StyleSheet, View } from "react-native";
 import * as Haptics from "expo-haptics";
 import { AppText, PrimaryButton, PrimaryLink } from "../../components";
 import { FieldNotePrompt } from "../field_notes";
@@ -33,17 +33,21 @@ export function CheckInRecorded({
     // a successful scan, timed to the visual celebration.
     Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
 
+    // The web runtime has no native animation driver, so JS-driven
+    // animation is used there to avoid the unsupported-driver warning.
+    const useNativeDriver = Platform.OS !== "web";
+
     Animated.parallel([
       Animated.spring(scale, {
         toValue: 1,
         friction: 4,
         tension: 60,
-        useNativeDriver: true,
+        useNativeDriver,
       }),
       Animated.timing(opacity, {
         toValue: 1,
         duration: 250,
-        useNativeDriver: true,
+        useNativeDriver,
       }),
     ]).start();
   }, [scale, opacity]);
