@@ -124,7 +124,19 @@
           </TableBodyCell>
           <TableBodyCell><Badge color={statusColor(trail.status)}>{trail.status}</Badge></TableBodyCell>
           <TableBodyCell>
-            <Button size="xs" color="alternative" onclick={() => openEditTrail(trail.id)}>Edit</Button>
+            <div class="flex gap-2">
+              <Button size="xs" color="alternative" onclick={() => openEditTrail(trail.id)}>Edit</Button>
+              <form
+                method="POST"
+                action="?/deleteTrail"
+                on:submit={(e) => {
+                  if (!confirm(`Delete "${trail.name}"? This can't be undone.`)) e.preventDefault();
+                }}
+              >
+                <input type="hidden" name="id" value={trail.id} />
+                <Button size="xs" color="red" type="submit">Delete</Button>
+              </form>
+            </div>
           </TableBodyCell>
         </TableBodyRow>
       {:else}
@@ -155,7 +167,19 @@
           <TableBodyCell class="text-text-muted">{region.region_type}</TableBodyCell>
           <TableBodyCell><Badge color={statusColor(region.status)}>{region.status}</Badge></TableBodyCell>
           <TableBodyCell>
-            <Button size="xs" color="alternative" onclick={() => openEditRegion(region.id)}>Edit</Button>
+            <div class="flex gap-2">
+              <Button size="xs" color="alternative" onclick={() => openEditRegion(region.id)}>Edit</Button>
+              <form
+                method="POST"
+                action="?/deleteRegion"
+                on:submit={(e) => {
+                  if (!confirm(`Delete "${region.name}"? This can't be undone.`)) e.preventDefault();
+                }}
+              >
+                <input type="hidden" name="id" value={region.id} />
+                <Button size="xs" color="red" type="submit">Delete</Button>
+              </form>
+            </div>
           </TableBodyCell>
         </TableBodyRow>
       {:else}

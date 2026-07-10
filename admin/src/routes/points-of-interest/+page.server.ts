@@ -122,4 +122,14 @@ export const actions: Actions = {
     if (error) return { poiError: error.message };
     return { poiSaved: true };
   },
+
+  deletePoi: async ({ request, locals }) => {
+    const form = await request.formData();
+    const id = String(form.get("id") ?? "");
+    if (!id) return { poiError: "Missing point of interest." };
+
+    const { error } = await locals.supabase.from("points_of_interest").delete().eq("id", id);
+    if (error) return { poiError: error.message };
+    return { poiSaved: true };
+  },
 };

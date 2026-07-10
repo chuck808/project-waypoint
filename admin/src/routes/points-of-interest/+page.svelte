@@ -93,7 +93,19 @@
           <TableBodyCell class="text-text-muted">{poi.source}</TableBodyCell>
           <TableBodyCell><Badge color={statusColor(poi.status)}>{poi.status}</Badge></TableBodyCell>
           <TableBodyCell>
-            <Button size="xs" color="alternative" onclick={() => openEditPoi(poi.id)}>Edit</Button>
+            <div class="flex gap-2">
+              <Button size="xs" color="alternative" onclick={() => openEditPoi(poi.id)}>Edit</Button>
+              <form
+                method="POST"
+                action="?/deletePoi"
+                on:submit={(e) => {
+                  if (!confirm(`Delete "${poi.name}"? This can't be undone.`)) e.preventDefault();
+                }}
+              >
+                <input type="hidden" name="id" value={poi.id} />
+                <Button size="xs" color="red" type="submit">Delete</Button>
+              </form>
+            </div>
           </TableBodyCell>
         </TableBodyRow>
       {:else}

@@ -201,4 +201,24 @@ export const actions: Actions = {
 
     return { trailSaved: true };
   },
+
+  deleteTrail: async ({ request, locals }) => {
+    const form = await request.formData();
+    const id = String(form.get("id") ?? "");
+    if (!id) return { trailError: "Missing trail." };
+
+    const { error } = await locals.supabase.from("trails").delete().eq("id", id);
+    if (error) return { trailError: error.message };
+    return { trailSaved: true };
+  },
+
+  deleteRegion: async ({ request, locals }) => {
+    const form = await request.formData();
+    const id = String(form.get("id") ?? "");
+    if (!id) return { regionError: "Missing region." };
+
+    const { error } = await locals.supabase.from("regions").delete().eq("id", id);
+    if (error) return { regionError: error.message };
+    return { regionSaved: true };
+  },
 };
