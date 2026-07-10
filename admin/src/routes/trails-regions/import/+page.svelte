@@ -26,6 +26,13 @@
 
   let target: "new" | "existing" = "new";
   let existingTrailId = data.trails[0]?.id ?? "";
+
+  // One entry per detected waypoint, defaulting to selected. A bare
+  // `checked` (no bind:) on Flowbite's Checkbox passes a static literal --
+  // Checkbox.svelte's `checked = $bindable(false)` then gets re-pushed to
+  // `true` on every re-render of this component, fighting the user's
+  // click. Binding to per-index state here is what actually lets it toggle.
+  let waypointSelected: boolean[] = (form?.preview?.waypoints ?? []).map(() => true);
 </script>
 
 <svelte:head><title>Import GPX — Waypoint Admin</title></svelte:head>
@@ -132,7 +139,7 @@
           </p>
           {#each form.preview.waypoints as wp, i}
             <div class="flex items-center gap-3">
-              <Checkbox name={`poi-${i}-selected`} checked class="shrink-0" />
+              <Checkbox name={`poi-${i}-selected`} bind:checked={waypointSelected[i]} class="shrink-0" />
               <span class="min-w-0 flex-1 truncate text-sm">{wp.name}</span>
               <Select
                 class="w-40 shrink-0"
