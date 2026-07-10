@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @plugin 'flowbite/plugin';
+@plugin '@tailwindcss/forms';
 @custom-variant dark (&:where(.dark, .dark *));
 
 @source "../node_modules/flowbite-svelte/dist";
@@ -51,4 +52,20 @@
 body {
   background-color: var(--color-background);
   color: var(--color-text);
+}
+
+/*
+ * Flowbite's Checkbox/Radio apply a static bg-gray-100 utility class as
+ * their unchecked background -- but Tailwind's cascade layers put that
+ * utilities-layer class ABOVE @tailwindcss/forms' base-layer `:checked`
+ * override (background-color: currentColor), regardless of selector
+ * specificity. The checkmark/dot background-image *does* render
+ * correctly on click -- it's just a white mark on a near-white gray
+ * background, invisible in practice. This unlayered rule (same pattern
+ * as `body` above) wins over both layers unconditionally.
+ */
+input[type="checkbox"]:checked,
+input[type="radio"]:checked {
+  background-color: var(--color-primary-600);
+  border-color: var(--color-primary-600);
 }
